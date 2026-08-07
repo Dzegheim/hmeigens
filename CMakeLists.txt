@@ -34,6 +34,14 @@ if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         -static -static-libgcc -static-libstdc++)
 endif()
 
+# Testing is performed with Catch2 (https://github.com/catchorg/Catch2).
+# Below are the options to build the tests.
+option(HMEIGENS_BUILD_TESTS "Build the test suite." ON)
+
+if(HMEIGENS_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION}")
 message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
