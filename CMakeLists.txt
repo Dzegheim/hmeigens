@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.21)
 
 project(HMEigenS
@@ -33,6 +32,19 @@ if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_options(${PROJECT_NAME_LOWER}_flags INTERFACE
         -static -static-libgcc -static-libstdc++)
 endif()
+
+# Selector for the floating-point type in include/hmeigens/scalar.hpp.
+# The header documents why double is the default.
+set(HMEIGENS_SCALAR "double" CACHE STRING "Floating-point type for all computation: float, double, longdouble.")
+set_property(CACHE HMEIGENS_SCALAR PROPERTY STRINGS float double longdouble)
+if(HMEIGENS_SCALAR STREQUAL "float")
+    target_compile_definitions(${PROJECT_NAME_LOWER}_flags INTERFACE HMEIGENS_SCALAR_FLOAT)
+elseif(HMEIGENS_SCALAR STREQUAL "longdouble")
+    target_compile_definitions(${PROJECT_NAME_LOWER}_flags INTERFACE HMEIGENS_SCALAR_LONGDOUBLE)
+elseif(NOT HMEIGENS_SCALAR STREQUAL "double")
+    message(FATAL_ERROR "HMEIGENS_SCALAR must be float, double or longdouble (got '${HMEIGENS_SCALAR}').")
+endif()
+message(STATUS "Floating-point type selected: ${HMEIGENS_SCALAR}.")
 
 # Testing is performed with Catch2 (https://github.com/catchorg/Catch2).
 # Below are the options to build the tests.
