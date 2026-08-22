@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(HMEigenS
-    VERSION 0.2.0
+    VERSION 0.3.0
     DESCRIPTION "HMEigenS (Householder Matrix Eigenvalues Solver) is a program that searches the eigenvalues of arbitrary square matrices."
     LANGUAGES CXX)
 
@@ -41,17 +41,14 @@ target_link_libraries(${PROJECT_NAME_LOWER}_core PRIVATE ${PROJECT_NAME_LOWER}_f
 
 # Selector for the floating-point type in include/hmeigens/scalar.hpp.
 # The header documents why double is the default.
-set(HMEIGENS_SCALAR "double" CACHE STRING "Floating-point type for all computation: float, double, longdouble.")
-set_property(CACHE HMEIGENS_SCALAR PROPERTY STRINGS float double longdouble)
-
+set(HMEIGENS_SCALAR "double" CACHE STRING "Floating-point type for all computation: float, double.")
+set_property(CACHE HMEIGENS_SCALAR PROPERTY STRINGS float double)
 # Public, cannot be private, as scalar.hpp needs these to choose a floating-point type.
 # Anything that includes it must be built with the same choice as the library, to prevent mismatches.
 if(HMEIGENS_SCALAR STREQUAL "float")
     target_compile_definitions(${PROJECT_NAME_LOWER}_core PUBLIC HMEIGENS_SCALAR_FLOAT)
-elseif(HMEIGENS_SCALAR STREQUAL "longdouble")
-    target_compile_definitions(${PROJECT_NAME_LOWER}_core PUBLIC HMEIGENS_SCALAR_LONGDOUBLE)
 elseif(NOT HMEIGENS_SCALAR STREQUAL "double")
-    message(FATAL_ERROR "HMEIGENS_SCALAR must be float, double or longdouble (got '${HMEIGENS_SCALAR}').")
+    message(FATAL_ERROR "HMEIGENS_SCALAR must be float or double (got '${HMEIGENS_SCALAR}').")
 endif()
 message(STATUS "Floating-point type selected: ${HMEIGENS_SCALAR}.")
 
