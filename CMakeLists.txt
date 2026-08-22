@@ -46,6 +46,11 @@ elseif(NOT HMEIGENS_SCALAR STREQUAL "double")
 endif()
 message(STATUS "Floating-point type selected: ${HMEIGENS_SCALAR}.")
 
+# Source code for the project.
+add_library(${PROJECT_NAME_LOWER}_core STATIC src/hmeigens/complex_parse.cpp)
+target_include_directories(${PROJECT_NAME_LOWER}_core PUBLIC include)
+target_link_libraries(${PROJECT_NAME_LOWER}_core PRIVATE ${PROJECT_NAME_LOWER}_flags) # Private to prevent carrying over flags.
+
 # Testing is performed with Catch2 (https://github.com/catchorg/Catch2).
 # Below are the options to build the tests.
 option(HMEIGENS_BUILD_TESTS "Build the test suite." ON)
