@@ -33,23 +33,27 @@ if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         -static -static-libgcc -static-libstdc++)
 endif()
 
+# Source code for the project.
+add_library(${PROJECT_NAME_LOWER}_core STATIC src/hmeigens/complex_parse.cpp)
+target_include_directories(${PROJECT_NAME_LOWER}_core PUBLIC include)
+# Private to prevent carrying over flags.
+target_link_libraries(${PROJECT_NAME_LOWER}_core PRIVATE ${PROJECT_NAME_LOWER}_flags)
+
 # Selector for the floating-point type in include/hmeigens/scalar.hpp.
 # The header documents why double is the default.
 set(HMEIGENS_SCALAR "double" CACHE STRING "Floating-point type for all computation: float, double, longdouble.")
 set_property(CACHE HMEIGENS_SCALAR PROPERTY STRINGS float double longdouble)
+
+# Public, cannot be private, as scalar.hpp needs these to choose a floating-point type.
+# Anything that includes it must be built with the same choice as the library, to prevent mismatches.
 if(HMEIGENS_SCALAR STREQUAL "float")
-    target_compile_definitions(${PROJECT_NAME_LOWER}_flags INTERFACE HMEIGENS_SCALAR_FLOAT)
+    target_compile_definitions(${PROJECT_NAME_LOWER}_core PUBLIC HMEIGENS_SCALAR_FLOAT)
 elseif(HMEIGENS_SCALAR STREQUAL "longdouble")
-    target_compile_definitions(${PROJECT_NAME_LOWER}_flags INTERFACE HMEIGENS_SCALAR_LONGDOUBLE)
+    target_compile_definitions(${PROJECT_NAME_LOWER}_core PUBLIC HMEIGENS_SCALAR_LONGDOUBLE)
 elseif(NOT HMEIGENS_SCALAR STREQUAL "double")
     message(FATAL_ERROR "HMEIGENS_SCALAR must be float, double or longdouble (got '${HMEIGENS_SCALAR}').")
 endif()
 message(STATUS "Floating-point type selected: ${HMEIGENS_SCALAR}.")
-
-# Source code for the project.
-add_library(${PROJECT_NAME_LOWER}_core STATIC src/hmeigens/complex_parse.cpp)
-target_include_directories(${PROJECT_NAME_LOWER}_core PUBLIC include)
-target_link_libraries(${PROJECT_NAME_LOWER}_core PRIVATE ${PROJECT_NAME_LOWER}_flags) # Private to prevent carrying over flags.
 
 # Testing is performed with Catch2 (https://github.com/catchorg/Catch2).
 # Below are the options to build the tests.
