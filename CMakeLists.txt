@@ -52,6 +52,21 @@ elseif(NOT HMEIGENS_SCALAR STREQUAL "double")
 endif()
 message(STATUS "Floating-point type selected: ${HMEIGENS_SCALAR}.")
 
+# Coverage options.
+# Used for testing to verify what parts of the code ACTUALLY run.
+# Note: It's only for GCC and Clang.
+option(HMEIGENS_COVERAGE "Build with coverage for testing." OFF)
+if(HMEIGENS_COVERAGE)
+    # Check the appropriate compiler is used.
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        message(FATAL_ERROR "HMEIGENS_COVERAGE requires GCC or Clang.")
+    endif()
+    # Private for compile but public for linking.
+    # Coverage only makes sense for -O0 optimization.
+    target_compile_options(${PROJECT_NAME_LOWER}_core PRIVATE --coverage -O0)
+    target_link_options(${PROJECT_NAME_LOWER}_core PUBLIC --coverage)
+endif()
+
 # Testing is performed with Catch2 (https://github.com/catchorg/Catch2).
 # Below are the options to build the tests.
 option(HMEIGENS_BUILD_TESTS "Build the test suite." ON)
