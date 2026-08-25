@@ -9,6 +9,11 @@ Version 0.2.0 is recorded from git history.
 ## [Unreleased]
 ### Added
 - **Comprehensive test for the parser.**
+- **Coverage build.** New flag `-DHMEIGENS_COVERAGE=ON` to compile with [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html). GCC and Clang only.
+
+### Fixed
+- **Parser: numbers with a trailing decimal point are now accepted.** The form `6.` is valid in C++ and was rejected by the parser. It is now accepted.
+
 
 ## [0.3.0] - 2026-08-22
 ### Removed

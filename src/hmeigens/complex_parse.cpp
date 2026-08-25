@@ -47,9 +47,9 @@ namespace hmeigens {
     hmeigens::Complex parseComplex(std::string_view input) {
         // String for a generic number with optional exponential part.
         // Structure:
-        // (?:\d+(?:\.\d+)?|\.\d+)  123 OR 123.45 OR .45 
+        // (?:\d+(?:\.\d*)?|\.\d+)  123 OR 123.45 OR .45 OR 123.
         // (?:[eE][\+\-]?\d+)?      Optional exponent
-        static const std::string unsignedNumber {R"((?:\d+(?:\.\d+)?|\.\d+)(?:[eE][\+\-]?\d+)?)"};
+        static const std::string unsignedNumber {R"((?:\d+(?:\.\d*)?|\.\d+)(?:[eE][\+\-]?\d+)?)"};
         // String for the sign of a number
         static const std::string sign {R"([\+\-])"};
         // String for an (optionally) signed number.
