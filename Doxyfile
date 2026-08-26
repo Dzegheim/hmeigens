@@ -1,0 +1,7 @@
+PROJECT_NAME     = HMEigenS
+PROJECT_NUMBER   = 0.4.0
+PROJECT_BRIEF    = "Householder Matrix Eigenvalues Solver"
+INPUT            = include docs CHANGELOG.md
+RECURSIVE        = YES
+OUTPUT_DIRECTORY = doxygen
+GENERATE_LATEX   = NO
