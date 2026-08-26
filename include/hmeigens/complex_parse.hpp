@@ -11,6 +11,8 @@ namespace hmeigens {
     struct ParseError : public std::invalid_argument {
         
         explicit ParseError(std::string_view input) : std::invalid_argument("Unable to parse a complex number from \"" + std::string{input} + "\".") {}
+
+        explicit ParseError(std::string_view input, std::string_view errorMessage) : std::invalid_argument("Unable to parse a complex number from \"" + std::string{input} + "\".\n---> "+ std::string{errorMessage}) {}
     };
 
     [[nodiscard]] hmeigens::Complex parseComplex(std::string_view input);

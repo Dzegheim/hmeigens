@@ -7,13 +7,18 @@ Versions before 0.3.0 were not tagged.
 Version 0.2.0 is recorded from git history.
 
 ## [Unreleased]
+
+
+## [0.4.0] - 2026-08-26
 ### Added
-- **Comprehensive test for the parser.**
+- **Comprehensive testing for the parser.**
 - **Coverage build.** New flag `-DHMEIGENS_COVERAGE=ON` to compile with [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html). GCC and Clang only.
+- **String holding the selected type.** In `scalar.hpp` the new variable `hmeigens::scalarType` now allows for runtime naming of the selected Scalar type.
 
 ### Fixed
 - **Parser: numbers with a trailing decimal point are now accepted.** The form `6.` is valid in C++ and was rejected by the parser. It is now accepted.
-
+- **Parser: out of range values are now correctly reported as such.** A number too large or too small for the chosen `Scalar` is now properly handled, a message names the part that caused the issue and the type.
+    - Added a second constructor to `hmeigens::ParseError` with an error message as a parameter.
 
 ## [0.3.0] - 2026-08-22
 ### Removed

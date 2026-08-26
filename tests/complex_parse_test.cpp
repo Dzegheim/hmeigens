@@ -5,10 +5,15 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
+#include <catch2/matchers/catch_matchers_exception.hpp>
 
+// This is a helper function to test whether the text is parsed correctly.
 // Apparently Catch2's floating-point matchers always compare in double (see catch_matchers_floating_point.hpp).
 // Source: https://github.com/catchorg/Catch2/blob/v3.15.3/docs/comparing-floating-point-numbers.md#withinabs
 static void checkParse (std::string_view testString, double expectedReal, double expectedImag) {
+    // CAPTURE prints the captured value at the time of capture if the test doesn't pass.
+    CAPTURE(testString);
     const auto z = hmeigens::parseComplex(testString);
     // This function only checks against doubles.
     // It's what Catch2 would do anyway, so here it's explicit.
@@ -29,7 +34,29 @@ static void checkParse (std::string_view testString, double expectedReal, double
     );
 }
 
-TEST_CASE("Parse test for a real number.", "[parse]") {
+// This is a helper function to test whether text that is not supposed to be parsed:
+// - throws;
+// - throws the correct exception;
+// - the thrown error contains the offending text;
+// - if the error must contain a specific substring, it is present.
+// The optional alsoContains is used to verify the last point.
+// If it is left at its default value, matching it always returns true, so tests that don't care for it are unaffected.
+static void checkRejects (std::string_view testString, std::string_view alsoContains = {""}) {
+    // CAPTURE prints the captured value at the time of capture if the test doesn't pass.
+    CAPTURE(testString, alsoContains);
+    CHECK_THROWS_MATCHES(
+        hmeigens::parseComplex(testString),
+        hmeigens::ParseError,
+        Catch::Matchers::MessageMatches(
+            Catch::Matchers::ContainsSubstring(std::string{testString}) &&
+            Catch::Matchers::ContainsSubstring(std::string{alsoContains})
+        )
+    );
+}
+
+
+
+TEST_CASE("Parse test: real number.", "[parse]") {
     // GIVEN a plain real number
     // WHEN  it is parsed
     // THEN  its result is the expected number with no imaginary part
@@ -44,7 +71,7 @@ TEST_CASE("Parse test for a real number.", "[parse]") {
     checkParse ("+6.7", 6.7, 0.0);
 }
 
-TEST_CASE("Parse test for exponential form.", "[parse]") {
+TEST_CASE("Parse test: exponential form.", "[parse]") {
     // GIVEN a real number in exponential form
     // WHEN  it is parsed
     // THEN  its result is the expected number with no imaginary part
@@ -59,7 +86,7 @@ TEST_CASE("Parse test for exponential form.", "[parse]") {
     checkParse ("1e+4", 10000.0, 0.0);
 }
 
-TEST_CASE("Parse test for an imaginary number.", "[parse]") {
+TEST_CASE("Parse test: imaginary number.", "[parse]") {
     // GIVEN an imaginary number in algebraic form
     // WHEN  it is parsed
     // THEN  its result is the expected number with no real part
@@ -75,7 +102,7 @@ TEST_CASE("Parse test for an imaginary number.", "[parse]") {
     checkParse ("3.i", 0.0, 3.0);
 }
 
-TEST_CASE("Parse test for algebraic form.", "[parse]") {
+TEST_CASE("Parse test: algebraic form.", "[parse]") {
     // GIVEN a complex number in algebraic form
     // WHEN  it is parsed
     // THEN  its result is the expected number
@@ -87,7 +114,7 @@ TEST_CASE("Parse test for algebraic form.", "[parse]") {
     checkParse ("2.1-6e-3i", 2.1, -6e-3);
 }
 
-TEST_CASE("Parse test for ordered pair.", "[parse]") {
+TEST_CASE("Parse test: ordered pair.", "[parse]") {
     // GIVEN an ordered pair a,b
     // WHEN  it is parsed
     // THEN  its result is the expected number
@@ -95,35 +122,49 @@ TEST_CASE("Parse test for ordered pair.", "[parse]") {
     checkParse ("0,4", 0.0, 4.0);
     checkParse ("4,0", 4.0, 0.0);
     checkParse ("-4,-8e2", -4.0, -800.0);
-
 }
 
-TEST_CASE("Rejection test for text that is not a complex number.", "[parse]") {
+TEST_CASE("Parse rejection test: text that is not a complex number.", "[parse]") {
     // GIVEN  text that is not a complex number in an accepted form
     // WHEN   it is parsed
-    // THEN   a ParseError is thrown
-    CHECK_THROWS_AS(hmeigens::parseComplex(""), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("  "), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("."), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex(".."), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex(".i"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("ii"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("1.1.i"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("1.1."), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("i.1"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex(".e2"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("+"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("1,2,3"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("1.2.3"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("1-2"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("-1+2"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("6,7i"), hmeigens::ParseError);
+    // THEN   a ParseError is thrown with a message carrying the entire offending text
+    checkRejects("");
+    checkRejects("  ");
+    checkRejects(".");
+    checkRejects("..");
+    checkRejects(".i");
+    checkRejects("ii");
+    checkRejects("1.1.i");
+    checkRejects("1.1.");
+    checkRejects("i.1");
+    checkRejects(".e2");
+    checkRejects("+");
+    checkRejects("1.2.3");
+    checkRejects("1.2.3i");
+    checkRejects("1,2,3");
+    checkRejects("1-2");
+    checkRejects("-1+2");
+    checkRejects("6,7i");
+    checkRejects("1.🤬i");
+    checkRejects("悪い入力");
+    checkRejects("𓃥𓃠𓆉𓆏𓃯𓃱𓃰");
+    checkRejects("𓂀𓂀𓂀𓋹𓁈𓃠𓆃☥𓅓𓆣");
 }
 
-TEST_CASE("Rejection test for not yet implemented but planned forms.", "[parse][future]") {
+
+TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
+    // GIVEN  a value that is out of range
+    // WHEN   it is parsed
+    // THEN   a ParseError is thrown with a message carrying the entire offending text and the "out of range" information
+    checkRejects("1e400", "out of range");
+    checkRejects("3+1e1000i", "1e1000 is out of range");
+}
+
+TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[parse][future]") {
     // GIVEN  text that is a complex number in a not yet accepted form
     // WHEN   it is parsed
     // THEN   a ParseError is thrown
-    CHECK_THROWS_AS(hmeigens::parseComplex("(1,3)"), hmeigens::ParseError);
-    CHECK_THROWS_AS(hmeigens::parseComplex("2i-3"), hmeigens::ParseError);
+    checkRejects("(1,3)");
+    checkRejects("2+i3");
+    checkRejects("2i-3");
 }

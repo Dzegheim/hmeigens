@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(HMEigenS
-    VERSION 0.3.0
+    VERSION 0.4.0
     DESCRIPTION "HMEigenS (Householder Matrix Eigenvalues Solver) is a program that searches the eigenvalues of arbitrary square matrices."
     LANGUAGES CXX)
 

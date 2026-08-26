@@ -1,6 +1,7 @@
 #ifndef HMEIGENS_SCALAR_HPP
 #define HMEIGENS_SCALAR_HPP
 #include <complex>
+#include <string>
 
 namespace hmeigens {
     // A compile-time switch between float, double.
@@ -11,8 +12,10 @@ namespace hmeigens {
     // NOTE: long double is unsupported (see CHANGELOG.md v0.3.0).
     #if defined(HMEIGENS_SCALAR_FLOAT)
     using Scalar = float;
+    inline const std::string scalarType = "float";
     #else
     using Scalar = double;
+    inline const std::string scalarType = "double";
     #endif
 
     using Complex = std::complex<Scalar>;
