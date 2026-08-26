@@ -7,6 +7,7 @@
 
 #include <stdexcept>     // For std::invalid_argument
 #include <string_view>
+#include <string>
 
 namespace hmeigens {
     /// @brief Exception thrown when text cannot be parsed as a complex number.
