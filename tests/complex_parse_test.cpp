@@ -54,8 +54,6 @@ static void checkRejects (std::string_view testString, std::string_view alsoCont
     );
 }
 
-
-
 TEST_CASE("Parse test: real number.", "[parse]") {
     // GIVEN a plain real number
     // WHEN  it is parsed
@@ -151,7 +149,6 @@ TEST_CASE("Parse rejection test: text that is not a complex number.", "[parse]")
     checkRejects("𓂀𓂀𓂀𓋹𓁈𓃠𓆃☥𓅓𓆣");
 }
 
-
 TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
     // GIVEN  a value that is out of range
     // WHEN   it is parsed
@@ -167,4 +164,11 @@ TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[pars
     checkRejects("(1,3)");
     checkRejects("2+i3");
     checkRejects("2i-3");
+}
+
+TEST_CASE("Parse rejection test: ParseError can be catched as a std::invalid_argument exception.", "[parse]") {
+    // GIVEN  something that doesn't recognize ParseError
+    // WHEN   an invalid input is parsed
+    // THEN   the exception can still be caught as std::invalid_argument
+    CHECK_THROWS_AS(hmeigens::parseComplex("?!?"), std::invalid_argument);
 }
