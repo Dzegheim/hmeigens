@@ -13,7 +13,8 @@ namespace hmeigens {
     /// @brief Exception thrown when text cannot be parsed as a complex number.
     ///
     /// Inherits from `std::invalid_argument`, so it can be caught as that if it's not caught specifically as `ParseError`.
-    struct ParseError : public std::invalid_argument {
+    class ParseError : public std::invalid_argument {
+        public:
         /// @brief One-argument constructor: parsed text **cannot** be interpreted into a complex number.
         ///
         /// @param input The offending text that was not successfully parsed.
