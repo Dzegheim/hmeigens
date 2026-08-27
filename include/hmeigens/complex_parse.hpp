@@ -47,7 +47,7 @@ namespace hmeigens {
     /// @todo Accept suffixes, digit separators, and hex.
     /// @param input The text to read.
     /// @return An `hmeigens::Complex` corresponding to the `input`.
-    /// @throws ParseError if the `input` cannot be read into a complex number.
+    /// @throws ParseError if `input` cannot be read into a complex number.
     [[nodiscard]] hmeigens::Complex parseComplex(std::string_view input);
 }
 
