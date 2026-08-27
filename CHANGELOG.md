@@ -6,8 +6,12 @@ Versions before 0.3.0 were not tagged.
 
 Version 0.2.0 is recorded from git history.
 
-## [Unreleased]
-
+## [0.5.0] - 2026-08-27
+### Added
+- **SquareMatrix class.** Features:
+    - constructor with safety check to ensure a matrix has a reasonable size (no `0`, no absurdly large numbers).
+    - getter for the size.
+- **maxMatrixSize constant.** Used to check that a requested matrix does not break `std::size_t` boundaries.
 
 ## [0.4.0] - 2026-08-26
 ### Added

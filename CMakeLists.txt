@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(HMEigenS
-    VERSION 0.4.0
+    VERSION 0.5.0
     DESCRIPTION "HMEigenS (Householder Matrix Eigenvalues Solver) is a program that searches the eigenvalues of arbitrary square matrices."
     LANGUAGES CXX)
 
@@ -34,7 +34,7 @@ if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 # Source code for the project.
-add_library(${PROJECT_NAME_LOWER}_core STATIC src/hmeigens/complex_parse.cpp)
+add_library(${PROJECT_NAME_LOWER}_core STATIC src/hmeigens/complex_parse.cpp src/hmeigens/square_matrix.cpp)
 target_include_directories(${PROJECT_NAME_LOWER}_core PUBLIC include)
 # Private to prevent carrying over flags.
 target_link_libraries(${PROJECT_NAME_LOWER}_core PRIVATE ${PROJECT_NAME_LOWER}_flags)
