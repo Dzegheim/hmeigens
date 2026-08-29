@@ -16,6 +16,41 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Static libraries by default.
 set(BUILD_SHARED_LIBS OFF)
 
+# Tests to check whether some tools are available that may not be.
+include(CheckSourceCompiles)
+# Verify std::from_chars can read from double.
+check_source_compiles(CXX "
+    #include <charconv>
+    int main() {
+        const char* s = \"1.5\";
+        double d{};
+        std::from_chars(s, s+3, d);
+    }
+" HMEIGENS_HAS_CHARCONV)
+# Verify std::format is available.
+check_source_compiles(CXX "
+    #include <format>
+    int main() {
+        std::format(\"{}\", 1);
+    }
+" HMEIGENS_HAS_FORMAT)
+if(NOT (HMEIGENS_HAS_CHARCONV AND HMEIGENS_HAS_FORMAT))
+    set(MISSING "")
+    if(NOT HMEIGENS_HAS_CHARCONV)
+        list(APPEND MISSING "  - std::from_chars for floating-point types")
+    endif()
+    if(NOT HMEIGENS_HAS_FORMAT)
+        list(APPEND MISSING "  - std::format")
+    endif()
+    list(JOIN MISSING "\n" MISSING_INFO)
+    message(FATAL_ERROR
+        "HMEigenS requires std::format and std::from_chars for floating-point numbers.\n"
+        "Detected compiler (${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}).\n"
+        "Missing:\n"
+        "${MISSING_INFO}")
+endif()
+
+
 # Interface for the compile flags for the library.
 add_library(${PROJECT_NAME_LOWER}_flags INTERFACE)
 

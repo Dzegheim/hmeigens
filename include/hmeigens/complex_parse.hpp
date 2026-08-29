@@ -5,9 +5,8 @@
 
 #include "hmeigens/scalar.hpp"
 
-#include <stdexcept>     // For std::invalid_argument
 #include <string_view>
-#include <string>
+#include <stdexcept>     // For std::invalid_argument
 
 namespace hmeigens {
     /// @brief Exception thrown when text cannot be parsed as a complex number.
@@ -18,12 +17,12 @@ namespace hmeigens {
         /// @brief One-argument constructor: parsed text **cannot** be interpreted into a complex number.
         ///
         /// @param input The offending text that was not successfully parsed.
-        explicit ParseError(std::string_view input) : std::invalid_argument("Unable to parse a complex number from \"" + std::string{input} + "\".") {}
+        explicit ParseError(std::string_view input);
         /// @brief Two-argument constructor: parsed text **can** be read into a complex number, but something about it failed, specified by the second argument.
         ///
         /// @param input The offending text that was not successfully parsed.
         /// @param errorMessage An additional text supplied to provide additional information on the type of failure the parser experienced.
-        explicit ParseError(std::string_view input, std::string_view errorMessage) : std::invalid_argument("Unable to parse a complex number from \"" + std::string{input} + "\".\n---> "+ std::string{errorMessage}) {}
+        explicit ParseError(std::string_view input, std::string_view errorMessage);
     };
 
     /// @brief Converts text into a corresponding complex number.

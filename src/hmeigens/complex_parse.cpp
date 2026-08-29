@@ -1,9 +1,12 @@
 #include "hmeigens/complex_parse.hpp"
 
 #include <string>
+#include <string_view>
 #include <regex>
 #include <charconv>       // For std::from_chars
 #include <system_error>   // For std::errc
+#include <stdexcept>      // For std::invalid_argument
+#include <format>
 
 namespace hmeigens {
 
@@ -38,14 +41,15 @@ namespace hmeigens {
                         // Full offending text.
                         fullInput,
                         // Error message constructed to signify out of range.
-                        "Input " +
-                        // The piece of offending text that caused the problem.
-                        submatch.str() +
-                        " is out of range for Scalar type " + hmeigens::scalarType + "."
+                        // The piece of offending text that caused the problem is submatch.str().
+                        std::format("Input {0} is out of range for Scalar type {1}.", submatch.str(), hmeigens::scalarType)
                     };
                 }
                 // This should never be reached because of previous checks, but better safe than sorry.
-                throw ParseError{fullInput, "The text " + submatch.str() + " caused the problem. This is a bug in HMEigenS, not in your input. Please report it on GitHub with the text you entered. Thank you."};
+                throw ParseError{
+                    // Full offending text.
+                    fullInput,
+                    std::format("The text {0} caused the problem. This is a bug in HMEigenS, not in your input. Please report it on GitHub with the text you entered. Thank you.", submatch.str())};
             }
             return value;
         }
@@ -124,4 +128,8 @@ namespace hmeigens {
         // If nothing matches an exception is thrown.
         throw hmeigens::ParseError{input};
     }
+
+    ParseError::ParseError(std::string_view input) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".", input)) {}
+
+    ParseError::ParseError(std::string_view input, std::string_view errorMessage) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".\n---> {1}", input, errorMessage)) {}
 }

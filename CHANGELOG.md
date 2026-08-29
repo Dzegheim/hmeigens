@@ -13,6 +13,8 @@ Version 0.2.0 is recorded from git history.
 
 ### Changed
 - **SquareMatrix construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
+- **Manual string concatenation replaced with `std::format` in the exception constructors all around the code.** 
+- **Improved error message for `std::length_error` in `square_matrix.cpp`.**
 
 ## [0.5.0] - 2026-08-27
 ### Added
