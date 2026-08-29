@@ -7,6 +7,10 @@ Versions before 0.3.0 were not tagged.
 Version 0.2.0 is recorded from git history.
 
 ## [Unreleased]
+### Added
+- **Tests for SquareMatrix.** Specifically:
+     - A `SquareMatrix` built with a valid size reports it correctly with `size()`.
+
 ### Changed
 - **SquareMatrix construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
 
