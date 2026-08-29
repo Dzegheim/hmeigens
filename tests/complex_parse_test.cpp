@@ -1,7 +1,9 @@
 #include "hmeigens/constants.hpp"
 #include "hmeigens/complex_parse.hpp"
+#include "hmeigens/detail/text_escape.hpp"
 
 #include <string_view>
+using namespace std::string_view_literals;      // For ""sv
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -50,6 +52,23 @@ static void checkRejects (std::string_view testString, std::string_view alsoCont
         Catch::Matchers::MessageMatches(
             Catch::Matchers::ContainsSubstring(std::string{testString}) &&
             Catch::Matchers::ContainsSubstring(std::string{alsoContains})
+        )
+    );
+}
+
+// This is a helper function to test whether output containing special characters is rejected correctly and if the error message is accurate.
+// Inputs are edited by hmeigens::detail::escape.
+// The expected text is provided by the caller instead of being computed with detail::escape.
+static void checkRejectsEscaped (std::string_view testString, std::string_view expectedInMessage) {
+    // Capturing testString here makes no sense.
+    // Printing testString breaks diagnostics messages.
+    CAPTURE(expectedInMessage);
+    CHECK_THROWS_MATCHES(
+        hmeigens::parseComplex(testString),
+        hmeigens::ParseError,
+        Catch::Matchers::MessageMatches(
+            // Not checking for testString here, but for the message with the escaped characters.
+            Catch::Matchers::ContainsSubstring(std::string{expectedInMessage})
         )
     );
 }
@@ -149,18 +168,48 @@ TEST_CASE("Parse rejection test: text that is not a complex number.", "[parse]")
     checkRejects("𓂀𓂀𓂀𓋹𓁈𓃠𓆃☥𓅓𓆣");
 }
 
+TEST_CASE("Parse rejection test: text with special characters.", "[parse]") {
+    // GIVEN  text with special characters
+    // WHEN   it is parsed
+    // THEN   a ParseError is thrown with a message carrying the entire offending text correctly escaped
+    checkRejectsEscaped("\0"sv, R"(\000)");
+    checkRejectsEscaped("\0" "1"sv, R"(\0001)");
+    checkRejectsEscaped("\x00" "2"sv, R"(\0002)");
+    checkRejectsEscaped("\04"sv, R"(\004)");
+    checkRejectsEscaped("6\0.7i"sv, R"(6\000.7i)");
+    checkRejectsEscaped("6.\04i"sv, R"(6.\004i)");
+    checkRejectsEscaped("6.2\0"sv, R"(6.2\000)");
+    checkRejectsEscaped("\"3.3\""sv, R"(\"3.3\")");
+    checkRejectsEscaped("8\n.9i"sv, R"(8\n.9i)");
+    checkRejectsEscaped("2\ti"sv, R"(2\ti)");
+    checkRejectsEscaped("3\r6"sv, R"(3\r6)");
+    checkRejectsEscaped("\177"sv, R"(\177)");
+
+    checkRejectsEscaped(R"(\0)", R"(\\0)");
+    checkRejectsEscaped(R"(6\0.7i)", R"(6\\0.7i)");
+    checkRejectsEscaped(R"(6.\04i)", R"(6.\\04i)");
+    checkRejectsEscaped(R"(6.2\0)", R"(6.2\\0)");
+    checkRejectsEscaped(R"(8\n.9i)", R"(8\\n.9i)");
+    checkRejectsEscaped(R"(\04)", R"(\\04)");
+    checkRejectsEscaped(R"(\"3.3\")", R"(\\\"3.3\\\")");
+}
+
 TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
     // GIVEN  a value that is out of range
     // WHEN   it is parsed
     // THEN   a ParseError is thrown with a message carrying the entire offending text and the "out of range" information
     checkRejects("1e400", "out of range");
+    checkRejects("1e-500", "out of range");
     checkRejects("3+1e1000i", "1e1000 is out of range");
+    checkRejects("1.8e-9999-i", "1.8e-9999 is out of range");
 }
 
 TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[parse][future]") {
     // GIVEN  text that is a complex number in a not yet accepted form
     // WHEN   it is parsed
     // THEN   a ParseError is thrown
+    checkRejects(" 1,2");
+    checkRejects(" 3,4 ");
     checkRejects("(1,3)");
     checkRejects("2+i3");
     checkRejects("2i-3");

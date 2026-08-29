@@ -69,7 +69,13 @@ if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 # Source code for the project.
-add_library(${PROJECT_NAME_LOWER}_core STATIC src/hmeigens/complex_parse.cpp src/hmeigens/square_matrix.cpp)
+set(HMEIGENS_SOURCES
+    complex_parse.cpp
+    square_matrix.cpp
+    detail/text_escape.cpp)
+list(TRANSFORM HMEIGENS_SOURCES PREPEND src/hmeigens/)
+
+add_library(${PROJECT_NAME_LOWER}_core STATIC ${HMEIGENS_SOURCES})
 target_include_directories(${PROJECT_NAME_LOWER}_core PUBLIC include)
 # Private to prevent carrying over flags.
 target_link_libraries(${PROJECT_NAME_LOWER}_core PRIVATE ${PROJECT_NAME_LOWER}_flags)

@@ -10,6 +10,10 @@ Version 0.2.0 is recorded from git history.
 ### Added
 - **Tests for SquareMatrix.** Specifically:
      - A `SquareMatrix` built with a valid size reports it correctly with `size()`.
+- **Tests for the parser's handling of special characters.** Specifically:
+     - Control characters, backslash, and quotes in rejected input are escaped.
+     - Values that underflow the `Scalar`. Previous testing for out-of-range only would test for overflow.
+
 
 ### Changed
 - **SquareMatrix construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
@@ -17,7 +21,7 @@ Version 0.2.0 is recorded from git history.
 - **Improved error message for `std::length_error` in `square_matrix.cpp`.**
 
 ### Fixed
-- **Control characters in input text no longer break error messages.** Before a `\0` or `\n` would not be escaped and, when properly rejected by the parser, would be printed literally in the diagnostics messages, breaking them. Printable controls characters are rendered as `\n` or `\t`, unprintable ones as three digit octals. Non-ASCII text is still handled like before, so that someone passing an emoji or another special character will still see it in the output.
+- **Control characters in input text no longer break error messages.** Before a `\0` or `\n` would not be escaped and, when properly rejected by the parser, would be printed literally in the diagnostics messages, breaking them. Printable control characters are rendered as `\n` or `\t`, unprintable ones as three digit octals. Non-ASCII text is still handled like before, so that someone passing an emoji or another special character will still see it in the output.
 
 ## [0.5.0] - 2026-08-27
 ### Added
