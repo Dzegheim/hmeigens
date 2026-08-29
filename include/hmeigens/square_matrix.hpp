@@ -41,7 +41,7 @@ namespace hmeigens {
         /// @throws std::invalid_argument if `size` is `0`.
         /// @throws std::length_error if `size * size` cannot be represented within `std::size_t`.
         /// @throws std::length_error if `size * size` exceeds the maximum allowed number of elements.
-        /// @throws std::runtime_error if the memory could not be allocated on the machine, and nests std::bad_alloc.
+        /// @throws std::bad_alloc if the memory could not be allocated on the machine.
         explicit SquareMatrix (std::size_t size);
 
         /// @brief A getter for the size of the matrix.
