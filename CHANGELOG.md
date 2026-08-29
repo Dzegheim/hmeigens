@@ -16,6 +16,9 @@ Version 0.2.0 is recorded from git history.
 - **Manual string concatenation replaced with `std::format` in the exception constructors all around the code.** 
 - **Improved error message for `std::length_error` in `square_matrix.cpp`.**
 
+### Fixed
+- **Control characters in input text no longer break error messages.** Before a `\0` or `\n` would not be escaped and, when properly rejected by the parser, would be printed literally in the diagnostics messages, breaking them. Printable controls characters are rendered as `\n` or `\t`, unprintable ones as three digit octals. Non-ASCII text is still handled like before, so that someone passing an emoji or another special character will still see it in the output.
+
 ## [0.5.0] - 2026-08-27
 ### Added
 - **SquareMatrix class.** Features:
