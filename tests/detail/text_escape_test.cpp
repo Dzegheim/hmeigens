@@ -34,6 +34,7 @@ TEST_CASE("Displayable chars test: special characters are correctly identified."
     // Last unsigned char.
     CHECK (hmeigens::detail::isDisplayable(255));
 }
+
 // ----------------------------------------------------------
 // The tests below assume hmeigens::detail::isDisplayable is trusted in its output, as it is tested independently above.
 // ----------------------------------------------------------
@@ -75,6 +76,8 @@ TEST_CASE ("Escape test: backslash and quotes are escaped.", "[text_escape]") {
     // GIVEN text containing backslashes and quotes
     // WHEN  it is ran through hmeigens::detail::escape
     // THEN  the characters are correctly escaped
+    //
+    // Both cases below are tested in both spellings, since both spellings appear in the parser tests.
     checkEscape("\\"sv, R"(\\)");
     checkEscape(R"(\)", R"(\\)");
     checkEscape("\""sv, R"(\")");
