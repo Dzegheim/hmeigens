@@ -10,6 +10,7 @@ namespace hmeigens::detail {
     // Inside there is a cast because std::isprint has two overloads. This code uses the one in <locale>.
     // According to https://en.cppreference.com/cpp/locale/isprint it needs a std::ctype.
     bool isDisplayable (unsigned char toCheck) {
+        // The first non-ASCII is 0x80 (128 decimal, 0200 octal).
         return toCheck >= 0x80 || std::isprint(static_cast<char>(toCheck), std::locale::classic());
     }
 
