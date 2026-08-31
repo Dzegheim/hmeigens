@@ -39,36 +39,24 @@ static void checkParse (std::string_view testString, double expectedReal, double
 // This is a helper function to test whether text that is not supposed to be parsed:
 // - throws;
 // - throws the correct exception;
-// - the thrown error contains the offending text;
+// - the thrown error contains the escaped offending text;
 // - if the error must contain a specific substring, it is present.
 // The optional alsoContains is used to verify the last point.
 // If it is left at its default value, matching it always returns true, so tests that don't care for it are unaffected.
 static void checkRejects (std::string_view testString, std::string_view alsoContains = {""}) {
+    // The function hmeigens::detail::escape is tested independently in another file, therefore its behaviour is not verified again here.
+    const std::string escaped = hmeigens::detail::escape(testString);
     // CAPTURE prints the captured value at the time of capture if the test doesn't pass.
-    CAPTURE(testString, alsoContains);
-    CHECK_THROWS_MATCHES(
-        hmeigens::parseComplex(testString),
-        hmeigens::ParseError,
-        Catch::Matchers::MessageMatches(
-            Catch::Matchers::ContainsSubstring(std::string{testString}) &&
-            Catch::Matchers::ContainsSubstring(std::string{alsoContains})
-        )
-    );
-}
-
-// This is a helper function to test whether output containing special characters is rejected correctly and if the error message is accurate.
-// Inputs are edited by hmeigens::detail::escape.
-// The expected text is provided by the caller instead of being computed with detail::escape.
-static void checkRejectsEscaped (std::string_view testString, std::string_view expectedInMessage) {
     // Capturing testString here makes no sense.
-    // Printing testString breaks diagnostics messages.
-    CAPTURE(expectedInMessage);
+    // Printing testString breaks diagnostics messages if they have control characters in them.
+    CAPTURE(escaped, alsoContains);
     CHECK_THROWS_MATCHES(
         hmeigens::parseComplex(testString),
         hmeigens::ParseError,
         Catch::Matchers::MessageMatches(
-            // Not checking for testString here, but for the message with the escaped characters.
-            Catch::Matchers::ContainsSubstring(std::string{expectedInMessage})
+            Catch::Matchers::ContainsSubstring(std::string{alsoContains})
+            &&
+            Catch::Matchers::ContainsSubstring(escaped)
         )
     );
 }
@@ -141,10 +129,30 @@ TEST_CASE("Parse test: ordered pair.", "[parse]") {
     checkParse ("-4,-8e2", -4.0, -800.0);
 }
 
+TEST_CASE("ParseError test: the offending text is escaped in the message.", "[parse]") {
+    // GIVEN text with control characters
+    // WHEN  a hmeigens::ParseError is built with it
+    // THEN  the message carries the escaped text
+    CHECK_THAT(
+        hmeigens::ParseError("4\0.2"sv).what(),
+        Catch::Matchers::ContainsSubstring(R"(4\000.2)")
+    );
+    CHECK_THAT(
+        hmeigens::ParseError("What\twent\nwrong?"sv, "The eggs were raw."sv).what(),
+        Catch::Matchers::ContainsSubstring(R"(What\twent\nwrong?)")
+    );
+    // The errorMessage is not escaped, callers escape their text.
+    // This is to catch if it is escaped twice.
+    CHECK_THAT(
+        hmeigens::ParseError("", R"(These\ncharacters\\would\"be\\adoubled.)").what(),
+        Catch::Matchers::ContainsSubstring(R"(These\ncharacters\\would\"be\\adoubled.)")
+    );
+}
+
 TEST_CASE("Parse rejection test: text that is not a complex number.", "[parse]") {
-    // GIVEN  text that is not a complex number in an accepted form
-    // WHEN   it is parsed
-    // THEN   a ParseError is thrown with a message carrying the entire offending text
+    // GIVEN text that is not a complex number in an accepted form
+    // WHEN  it is parsed
+    // THEN  a ParseError is thrown with a message carrying the escaped offending text
     checkRejects("");
     checkRejects("  ");
     checkRejects(".");
@@ -166,38 +174,18 @@ TEST_CASE("Parse rejection test: text that is not a complex number.", "[parse]")
     checkRejects("悪い入力");
     checkRejects("𓃥𓃠𓆉𓆏𓃯𓃱𓃰");
     checkRejects("𓂀𓂀𓂀𓋹𓁈𓃠𓆃☥𓅓𓆣");
-}
-
-TEST_CASE("Parse rejection test: text with special characters.", "[parse]") {
-    // GIVEN  text with special characters
-    // WHEN   it is parsed
-    // THEN   a ParseError is thrown with a message carrying the entire offending text correctly escaped
-    checkRejectsEscaped("\0"sv, R"(\000)");
-    checkRejectsEscaped("\0" "1"sv, R"(\0001)");
-    checkRejectsEscaped("\x00" "2"sv, R"(\0002)");
-    checkRejectsEscaped("\04"sv, R"(\004)");
-    checkRejectsEscaped("6\0.7i"sv, R"(6\000.7i)");
-    checkRejectsEscaped("6.\04i"sv, R"(6.\004i)");
-    checkRejectsEscaped("6.2\0"sv, R"(6.2\000)");
-    checkRejectsEscaped("\"3.3\""sv, R"(\"3.3\")");
-    checkRejectsEscaped("8\n.9i"sv, R"(8\n.9i)");
-    checkRejectsEscaped("2\ti"sv, R"(2\ti)");
-    checkRejectsEscaped("3\r6"sv, R"(3\r6)");
-    checkRejectsEscaped("\177"sv, R"(\177)");
-
-    checkRejectsEscaped(R"(\0)", R"(\\0)");
-    checkRejectsEscaped(R"(6\0.7i)", R"(6\\0.7i)");
-    checkRejectsEscaped(R"(6.\04i)", R"(6.\\04i)");
-    checkRejectsEscaped(R"(6.2\0)", R"(6.2\\0)");
-    checkRejectsEscaped(R"(8\n.9i)", R"(8\\n.9i)");
-    checkRejectsEscaped(R"(\04)", R"(\\04)");
-    checkRejectsEscaped(R"(\"3.3\")", R"(\\\"3.3\\\")");
+    checkRejects("\0"sv);
+    checkRejects("6\0" "7i"sv);
+    checkRejects("6\0.7i"sv);
+    checkRejects("6.2\0"sv);
+    checkRejects("\"3.3\""sv);
+    checkRejects(R"(6\0.7i)");
 }
 
 TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
-    // GIVEN  a value that is out of range
-    // WHEN   it is parsed
-    // THEN   a ParseError is thrown with a message carrying the entire offending text and the "out of range" information
+    // GIVEN a value that is out of range
+    // WHEN  it is parsed
+    // THEN  a ParseError is thrown with a message carrying the entire offending text and the "out of range" information
     checkRejects("1e400", "out of range");
     checkRejects("1e-500", "out of range");
     checkRejects("3+1e1000i", "1e1000 is out of range");
@@ -205,9 +193,9 @@ TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
 }
 
 TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[parse][future]") {
-    // GIVEN  text that is a complex number in a not yet accepted form
-    // WHEN   it is parsed
-    // THEN   a ParseError is thrown
+    // GIVEN text that is a complex number in a not yet accepted form
+    // WHEN  it is parsed
+    // THEN  a ParseError is thrown
     checkRejects(" 1,2");
     checkRejects(" 3,4 ");
     checkRejects("(1,3)");
@@ -215,9 +203,9 @@ TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[pars
     checkRejects("2i-3");
 }
 
-TEST_CASE("Parse rejection test: ParseError can be catched as a std::invalid_argument exception.", "[parse]") {
-    // GIVEN  something that doesn't recognize ParseError
-    // WHEN   an invalid input is parsed
-    // THEN   the exception can still be caught as std::invalid_argument
+TEST_CASE("Parse rejection test: ParseError can be caught as a std::invalid_argument exception.", "[parse]") {
+    // GIVEN something that doesn't recognize ParseError
+    // WHEN  an invalid input is parsed
+    // THEN  the exception can still be caught as std::invalid_argument
     CHECK_THROWS_AS(hmeigens::parseComplex("?!?"), std::invalid_argument);
 }
