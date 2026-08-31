@@ -6,7 +6,7 @@ using namespace std::string_view_literals;      // For ""sv
 
 #include <catch2/catch_test_macros.hpp>
 
-// This is a helper function to verify that the excaped text is the same as the expected one.
+// This is a helper function to verify that the escaped text is the same as the expected one.
 static void checkEscape (std::string_view toEscape, std::string_view expectedText) {
     CAPTURE(expectedText);
     CHECK(hmeigens::detail::escape(toEscape) == expectedText);
@@ -28,7 +28,7 @@ TEST_CASE("Displayable chars test: special characters are correctly identified."
     CHECK (hmeigens::detail::isDisplayable(126));
     // DEL
     CHECK_FALSE(hmeigens::detail::isDisplayable(127));
-    // Non-ASCII - these cases verify the non-std::isprint's branch.
+    // Non-ASCII - these cases verify the non-std::isprint branch.
     // First non-ASCII.
     CHECK (hmeigens::detail::isDisplayable(128));
     // Last unsigned char.
@@ -36,12 +36,12 @@ TEST_CASE("Displayable chars test: special characters are correctly identified."
 }
 
 // ----------------------------------------------------------
-// The tests below assume hmeigens::detail::isDisplayable is trusted in its output, as it is tested independently above.
+// The function hmeigens::detail::isDisplayable is tested above, so the tests below do not verify its behaviour again.
 // ----------------------------------------------------------
 
 TEST_CASE ("Escape test: regular printable text is unaffected.", "[text_escape]") {
     // GIVEN regularly printable text
-    // WHEN  is it ran through hmeigens::detail::escape
+    // WHEN  it is run through hmeigens::detail::escape
     // THEN  it is completely unaffected
     checkEscape("", "");
     checkEscape(" ", " ");
@@ -56,7 +56,7 @@ TEST_CASE ("Escape test: regular printable text is unaffected.", "[text_escape]"
 
 TEST_CASE ("Escape test: control characters are escaped.", "[text_escape]") {
     // GIVEN text containing control characters
-    // WHEN  is it ran through hmeigens::detail::escape
+    // WHEN  it is run through hmeigens::detail::escape
     // THEN  the characters are correctly escaped
     //
     // These three are printed in their "readable" form.
@@ -69,12 +69,13 @@ TEST_CASE ("Escape test: control characters are escaped.", "[text_escape]") {
     checkEscape("\177"sv, R"(\177)");
     // Strings containing the control characters in the middle.
     checkEscape("a\nb"sv, R"(a\nb)");
+    checkEscape("\0" "1"sv, R"(\0001)");
     checkEscape("You\0shouldn't\atype\rlike\tthis."sv, R"(You\000shouldn't\007type\rlike\tthis.)");
 }
 
 TEST_CASE ("Escape test: backslash and quotes are escaped.", "[text_escape]") {
     // GIVEN text containing backslashes and quotes
-    // WHEN  it is ran through hmeigens::detail::escape
+    // WHEN  it is run through hmeigens::detail::escape
     // THEN  the characters are correctly escaped
     //
     // Both cases below are tested in both spellings, since both spellings appear in the parser tests.
@@ -87,7 +88,7 @@ TEST_CASE ("Escape test: backslash and quotes are escaped.", "[text_escape]") {
 
 TEST_CASE ("Escape test: Non-ASCII and control characters can live in the same string and only controls are escaped.", "[text_escape]") {
     // GIVEN text containing both non-ASCII characters and control characters
-    // WHEN  it is ran through hmeigens::detail::escape
+    // WHEN  it is run through hmeigens::detail::escape
     // THEN  non-ASCII are unaffected, the control characters are escaped
     checkEscape("\n🤬"sv, R"(\n🤬)");
     checkEscape("悪い\0入力"sv, R"(悪い\000入力)");
