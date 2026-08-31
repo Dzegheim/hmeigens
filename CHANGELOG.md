@@ -10,7 +10,7 @@ Version 0.2.0 is recorded from git history.
 ### Added
 - **Tests for SquareMatrix.** Specifically:
      - A `SquareMatrix` built with a valid size reports it correctly with `size()`.
-- **Tests for the parser's handling of special characters.** Specifically:
+- **Tests for the handling of special characters.** Specifically:
      - Control characters, backslash, and quotes in rejected input are escaped.
      - Values that underflow the `Scalar`. Previous testing for out-of-range only would test for overflow.
 
