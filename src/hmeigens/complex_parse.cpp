@@ -44,14 +44,14 @@ namespace hmeigens {
                         fullInput,
                         // Error message constructed to signify out of range.
                         // The piece of offending text that caused the problem is submatch.str().
-                        std::format("Input {0} is out of range for Scalar type {1}.", submatch.str(), hmeigens::scalarType)
+                        std::format("Input {0} is out of range for Scalar type {1}.", detail::escape(submatch.str()), hmeigens::scalarType)
                     };
                 }
                 // This should never be reached because of previous checks, but better safe than sorry.
                 throw ParseError{
                     // Full offending text.
                     fullInput,
-                    std::format("The text {0} caused the problem. This is a bug in HMEigenS, not in your input. Please report it on GitHub with the text you entered. Thank you.", submatch.str())};
+                    std::format("The text {0} caused the problem. This is a bug in HMEigenS, not in your input. Please report it on GitHub with the text you entered. Thank you.", detail::escape(submatch.str()))};
             }
             return value;
         }
@@ -133,5 +133,6 @@ namespace hmeigens {
 
     ParseError::ParseError(std::string_view input) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".", detail::escape(input))) {}
 
-    ParseError::ParseError(std::string_view input, std::string_view errorMessage) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".\n---> {1}", input, detail::escape(errorMessage))) {}
+    // The errorMessage needs no escaping, as it is built by internal functions that escape text on their own.
+    ParseError::ParseError(std::string_view input, std::string_view errorMessage) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".\n---> {1}", detail::escape(input), errorMessage)) {}
 }
