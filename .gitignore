@@ -59,6 +59,7 @@ compile_commands.json
 
 # Machine-specific CMake presets
 CMakeUserPresets.json
+.clangd
 
 # Temporary files
 *.tmp
