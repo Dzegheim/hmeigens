@@ -1,61 +1,15 @@
 #include "hmeigens/complex_parse.hpp"
+#include "hmeigens/scalar.hpp"
 #include "hmeigens/detail/text_escape.hpp"
+#include "hmeigens/detail/to_scalar.hpp"
 
 #include <string>
 #include <string_view>
 #include <regex>
-#include <charconv>       // For std::from_chars
-#include <system_error>   // For std::errc
 #include <stdexcept>      // For std::invalid_argument
 #include <format>
 
 namespace hmeigens {
-
-    namespace detail {
-
-        // This function converts the submatch to a corresponding hmeigens::Scalar.
-        // Since std::from_chars has no locale, there is no risk that someone changing the decimal separator affects the way the code reads the numbers.
-        // Note from https://en.cppreference.com/cpp/utility/from_chars: "the plus sign is not recognized outside of the exponent (only the minus sign is permitted at the beginning)".
-        // The case of a leading '+' is accepted in the input, and is handled manually in this function.
-        // The fullInput parameter is the entire string containing submatch, and is only used to provide accurate diagnostic messages in case of errors.
-        [[nodiscard]] hmeigens::Scalar toScalar (const std::csub_match& submatch, std::string_view fullInput) {
-            // The iterators of cmatch are const char*.
-            // The second is the past-the-end location.
-            const char* first = submatch.first;
-            const char* last  = submatch.second;
-            // Check that the match is not empty, and that the first character is a '+'.
-            // If it is a '+', go forward one.
-            if (first != last && *first == '+') {
-               ++first;
-            }
-            hmeigens::Scalar value{};
-            // The names for ptr and ec are the ones from the standard.
-            // In the structured binding ptr points past-the-end if successful, or to the first non matching character, ec is an error code.
-            // The value is untouched in case of errors.
-            const auto [ptr, ec] = std::from_chars(first, last, value);
-            // The value was read correctly only if ptr is last, and if ec is default.
-            if (ec != std::errc{} || ptr != last) {
-                // If there is an error, throw with the offending text.
-                // The input is already checked by hmeigens::parseComplex, so a std::errc::invalid_argument should never happen.
-                // What can happen here is std::errc::result_out_of_range if the passed value does not fit in the chosen Scalar type.
-                if (ec == std::errc::result_out_of_range) {
-                    throw ParseError{
-                        // Full offending text.
-                        fullInput,
-                        // Error message constructed to signify out of range.
-                        // The piece of offending text that caused the problem is submatch.str().
-                        std::format("Input {0} is out of range for Scalar type {1}.", detail::escape(submatch.str()), hmeigens::scalarType)
-                    };
-                }
-                // This should never be reached because of previous checks, but better safe than sorry.
-                throw ParseError{
-                    // Full offending text.
-                    fullInput,
-                    std::format("The text {0} caused the problem. This is a bug in HMEigenS, not in your input. Please report it on GitHub with the text you entered. Thank you.", detail::escape(submatch.str()))};
-            }
-            return value;
-        }
-    }
 
     hmeigens::Complex parseComplex(std::string_view input) {
         // String for a generic number with optional exponential part.
@@ -98,8 +52,7 @@ namespace hmeigens {
         if (std::regex_match(first, last, match, realNumber)) {
             return hmeigens::Complex {
                 // Matched real part, including sign.
-                // See toScalar about sign problems when the input starts with '+'.
-                hmeigens::detail::toScalar(match[1], input),
+                hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input),
                 // Null imaginary part.
                 hmeigens::Scalar {0.0}
             };
@@ -108,23 +61,26 @@ namespace hmeigens {
         if (std::regex_match(first, last, match, orderedPair)) {
             return hmeigens::Complex{
                 // Matched real part, including sign.
-                // See toScalar about sign problems when the input starts with '+'.
-                hmeigens::detail::toScalar(match[1], input),
+                hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input),
                 // Matched imaginary part, including sign.
-                hmeigens::detail::toScalar(match[2], input)
+                hmeigens::detail::toScalar(std::string_view{match[2].first, match[2].second}, input),
             };
         }
         // Algebraic expression case.
         if (std::regex_match(first, last, match, algebraicForm)) {
             // If a real part is matched, it is used.
             // If not matched, it is null.
-            const hmeigens::Scalar realPart = match[1].matched ? hmeigens::detail::toScalar(match[1], input) : hmeigens::Scalar{0.0};
+            const hmeigens::Scalar realPart = match[1].matched ?
+            hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input) :
+            hmeigens::Scalar{0.0};
             // If there is a sign, it is used.
             // If there is no sign, it is a '+'.
             const hmeigens::Scalar imagSign = (match[2].matched && *match[2].first == '-') ? hmeigens::Scalar{-1.0} : hmeigens::Scalar{1.0};
             // If there is a magnitude, it is used.
             // If there is no magnitude, it is 1.0.
-            const hmeigens::Scalar imagMagnitude = match[3].matched ? hmeigens::detail::toScalar(match[3], input) : hmeigens::Scalar{1.0};
+            const hmeigens::Scalar imagMagnitude = match[3].matched
+            ? hmeigens::detail::toScalar(std::string_view{match[3].first, match[3].second}, input) :
+            hmeigens::Scalar{1.0};
             return hmeigens::Complex{realPart, imagSign * imagMagnitude};
         }
         // If nothing matches an exception is thrown.

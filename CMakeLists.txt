@@ -72,7 +72,9 @@ endif()
 set(HMEIGENS_SOURCES
     complex_parse.cpp
     square_matrix.cpp
-    detail/text_escape.cpp)
+    detail/text_escape.cpp
+    detail/to_scalar.cpp
+)
 list(TRANSFORM HMEIGENS_SOURCES PREPEND src/hmeigens/)
 
 add_library(${PROJECT_NAME_LOWER}_core STATIC ${HMEIGENS_SOURCES})
