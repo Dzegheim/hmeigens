@@ -13,8 +13,10 @@ FetchContent_MakeAvailable(Catch2)
 set(HMEIGENS_TEST_SOURCES
     is_it_alive_test.cpp
     complex_parse_test.cpp
+    detail/text_escape_test.cpp
+    detail/to_scalar_test.cpp
     square_matrix_test.cpp
-    detail/text_escape_test.cpp)
+    )
 
 add_executable(${PROJECT_NAME_LOWER}_tests ${HMEIGENS_TEST_SOURCES})
 target_link_libraries(${PROJECT_NAME_LOWER}_tests PRIVATE ${PROJECT_NAME_LOWER}_core ${PROJECT_NAME_LOWER}_flags Catch2::Catch2WithMain)
