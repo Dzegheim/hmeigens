@@ -36,5 +36,6 @@ namespace hmeigens {
         // Validating HERE is important, because if it's done later, there could be an attempt to make a Container with an invalid size.
         size_(detail::validateSize(size)),
         // Using size_ for initialization makes it so that if the members are somehow swapped in the header, -Wuninitialized (i. e. -Wall) would complain.
+        // The container may generate a std::bad_alloc. That is deliberately not handled here.
         body_(size_*size_) {}
 }

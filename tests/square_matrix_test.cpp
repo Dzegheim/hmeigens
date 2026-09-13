@@ -45,7 +45,7 @@ TEST_CASE("Square matrix test: size 0 and over max are correctly reported.", "[s
 }
 
 TEST_CASE("Square matrix test: sizes larger than container's max are reported.", "[square_matrix]") {
-    // GIVEN a size under the maximum but larger than the container's max
+    // GIVEN a size corresponding to a number of elements under the maximum but larger than the container's max
     // WHEN  the matrix is constructed
     // THEN  the correct exception is thrown, with a message containing the reason and the invalid size
     //
@@ -58,3 +58,6 @@ TEST_CASE("Square matrix test: sizes larger than container's max are reported.",
     checkInvalidSize<std::length_error>(hmeigens::maxMatrixSize, std::format("{0}x{0}", hmeigens::maxMatrixSize));
     checkInvalidSize<std::length_error>(hmeigens::maxMatrixSize, "exceeds the maximum number of elements allowed");
 }
+
+// There is no meaningful way to test for the std::bad_alloc exception. That is generated when the checks pass on the size, but the container cannot allocate, and it's the standard library's job.
+// In the documentation there is still info that the constructor can throw, but testing for it means testing std::vector.
