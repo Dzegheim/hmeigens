@@ -152,7 +152,7 @@ TEST_CASE("ParseError test: the offending text is escaped in the message.", "[pa
 TEST_CASE("Parse rejection test: text that is not a complex number.", "[parse]") {
     // GIVEN text that is not a complex number in an accepted form
     // WHEN  it is parsed
-    // THEN  a ParseError is thrown with a message carrying the escaped offending text
+    // THEN  a hmeigens::ParseError is thrown with a message carrying the escaped offending text
     checkRejects("");
     checkRejects("  ");
     checkRejects(".");
@@ -185,7 +185,7 @@ TEST_CASE("Parse rejection test: text that is not a complex number.", "[parse]")
 TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
     // GIVEN a value that is out of range
     // WHEN  it is parsed
-    // THEN  a ParseError is thrown with a message carrying the entire offending text and the "out of range" information
+    // THEN  a hmeigens::ParseError is thrown with a message carrying the entire offending text and the "out of range" information
     checkRejects("1e400", "out of range");
     checkRejects("1e-500", "out of range");
     checkRejects("3+1e1000i", "1e1000 is out of range");
@@ -195,7 +195,7 @@ TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
 TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[parse][future]") {
     // GIVEN text that is a complex number in a not yet accepted form
     // WHEN  it is parsed
-    // THEN  a ParseError is thrown
+    // THEN  a hmeigens::ParseError is thrown
     checkRejects(" 1,2");
     checkRejects(" 3,4 ");
     checkRejects("(1,3)");
@@ -204,7 +204,7 @@ TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[pars
 }
 
 TEST_CASE("Parse rejection test: ParseError can be caught as a std::invalid_argument exception.", "[parse]") {
-    // GIVEN something that doesn't recognize ParseError
+    // GIVEN something that doesn't recognize hmeigens::ParseError
     // WHEN  an invalid input is parsed
     // THEN  the exception can still be caught as std::invalid_argument
     CHECK_THROWS_AS(hmeigens::parseComplex("?!?"), std::invalid_argument);

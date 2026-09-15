@@ -13,7 +13,7 @@ namespace hmeigens::detail {
     // Since std::from_chars has no locale, there is no risk that someone changing the decimal separator affects the way the code reads the numbers.
     // The toConvert parameter is what will be turned into a floating-point.
     // The fullInput parameter is the entire string containing toConvert, and is only used to provide accurate diagnostic messages in case of errors.
-    [[nodiscard]] hmeigens::Scalar toScalar (std::string_view toConvert, std::string_view fullInput);
+    [[nodiscard]] Scalar toScalar (std::string_view toConvert, std::string_view fullInput);
 }
 
 #endif

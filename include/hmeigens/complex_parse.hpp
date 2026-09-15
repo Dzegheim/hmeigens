@@ -11,7 +11,7 @@
 namespace hmeigens {
     /// @brief Exception thrown when text cannot be parsed as a complex number.
     ///
-    /// Inherits from `std::invalid_argument`, so it can be caught as that if it's not caught specifically as `ParseError`.
+    /// Inherits from `std::invalid_argument`, so it can be caught as that if it's not caught specifically as `hmeigens::ParseError`.
     class ParseError : public std::invalid_argument {
         public:
         /// @brief One-argument constructor: parsed text **cannot** be interpreted into a complex number.
@@ -30,7 +30,7 @@ namespace hmeigens {
     /// Accepted forms: 
     ///
     /// | Form      | Example        |  (Real, Imaginary)   |
-    /// |-----------|----------------|----------------------|
+    /// | :-------: | :------------: | :------------------: |
     /// |   `a`     |      `1.2`     |       (1.2,0)        |
     /// |  `a+bi`   |     `1-2i`     |       (1,-2)         |
     /// |   `bi`    |     `-3.i`     |       (0,-3)         |
@@ -46,8 +46,8 @@ namespace hmeigens {
     /// @todo Accept suffixes, digit separators, and hex.
     /// @param input The text to read.
     /// @return An `hmeigens::Complex` corresponding to the `input`.
-    /// @throws ParseError if `input` cannot be read into a complex number.
-    [[nodiscard]] hmeigens::Complex parseComplex(std::string_view input);
+    /// @throws hmeigens::ParseError if `input` cannot be read into a complex number.
+    [[nodiscard]] Complex parseComplex(std::string_view input);
 }
 
 #endif

@@ -28,7 +28,7 @@ namespace hmeigens {
     inline const std::string scalarType = "double";
     #endif
 
-    /// @brief Alias for complex numbers with the chosen `Scalar` value type.
+    /// @brief Alias for complex numbers with the chosen `hmeigens::Scalar` value type.
     using Complex = std::complex<Scalar>;
 }
 
