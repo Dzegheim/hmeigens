@@ -10,13 +10,9 @@ namespace hmeigens::detail {
     std::size_t validateSize (std::size_t toValidate);
 
     // Helper function to verify that the size provided to the constructor is the square root of the length of the hmeigens::SquareMatrix::Container given as the other parameter.
-    // The variable declaredSize is always assumed to already have been validate by hmeigens::detail::validateSize.
+    // The variable declaredSize is always assumed to already have been validated by hmeigens::detail::validateSize.
     // The variable containerSize is assumed to be the valid size of a hmeigens::SquareMatrix::Container.
     std::size_t checkIfAppropriateSize (std::size_t declaredSize, std::size_t containerSize);
-
-    // Helper function that throws an exception, called by the member hmeigens::SquareMatrix::checkIndex.
-    // Separated here otherwise hmeigens::SquareMatrix::checkIndex cannot be inlined.
-    [[noreturn]] void throwIndexError (std::size_t row, std::size_t col, std::size_t size);
 }
 
 #endif

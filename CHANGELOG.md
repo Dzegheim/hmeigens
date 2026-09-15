@@ -8,20 +8,31 @@ Version 0.2.0 is recorded from git history.
 
 ## [Unreleased]
 ### Added
-- **Tests for SquareMatrix.** Specifically:
-     - A `SquareMatrix` built with a valid size reports it correctly with `size()`.
-- **Tests for the handling of special characters.** Specifically:
-     - Control characters, backslash, and quotes in rejected input are escaped.
-     - Values that underflow the `Scalar`. Previous testing for out-of-range only would test for overflow.
-
+- **Tests for `hmeigens::SquareMatrix`.** Specifically:
+    - A `SquareMatrix` built with a valid size reports it correctly with `size()`;
+    - Invalid sizes are rejected.
+- **Tests for `hmeigens::parseComplex`.** Specifically:
+    - values that underflow `hmeigens::Scalar`, as previous testing for out-of-range only would test for overflow;
+    - specific tests for `hmeigens::ParseError`.
+- **Tests for the `hmeigens::detail` functions.** Specifically:
+    - `hmeigens::detail::toScalar` thoroughly tested;
+    - `hmeigens::detail::isDisplayable` + `hmeigens::detail::escape` thoroughly tested, i.e. control characters, backslash, and quotes in rejected input are escaped.
+- **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
+- **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
+- **Several `hmeigens::SquareMatrix` class features.** Specifically:
+    - a new constructor that takes as parameters a size and a body containing numbers (row major), creating a matrix with the corresponding contents;
+    - both read and write accessor `operator()` (does NOT check that the indexes are safe in release mode, and checks and behaves like `at()` in debug mode when `NDEBUG` is not defined);
+    - both read and write safe accessor `at()` (checks the indexes and throws `std::out_of_range` if out of bounds).
 
 ### Changed
-- **SquareMatrix construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
-- **Manual string concatenation replaced with `std::format` in the exception constructors all around the code.** 
-- **Improved error message for `std::length_error` in `square_matrix.cpp`.**
+- **`hmeigens::SquareMatrix` construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
+- **Manual string concatenation replaced with `std::format` in the exception constructors all around the code.**
+- **The alias `hmeigens::detail::Container` is now `hmeigens::SquareMatrix::Container`.**
 
 ### Fixed
 - **Control characters in input text no longer break error messages.** Before a `\0` or `\n` would not be escaped and, when properly rejected by the parser, would be printed literally in the diagnostics messages, breaking them. Printable control characters are rendered as `\n` or `\t`, unprintable ones as three digit octals. Non-ASCII text is still handled like before, so that someone passing an emoji or another special character will still see it in the output.
+- **`hmeigens::ParseError`'s two argument constructor now escapes the correct parameter.**
+- **Added missing `#include <cstddef>` in various files that needed it.**
 
 ## [0.5.0] - 2026-08-27
 ### Added
