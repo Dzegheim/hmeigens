@@ -74,6 +74,7 @@ set(HMEIGENS_SOURCES
     square_matrix.cpp
     detail/text_escape.cpp
     detail/to_scalar.cpp
+    detail/square_matrix_helpers.cpp
 )
 list(TRANSFORM HMEIGENS_SOURCES PREPEND src/hmeigens/)
 

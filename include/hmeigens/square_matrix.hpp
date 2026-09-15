@@ -9,16 +9,15 @@
 
 namespace hmeigens {
 
-    namespace detail {
-        // Alias for the container used by SquareMatrix.
-        using Container = std::vector<Complex>;
-    }
-
     /// @brief Square matrix with complex elements.
     ///
     /// The size is fixed at construction and cannot be changed.
     /// @note The size of a matrix is a **positive** number. A size `0` matrix **cannot** be constructed.
     class SquareMatrix {
+        public:
+        /// @brief Alias for the data container used to represent the matrix's `body_`. At the moment, it is `std::vector<Complex>`.
+        using Container = std::vector<Complex>;
+        
         private:
         // Size of the matrix.
         // A square matrix is a size_ * size_ table of numbers.
@@ -28,9 +27,9 @@ namespace hmeigens {
         // | 1  2 |
         // | 3  4 |
         // IMPORTANT: This MUST live after size_, or the constructor could try to allocate an invalid size.
-        detail::Container body_;
+        Container body_; 
 
-        public:
+        public:       
         /// @brief Constructor for a zero-filled `size * size` matrix.
         ///
         /// The size of the matrix is validated at creation, and cannot be altered afterwards. A matrix cannot have a size:

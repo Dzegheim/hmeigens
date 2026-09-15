@@ -52,7 +52,7 @@ TEST_CASE("Square matrix test: sizes larger than container's max are reported.",
     // The branch this test checks can only ever be reached if hmeigens::maxMatrixSize**2 is bigger than the container's max size.
     // If that cannot happen, this test makes no sense, and is skipped.
     // Squaring hmeigens::maxMatrixSize is always safe. The static asserts in constants.hpp ensure that.
-    if (!(hmeigens::maxMatrixSize * hmeigens::maxMatrixSize > hmeigens::detail::Container{}.max_size())) {
+    if (!(hmeigens::maxMatrixSize * hmeigens::maxMatrixSize > hmeigens::SquareMatrix::Container{}.max_size())) {
         SKIP("The maximum number of elements a matrix can hold on this machine is smaller than the maximum size the container allows. This check can never be meaningful on this machine.");
     }
     checkInvalidSize<std::length_error>(hmeigens::maxMatrixSize, std::format("{0}x{0}", hmeigens::maxMatrixSize));
