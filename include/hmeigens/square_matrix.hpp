@@ -31,7 +31,7 @@ namespace hmeigens {
         // Size of the matrix.
         // A square matrix is a size_ * size_ table of numbers.
         std::size_t size_;
-        // The content of the matrix, stored row major.
+        // The content of the matrix, stored row-major.
         // IMPORTANT: This MUST live after size_ or:
         // - the constructor could try to allocate an invalid size;
         // - the constructor could try to read the size of a container after it has already been moved into body_.
@@ -59,7 +59,7 @@ namespace hmeigens {
         /// - so large that `size * size` cannot be represented;
         /// - so large that it cannot be stored on the machine.
         /// @param size The size of the matrix.
-        /// @param body The elements of the matrix, row major. The parameter must have `size * size` elements, and it must be an rvalue, as it is not copied but moved.
+        /// @param body The elements of the matrix, row-major. The parameter must have `size * size` elements, and it must be an rvalue, as it is not copied but moved.
         /// @throws std::invalid_argument if `size` is `0`.
         /// @throws std::length_error if `size * size` cannot be represented within `std::size_t`.
         /// @throws std::length_error if `size * size` exceeds the maximum allowed number of elements.
