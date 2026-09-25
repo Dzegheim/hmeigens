@@ -16,6 +16,7 @@ set(HMEIGENS_TEST_SOURCES
     detail/text_escape_test.cpp
     detail/to_scalar_test.cpp
     square_matrix_test.cpp
+    detail/square_matrix_helpers_test.cpp
     )
 
 add_executable(${PROJECT_NAME_LOWER}_tests ${HMEIGENS_TEST_SOURCES})

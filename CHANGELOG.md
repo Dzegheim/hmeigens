@@ -16,7 +16,8 @@ Version 0.2.0 is recorded from git history.
     - specific tests for `hmeigens::ParseError`.
 - **Tests for the `hmeigens::detail` functions.** Specifically:
     - `hmeigens::detail::toScalar` thoroughly tested;
-    - `hmeigens::detail::isDisplayable` + `hmeigens::detail::escape` thoroughly tested, i.e. control characters, backslash, and quotes in rejected input are escaped.
+    - `hmeigens::detail::isDisplayable` + `hmeigens::detail::escape` thoroughly tested, i.e. control characters, backslash, and quotes in rejected input are escaped;
+    - `hmeigens::detail::validateSize` and `hmeigens::detail::checkIfAppropriateSize` thoroughly tested.
 - **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
 - **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
 - **Several `hmeigens::SquareMatrix` class features.** Specifically:
