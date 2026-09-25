@@ -79,14 +79,15 @@ namespace hmeigens {
         ///
         /// @param row The row of the element to access.
         /// @param col The column of the element to access.
-        /// @return A copy of the element in position (`row`, `col`).
+        /// @return A read-only reference to the element in position (`row`, `col`).
+        /// @warning The returned reference is only valid as long as the matrix also is.
         /// @pre row < size() and col < size()
         /// @warning This operator does not perform out-of-bound checks in release mode. For a range safe version, see `hmeigens::SquareMatrix::at()`.
         /// In debug mode (i.e. if `NDEBUG` is not defined) the operator behaves and throws exactly like `hmeigens::SquareMatrix::at()`.
         /// @sa operator()(std::size_t, std::size_t)
         /// @sa at(std::size_t, std::size_t) const
         /// @sa at(std::size_t, std::size_t)
-        [[nodiscard]] Complex operator() (std::size_t row, std::size_t col) const {
+        [[nodiscard]] const Complex& operator() (std::size_t row, std::size_t col) const {
             #ifndef NDEBUG
             checkIndex (row, col);
             #endif
@@ -98,6 +99,7 @@ namespace hmeigens {
         /// @param row The row of the element to access.
         /// @param col The column of the element to access.
         /// @return A reference to the element in position (`row`, `col`).
+        /// @warning The returned reference is only valid as long as the matrix also is.
         /// @pre row < size() and col < size()
         /// @warning This operator does not perform out-of-bound checks in release mode. For a range safe version, see `hmeigens::SquareMatrix::at()`.
         /// In debug mode (i.e. if `NDEBUG` is not defined) the operator behaves and throws exactly like `hmeigens::SquareMatrix::at()`.
@@ -115,12 +117,13 @@ namespace hmeigens {
         ///
         /// @param row The row of the element to access.
         /// @param col The column of the element to access.
-        /// @return A copy of the element in position (`row`, `col`).
+        /// @return A read-only reference to the element in position (`row`, `col`).
+        /// @warning The returned reference is only valid as long as the matrix also is.
         /// @throws std::out_of_range if `row >= size()` or `col >= size()`.
         /// @sa operator()(std::size_t, std::size_t) const
         /// @sa operator()(std::size_t, std::size_t)
         /// @sa at(std::size_t, std::size_t)
-        [[nodiscard]] Complex at(std::size_t row, std::size_t col) const {
+        [[nodiscard]] const Complex& at(std::size_t row, std::size_t col) const {
             checkIndex (row, col);
             return body_[getIndex(row, col)];
         }
@@ -130,6 +133,7 @@ namespace hmeigens {
         /// @param row The row of the element to access.
         /// @param col The column of the element to access.
         /// @return A reference to the element in position (`row`, `col`).
+        /// @warning The returned reference is only valid as long as the matrix also is.
         /// @throws std::out_of_range if `row >= size()` or `col >= size()`.
         /// @sa operator()(std::size_t, std::size_t) const
         /// @sa operator()(std::size_t, std::size_t)
