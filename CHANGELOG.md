@@ -8,9 +8,6 @@ Version 0.2.0 is recorded from git history.
 
 ## [Unreleased]
 ### Added
-- **Tests for `hmeigens::SquareMatrix`.** Specifically:
-    - A `SquareMatrix` built with a valid size reports it correctly with `size()`;
-    - Invalid sizes are rejected.
 - **Tests for `hmeigens::parseComplex`.** Specifically:
     - values that underflow `hmeigens::Scalar`, as previous testing for out-of-range only would test for overflow;
     - specific tests for `hmeigens::ParseError`.
@@ -18,10 +15,19 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::toScalar` thoroughly tested;
     - `hmeigens::detail::isDisplayable` + `hmeigens::detail::escape` thoroughly tested, i.e. control characters, backslash, and quotes in rejected input are escaped;
     - `hmeigens::detail::validateSize` and `hmeigens::detail::checkIfAppropriateSize` thoroughly tested.
+- **Tests for `hmeigens::SquareMatrix`.** Specifically:
+    - a `SquareMatrix` built with a valid size reports it correctly with `size()`;
+    - invalid or mismatching sizes are rejected;
+    - the accessors allow reading the element at the requested position;
+    - the write accessors also allow editing the elements;
+    - `at()` is index safe;
+    - `operator()` is index safe **in debug mode only**;
+    - a `SquareMatrix` constructed with the one parameter constructor is zero-filled;
+    - a `SquareMatrix` constructed with the two parameter constructor is filled with the correct elements in row-major order.
 - **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
 - **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
 - **Several `hmeigens::SquareMatrix` class features.** Specifically:
-    - a new constructor that takes as parameters a size and a body containing numbers (row major), creating a matrix with the corresponding contents;
+    - a new constructor that takes as parameters a size and a body containing numbers (row-major), creating a matrix with the corresponding contents;
     - both read and write accessor `operator()` (does NOT check that the indexes are safe in release mode, and checks and behaves like `at()` in debug mode when `NDEBUG` is not defined);
     - both read and write safe accessor `at()` (checks the indexes and throws `std::out_of_range` if out of bounds).
 
