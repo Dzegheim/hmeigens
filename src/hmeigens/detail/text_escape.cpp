@@ -26,7 +26,7 @@ std::string hmeigens::detail::escape (std::string_view toEscape) {
         // For legibility reasons the following characters are not rendered as octals.
         // Since these letters are not octal digits they don't merge with other digits that follow them.
         // There is no \0 because instead a \0 followed by a 1 would be \01 and not be the input.
-        // There is no apostrophe because strings in this code are formatted with qoutes as delimiters
+        // There is no apostrophe because strings in this code are formatted with quotes as delimiters.
         else if (character == '\n') {
             escaped += R"(\n)";
         }
