@@ -1,10 +1,11 @@
 #include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
 
-#include <stdexcept>   // For std::out_of_range, std::length_error, std::invalid_argument
-#include <cstddef>     // For std::size_t
+#include <stdexcept>     // For std::out_of_range, std::length_error, std::invalid_argument
+#include <cstddef>       // For std::size_t
 #include <format>
 #include <string_view>
+#include <type_traits>   // For std::is_same, std::is_assignable_v, std::is_convertible_v
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
@@ -122,6 +123,67 @@ TEST_CASE("Square matrix test: invalid sizes are correctly reported.", "[square_
     // In the documentation there is still info that the constructor can throw, but testing for it means testing std::vector.
 }
 
+TEST_CASE("FAILING - Square matrix test: negative sizes are correctly reported.", "[square_matrix][!shouldfail]") {
+    // FAILING CASE: Negative size.
+    // At the moment a negative size is caught as a wrong one, but is incorrectly reported as std::length_error. It should be std::invalid_argument. This is in the process of being fixed.
+    CHECK_THROWS_AS(
+        hmeigens::SquareMatrix(-1),
+        std::invalid_argument
+    );
+    // WIP: This is a narrowing conversion and does not compile.
+    // When the issue is fixed it will be an std::invalid_argument.
+    //CHECK_THROWS_AS(
+    //    hmeigens::SquareMatrix{-1},
+    //    std::invalid_argument
+    //);
+}
+
+TEST_CASE("Square matrix test: the one parameter constructor is explicit.", "[square_matrix]") {
+    // GIVEN a size
+    // WHEN  an implicit conversion to a matrix is attempted
+    // THEN  it is refused
+    STATIC_REQUIRE_FALSE(
+        std::is_convertible_v<
+            std::size_t,
+            hmeigens::SquareMatrix
+        >
+    );
+    // There is neither need nor a meaningful way to test for the explicitness of the two parameter constructor.
+}
+
+TEST_CASE("Square matrix test: accessors return the correct type.", "[square_matrix]") {
+    // GIVEN a matrix
+    // WHEN  the accessors' return type is checked
+    // THEN  the returned type is correctly qualified
+    hmeigens::SquareMatrix testMatrix {2};
+    const hmeigens::SquareMatrix testMatrixConst {2};
+    // (0,0) is arbitrary and resolved by decltype without needing an actual element.
+    STATIC_REQUIRE(
+        std::is_same_v<
+            decltype(testMatrixConst(0, 0)),
+            const hmeigens::Complex&
+        >
+    );
+    STATIC_REQUIRE(
+        std::is_same_v<
+            decltype(testMatrixConst.at(0, 0)),
+            const hmeigens::Complex&
+        >
+    );
+    STATIC_REQUIRE(
+        std::is_same_v<
+            decltype(testMatrix(0, 0)),
+            hmeigens::Complex&
+        >
+    );
+    STATIC_REQUIRE(
+        std::is_same_v<
+            decltype(testMatrix.at(0, 0)),
+            hmeigens::Complex&
+        >
+    );
+}
+
 TEST_CASE("Square matrix test: accessor operator() const returns the correct element.", "[square_matrix]") {
     // GIVEN a valid row-column position pair
     // WHEN  hmeigens::SquareMatrix::operator() const is called
@@ -191,7 +253,40 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
     }
 }
 
-TEST_CASE("Square matrix test: editing accessors actually allow editing.", "[square_matrix]") {
+TEST_CASE("Square matrix test: const accessors do not allow editing, non-consts do.", "[square_matrix]") {
+    // GIVEN a matrix
+    // WHEN  the accessors' return type is checked
+    // THEN  the const accessors return uneditable references, the non const ones return editable ones
+    hmeigens::SquareMatrix testMatrix {2};
+    const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
+    // (0,0) is arbitrary and resolved by decltype without needing an actual element.
+    STATIC_REQUIRE_FALSE(
+        std::is_assignable_v<
+            decltype(testMatrixConst(0, 0)),
+            hmeigens::Complex
+        >
+    );
+    STATIC_REQUIRE(
+        std::is_assignable_v<
+            decltype(testMatrix(0, 0)),
+            hmeigens::Complex
+        >
+    );
+    STATIC_REQUIRE_FALSE(
+        std::is_assignable_v<
+            decltype(testMatrixConst.at(0, 0)),
+            hmeigens::Complex
+        >
+    );
+    STATIC_REQUIRE(
+        std::is_assignable_v<
+            decltype(testMatrix.at(0, 0)),
+            hmeigens::Complex
+        >
+    );
+}
+
+TEST_CASE("Square matrix test: edited values persist and are in the right place.", "[square_matrix]") {
     // GIVEN a matrix
     // WHEN  an edit of a value is attempted through the accessors
     // THEN  the correct element is edited, and the correct value is stored afterwards

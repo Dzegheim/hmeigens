@@ -23,7 +23,9 @@ Version 0.2.0 is recorded from git history.
     - `at()` is index safe;
     - `operator()` is index safe **in debug mode only**;
     - a `SquareMatrix` constructed with the one parameter constructor is zero-filled;
-    - a `SquareMatrix` constructed with the two parameter constructor is filled with the correct elements in row-major order.
+    - a `SquareMatrix` constructed with the two parameter constructor is filled with the correct elements in row-major order;
+    - `type_traits` tests to assert return types for accessors and their constness (or lack of it);
+    - `type_traits` test to check for the explicitness of the one parameter constructor.
 - **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
 - **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
 - **Several `hmeigens::SquareMatrix` class features.** Specifically:
