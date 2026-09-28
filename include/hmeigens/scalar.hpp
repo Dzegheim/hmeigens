@@ -30,6 +30,16 @@ namespace hmeigens {
 
     /// @brief Alias for complex numbers with the chosen `hmeigens::Scalar` value type.
     using Complex = std::complex<Scalar>;
+
+    /// @brief Literal suffix for floating-point values that performs a `static_cast` to whatever `hmeigens::Scalar` is.
+    ///
+    /// Useful to avoid implicit conversions when building in `float`.
+    /// The initials `hs` stand for `hmeigens` and `Scalar` respectively.
+    /// @param toConvert A floating-point value to turn into a `hmeigens::Scalar`.
+    /// @return A `static_cast` to `hmeigens::Scalar` of the input.
+    consteval Scalar operator""_hs (long double toConvert) {
+        return static_cast<Scalar>(toConvert);
+    }
 }
 
 #endif
