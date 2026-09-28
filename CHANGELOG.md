@@ -33,6 +33,9 @@ Version 0.2.0 is recorded from git history.
     - both read and write accessor `operator()` (does NOT check that the indexes are safe in release mode, and checks and behaves like `at()` in debug mode when `NDEBUG` is not defined);
     - both read and write safe accessor `at()` (checks the indexes and throws `std::out_of_range` if out of bounds).
 - **A new literal suffix `hmeigens::operator""_hs`.** It turns floating-point values into the current `hmeigens::Scalar` to avoid implicit conversions across the code.
+- **Tests for `scalar.hpp`.** Specifically:
+    - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);
+    - `hmeigens::operator""_hs` returns the expected type and the correct values.
 
 ### Changed
 - **`hmeigens::SquareMatrix` construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
