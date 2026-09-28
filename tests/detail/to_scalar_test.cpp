@@ -11,7 +11,7 @@
 #include <catch2/matchers/catch_matchers_exception.hpp>
 
 // This is a helper function to verify that the number read corresponds to the expected one.
-// The expectedValue is a double because catch2 always checks in double anyway.
+// The expectedValue is a double because Catch2 always checks in double anyway.
 // See comment to checkParse in tests/complex_parse_test.cpp.
 static void checkReads (std::string_view toConvert, double expectedValue) {
     CAPTURE(toConvert, expectedValue);
