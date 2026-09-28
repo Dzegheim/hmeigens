@@ -2,7 +2,7 @@
 
 #include <string>
 #include <string_view>
-using namespace std::string_view_literals;      // For ""sv
+using std::string_view_literals::operator""sv;
 
 #include <catch2/catch_test_macros.hpp>
 
