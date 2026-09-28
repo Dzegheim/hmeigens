@@ -2,6 +2,8 @@
 #include "hmeigens/detail/square_matrix_helpers.hpp"
 #include "hmeigens/square_matrix.hpp"
 
+using hmeigens::operator""_hs;
+
 #include <cstddef>       // For std::size_t
 #include <string>
 #include <string_view>
@@ -103,7 +105,7 @@ TEST_CASE("Square matrix helpers test: appropriate size comparison.", "[square_m
     // A 0 here passes, because this function does not perform that check.
     CHECK (hmeigens::detail::checkIfAppropriateSize(0, hmeigens::SquareMatrix::Container{}.size()) == 0);
     // A valid and meaningful size.
-    CHECK (hmeigens::detail::checkIfAppropriateSize(3, hmeigens::SquareMatrix::Container{1., 2., 3., 4., 5., 6., 7., 8., 9.}.size()) == 3);
+    CHECK (hmeigens::detail::checkIfAppropriateSize(3, hmeigens::SquareMatrix::Container{1._hs, 2._hs, 3._hs, 4._hs, 5._hs, 6._hs, 7._hs, 8._hs, 9._hs}.size()) == 3);
 }
 
 TEST_CASE("Square matrix helpers test: mismatching or inappropriate sizes are refused.", "[square_matrix_helpers]") {
@@ -111,5 +113,5 @@ TEST_CASE("Square matrix helpers test: mismatching or inappropriate sizes are re
     // WHEN  hmeigens::detail::checkIfAppropriateSize tries to validate it
     // THEN  it is rejected with the appropriate exception and text
     checkMismatchingSize<std::invalid_argument>(4, "The provided matrix is not 4x4.\n---> Expected elements: 16.\n---> Provided elements: 0.", hmeigens::SquareMatrix::Container{});
-    checkMismatchingSize<std::invalid_argument>(2, "The provided matrix is not 2x2.\n---> Expected elements: 4.\n---> Provided elements: 6.", hmeigens::SquareMatrix::Container{1., 2., 3., 4., 5., 6.});
+    checkMismatchingSize<std::invalid_argument>(2, "The provided matrix is not 2x2.\n---> Expected elements: 4.\n---> Provided elements: 6.", hmeigens::SquareMatrix::Container{1._hs, 2._hs, 3._hs, 4._hs, 5._hs, 6._hs});
 }

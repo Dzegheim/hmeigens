@@ -1,6 +1,8 @@
 #include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
 
+using hmeigens::operator""_hs;
+
 #include <stdexcept>     // For std::out_of_range, std::length_error, std::invalid_argument
 #include <cstddef>       // For std::size_t
 #include <format>
@@ -195,9 +197,9 @@ TEST_CASE("Square matrix test: accessor operator() const returns the correct ele
     // The test here is performed versus values independent of the class, via testBody.
     // The other behaviours of the constructor (size, exceptions) can and are tested separately.
     const hmeigens::SquareMatrix::Container testBody {
-        {1., 1.}, {2., 2.}, {3., 3.},
-        {4., 4.}, {5., 5.}, {6., 6.},
-        {7., 7.}, {8., 8.}, {9., 9.}
+        {1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
+        {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
+        {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}
     };
     const hmeigens::SquareMatrix testMatrixConst {
         3,
@@ -221,9 +223,9 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
     // The checkAllElementsVersus helper uses only the trusted hmeigens::SquareMatrix::operator() const, so here it would not do what is needed.
     hmeigens::SquareMatrix testMatrix {
         3,
-        {{1., 1.}, {2., 2.}, {3., 3.},
-         {4., 4.}, {5., 5.}, {6., 6.},
-         {7., 7.}, {8., 8.}, {9., 9.}}
+        {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
+         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
+         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
     };
     // Need both a non const and a const one for the test.
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
@@ -296,27 +298,27 @@ TEST_CASE("Square matrix test: edited values persist and are in the right place.
     // The alternative could be, for example, writing different values. A new matrix is better, as if the accessors fuck something up, the tests still remain truly independent of each other.
     hmeigens::SquareMatrix testMatrix {
         3,
-        {{1., 1.}, {2., 2.}, {3., 3.},
-         {4., 4.}, {5., 5.}, {6., 6.},
-         {7., 7.}, {8., 8.}, {9., 9.}}
+        {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
+         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
+         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
     };
     // A const reference version is needed, as the trusted function for checks is hmeigens::SquareMatrix::operator() const.
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
     SECTION("hmeigens::SquareMatrix::at()") {
         // Testing both a diagonal and an off-diagonal element.
         // Edit the elements, then see if their value was updated.
-        testMatrix.at(0,0) = hmeigens::Complex {6., 7.};
-        testMatrix.at(1,2) = hmeigens::Complex {4., 2.};
-        checkComplex(testMatrixConst(0,0), hmeigens::Complex {6., 7.});
-        checkComplex(testMatrixConst(1,2), hmeigens::Complex {4., 2.});
+        testMatrix.at(0,0) = hmeigens::Complex {6._hs, 7._hs};
+        testMatrix.at(1,2) = hmeigens::Complex {4._hs, 2._hs};
+        checkComplex(testMatrixConst(0,0), hmeigens::Complex {6._hs, 7._hs});
+        checkComplex(testMatrixConst(1,2), hmeigens::Complex {4._hs, 2._hs});
     }
     SECTION("hmeigens::SquareMatrix::operator()") {
         // Testing both a diagonal and an off-diagonal element.
         // Edit the elements, then see if their value was updated.
-        testMatrix(0,0) = hmeigens::Complex {6., 7.};
-        testMatrix(1,2) = hmeigens::Complex {4., 2.};
-        checkComplex(testMatrixConst(0,0), hmeigens::Complex {6., 7.});
-        checkComplex(testMatrixConst(1,2), hmeigens::Complex {4., 2.});
+        testMatrix(0,0) = hmeigens::Complex {6._hs, 7._hs};
+        testMatrix(1,2) = hmeigens::Complex {4._hs, 2._hs};
+        checkComplex(testMatrixConst(0,0), hmeigens::Complex {6._hs, 7._hs});
+        checkComplex(testMatrixConst(1,2), hmeigens::Complex {4._hs, 2._hs});
     }
 }
 
@@ -326,9 +328,9 @@ TEST_CASE("Square matrix test: the overloads of at() are index safe.", "[square_
     // THEN  an exception is thrown with the correct type and message
     hmeigens::SquareMatrix testMatrix {
         3,
-        {{1., 1.}, {2., 2.}, {3., 3.},
-         {4., 4.}, {5., 5.}, {6., 6.},
-         {7., 7.}, {8., 8.}, {9., 9.}}
+        {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
+         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
+         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
     };
     // A const reference version is needed to check both overloads.
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
@@ -378,9 +380,9 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
     // The choice made here is that, in this specific instance, code duplication is more acceptable than a less clear test result.
     hmeigens::SquareMatrix testMatrix {
         3,
-        {{1., 1.}, {2., 2.}, {3., 3.},
-         {4., 4.}, {5., 5.}, {6., 6.},
-         {7., 7.}, {8., 8.}, {9., 9.}}
+        {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
+         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
+         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
     };
     // A const reference version is needed to check both overloads.
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
@@ -435,12 +437,12 @@ TEST_CASE("Square matrix test: a matrix constructed with the two parameter const
     //
     // Trivial size.
     checkAllElementsVersus(
-        hmeigens::SquareMatrix {1, {{6.7, 4.2}}},
-        hmeigens::SquareMatrix::Container{{6.7, 4.2}}
+        hmeigens::SquareMatrix {1, {{6.7_hs, 4.2_hs}}},
+        hmeigens::SquareMatrix::Container{{6.7_hs, 4.2_hs}}
     );
     // Non trivial size.
     checkAllElementsVersus(
-        hmeigens::SquareMatrix {2, {{1.1, 2.2}, {3.3, 4.4}, {5.5, 6.6}, {7.7, 8.8}}},
-        hmeigens::SquareMatrix::Container{{1.1, 2.2}, {3.3, 4.4}, {5.5, 6.6}, {7.7, 8.8}}
+        hmeigens::SquareMatrix {2, {{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}},
+        hmeigens::SquareMatrix::Container{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}
     );
 }
