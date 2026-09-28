@@ -186,10 +186,15 @@ TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
     // GIVEN a value that is out of range
     // WHEN  it is parsed
     // THEN  a hmeigens::ParseError is thrown with a message carrying the entire offending text and the "out of range" information
+    // Real number.
     checkRejects("1e400", "out of range");
     checkRejects("1e-500", "out of range");
+    // Algebraic form.
     checkRejects("3+1e1000i", "1e1000 is out of range");
     checkRejects("1.8e-9999-i", "1.8e-9999 is out of range");
+    // Ordered pair.
+    checkRejects("1,1e400", "out of range");
+    checkRejects("1e400,1", "out of range");
 }
 
 TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[parse][future]") {
