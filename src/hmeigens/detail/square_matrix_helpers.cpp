@@ -8,6 +8,7 @@
 
 std::size_t hmeigens::detail::validateSize (std::size_t toValidate) {
     // A matrix must have a positive integer as a size.
+    // For a signed value the template overload kicks in and the value is checked by hmeigens::detail::validateSizeSigned, so this is always safe.
     // A 0 size has no mathematical meaning.
     // Throws std::invalid_argument because the user provided an invalid argument to the constructor.
     if (toValidate == 0) {
@@ -24,6 +25,17 @@ std::size_t hmeigens::detail::validateSize (std::size_t toValidate) {
         throw std::length_error{std::format("A {0}x{0} matrix cannot be created.\n---> Number of elements ({1}) exceeds the maximum number of elements allowed ({2}).", toValidate, toValidate*toValidate, hmeigens::SquareMatrix::Container{}.max_size())};
     }
     return toValidate;
+}
+
+std::size_t hmeigens::detail::validateSize (long long int toValidate) {
+    // A matrix must have a positive integer as a size.
+    // This function checks that the size is non-negative.
+    // The other checks are handled by hmeigens::detail::validateSize.
+    if (toValidate < 0) {
+        throw std::invalid_argument{std::format("A matrix cannot have a negative size.\n---> Provided value: {0}", toValidate)};
+    }
+    // If the size is not negative, it can be converted safely into an std::size_t.
+    return hmeigens::detail::validateSize(static_cast<std::size_t>(toValidate));
 }
 
 std::size_t hmeigens::detail::checkIfAppropriateSize (std::size_t declaredSize, std::size_t containerSize) {

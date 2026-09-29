@@ -9,6 +9,8 @@ using hmeigens::operator""_hs;
 #include <string_view>
 #include <format>
 #include <stdexcept>     // For std::length_error, std::invalid_argument
+#include <concepts>      // For std::integral
+#include <limits>        // For std::numeric_limits<long long int>::min()
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
@@ -19,8 +21,9 @@ using hmeigens::operator""_hs;
 // - throws;
 // - throws the correct exception type;
 // - exception's message contains the correct information, including the invalid size and the reason why it was invalid.
-template <typename Exception>
-static void checkInvalidSize(std::size_t size, std::string_view expectedText) {
+// The IntType template parameter selects the appropriate overload of the validator based on whether the passed parameter is signed or not.
+template <typename Exception, std::integral IntType>
+static void checkInvalidSize(IntType size, std::string_view expectedText) {
     CAPTURE (size, expectedText);
     CHECK_THROWS_MATCHES(
         hmeigens::detail::validateSize(size),
@@ -49,17 +52,33 @@ static void checkMismatchingSize(std::size_t size, std::string_view expectedText
     return;
 }
 
-TEST_CASE("Square matrix helpers test: a valid size is accepted.", "[square_matrix_helpers]") {
-    // GIVEN a valid size for a matrix
+TEST_CASE("Square matrix helpers test: a valid unsigned size is accepted.", "[square_matrix_helpers]") {
+    // GIVEN a valid unsigned size for a matrix
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the size is reported as valid
     //
     // If the size is valid, the function returns the size, so it is enough to just check against the input.
     // Minimum valid size.
-    CHECK(hmeigens::detail::validateSize(1) == 1);
+    CHECK(hmeigens::detail::validateSize(std::size_t{1}) == 1);
     // A large size for practical uses.
     // This is a magic number, but the upper boundary of the matrix size varies from machine to machine and is not easy to compute.
     // This is, for all intents and purposes, a number big enough to mean something, but small enough that it will always be a theoretically possible size.
+    CHECK(hmeigens::detail::validateSize(std::size_t{10'000}) == 10'000);
+}
+
+TEST_CASE("Square matrix helpers test: a valid signed size is accepted.", "[square_matrix_helpers]") {
+    // GIVEN a valid signed size for a matrix
+    // WHEN  hmeigens::detail::validateSize attempts to validate it
+    // THEN  the size is reported as valid
+    //
+    // Same numbers as the unsigned case, but signed.
+    // All of these must remain untouched and reach the unsigned case.
+    //
+    // These values skip the template overload and directly go to the long long int overload.
+    CHECK(hmeigens::detail::validateSize(1ll) == 1);
+    CHECK(hmeigens::detail::validateSize(10'000ll) == 10'000);
+    // These values reach the template overload.
+    CHECK(hmeigens::detail::validateSize(1) == 1);
     CHECK(hmeigens::detail::validateSize(10'000) == 10'000);
 }
 
@@ -67,7 +86,10 @@ TEST_CASE("Square matrix helpers test: size 0 is correctly reported.", "[square_
     // GIVEN size 0
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the correct exception is thrown, with a message containing the reason and the invalid size
-    checkInvalidSize<std::invalid_argument>(0, "Size 0 is invalid for a matrix.");
+    checkInvalidSize<std::invalid_argument>(std::size_t{0}, "Size 0 is invalid for a matrix.");
+    // The signed overload must not touch 0.
+    // Since the signed overload does not throw with this text, this test passing means 0ll reached the unsigned validator.
+    checkInvalidSize<std::invalid_argument>(0ll, "Size 0 is invalid for a matrix.");
 }
 
 TEST_CASE("Square matrix helpers test: size over max is correctly reported.", "[square_matrix_helpers]") {
@@ -95,6 +117,17 @@ TEST_CASE("Square matrix helpers test: sizes larger than container's max are rep
     }
     checkInvalidSize<std::length_error>(hmeigens::maxMatrixSize, std::format("{0}x{0}", hmeigens::maxMatrixSize));
     checkInvalidSize<std::length_error>(hmeigens::maxMatrixSize, "exceeds the maximum number of elements allowed");
+}
+
+TEST_CASE("Square matrix helpers test: negative sizes are correctly reported.", "[square_matrix_helpers]") {
+    // GIVEN a negative size
+    // WHEN  hmeigens::detail::validateSize attempts to validate it
+    // THEN  the correct exception is thrown, with a message containing the reason and the invalid size
+    //
+    // Maximum negative value.
+    checkInvalidSize<std::invalid_argument>(-1, "A matrix cannot have a negative size.\n---> Provided value: -1");
+    // Minimum negative value.
+    checkInvalidSize<std::invalid_argument>(std::numeric_limits<long long int>::min(), std::format("Provided value: {0}", std::numeric_limits<long long int>::min()));
 }
 
 TEST_CASE("Square matrix helpers test: appropriate size comparison.", "[square_matrix_helpers]") {
