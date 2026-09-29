@@ -71,9 +71,7 @@ namespace hmeigens {
         ///
         /// The size is the number of rows/columns of the matrix.
         /// @return The size of the matrix.
-        [[nodiscard]] std::size_t size() const {
-            return size_;
-        }
+        [[nodiscard]] std::size_t size() const;
 
         /// @brief Read access operator for the element in position (`row`, `col`), `0`-indexed.
         ///
@@ -87,12 +85,7 @@ namespace hmeigens {
         /// @sa operator()(std::size_t, std::size_t)
         /// @sa at(std::size_t, std::size_t) const
         /// @sa at(std::size_t, std::size_t)
-        [[nodiscard]] const Complex& operator() (std::size_t row, std::size_t col) const {
-            #ifndef NDEBUG
-            checkIndex (row, col);
-            #endif
-            return body_[getIndex(row, col)];
-        }
+        [[nodiscard]] const Complex& operator() (std::size_t row, std::size_t col) const;
 
         /// @brief Write access operator for the element in position (`row`, `col`), `0`-indexed.
         ///
@@ -106,12 +99,7 @@ namespace hmeigens {
         /// @sa operator()(std::size_t, std::size_t) const
         /// @sa at(std::size_t, std::size_t) const
         /// @sa at(std::size_t, std::size_t)
-        [[nodiscard]] Complex& operator() (std::size_t row, std::size_t col) {
-            #ifndef NDEBUG
-            checkIndex (row, col);
-            #endif
-            return body_[getIndex(row, col)];
-        }
+        [[nodiscard]] Complex& operator() (std::size_t row, std::size_t col);
 
         /// @brief Out-of-bound safe read access for the element in position (`row`, `col`), `0`-indexed.
         ///
@@ -123,10 +111,7 @@ namespace hmeigens {
         /// @sa operator()(std::size_t, std::size_t) const
         /// @sa operator()(std::size_t, std::size_t)
         /// @sa at(std::size_t, std::size_t)
-        [[nodiscard]] const Complex& at(std::size_t row, std::size_t col) const {
-            checkIndex (row, col);
-            return body_[getIndex(row, col)];
-        }
+        [[nodiscard]] const Complex& at(std::size_t row, std::size_t col) const;
 
         /// @brief Out-of-bound safe write access for the element in position (`row`, `col`), `0`-indexed.
         ///
@@ -138,17 +123,12 @@ namespace hmeigens {
         /// @sa operator()(std::size_t, std::size_t) const
         /// @sa operator()(std::size_t, std::size_t)
         /// @sa at(std::size_t, std::size_t) const
-        [[nodiscard]] Complex& at(std::size_t row, std::size_t col) {
-            checkIndex (row, col);
-            return body_[getIndex(row, col)];
-        }
+        [[nodiscard]] Complex& at(std::size_t row, std::size_t col);
 
         private:
         // Member function for computing the index of an element given the row and col (column).
         // All in a single place, so it doesn't need to be repeated every time an index is needed.
-        [[nodiscard]] std::size_t getIndex (std::size_t row, std::size_t col) const {
-            return row * size_ + col;
-        }
+        [[nodiscard]] std::size_t getIndex (std::size_t row, std::size_t col) const;
 
         // Member function to verify that an index is within the confines of the matrix.
         // If either coordinate is greater or equal to size, it throws an std::out_of_range exception.
