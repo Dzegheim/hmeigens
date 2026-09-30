@@ -75,6 +75,7 @@ set(HMEIGENS_SOURCES
     detail/text_escape.cpp
     detail/to_scalar.cpp
     detail/square_matrix_helpers.cpp
+    detail/isqrt.cpp
 )
 list(TRANSFORM HMEIGENS_SOURCES PREPEND src/hmeigens/)
 

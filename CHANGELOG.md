@@ -36,6 +36,7 @@ Version 0.2.0 is recorded from git history.
 - **Tests for `scalar.hpp`.** Specifically:
     - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);
     - `hmeigens::operator""_hs` returns the expected type and the correct values.
+- **An integer square root function `hmeigens::detail::isqrt()`.** With tests.
 
 ### Changed
 - **`hmeigens::SquareMatrix` construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
