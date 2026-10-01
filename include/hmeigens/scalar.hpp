@@ -37,9 +37,17 @@ namespace hmeigens {
     /// The initials `hs` stand for `hmeigens` and `Scalar` respectively.
     /// @param toConvert A floating-point value to turn into a `hmeigens::Scalar`.
     /// @return A `static_cast` to `hmeigens::Scalar` of the input.
-    consteval Scalar operator""_hs (long double toConvert) {
-        return static_cast<Scalar>(toConvert);
-    }
+    consteval Scalar operator""_hs (long double toConvert);
+}
+
+/* ------------------------------*/
+/* -------- Definitions -------- */
+/* ------------------------------*/
+
+// See the declaration for all relevant information.
+// This literal wraps a cast to avoid implicit conversions.
+consteval hmeigens::Scalar hmeigens::operator""_hs (long double toConvert) {
+    return static_cast<Scalar>(toConvert);
 }
 
 #endif
