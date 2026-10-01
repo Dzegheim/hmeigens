@@ -83,7 +83,6 @@ TEST_CASE("Square matrix test: invalid sizes are correctly reported.", "[square_
         std::invalid_argument
     );
     // Size too large.
-    // Note: it doesn't matter which of the two "too large" cases it is, those are tested in the square_matrix_helpers_test.cpp file.
     CHECK_THROWS_AS(
         hmeigens::SquareMatrix(hmeigens::maxMatrixSize+1),
         std::length_error
