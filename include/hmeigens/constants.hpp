@@ -29,11 +29,8 @@ namespace hmeigens {
     /// Let `BST` be the number of bits of `std::size_t` and `**` be the exponentiation operation, then the expression `2**(BST/2)-1` is the largest (unsigned) integer that can be squared without overflowing.
     inline constexpr std::size_t maxSquarableSize = (std::size_t{1} << (std::numeric_limits<std::size_t>::digits / 2)) - 1;
     // These two assertions verify that the operation above behaved properly.
-    static_assert(maxSquarableSize <= std::numeric_limits<std::size_t>::max() / maxSquarableSize, "The variable maxSquarableSize cannot overflow when squared.");
-    static_assert(maxSquarableSize + 1 > std::numeric_limits<std::size_t>::max() / (maxSquarableSize + 1),"The variable maxSquarableSize must be the largest possible value that does not overflow when squared.");
-
-    // Temporary fix, this will soon change value and move.
-    inline constexpr std::size_t maxMatrixSize = maxSquarableSize;
+    static_assert(maxSquarableSize <= std::numeric_limits<std::size_t>::max() / maxSquarableSize, "The variable hmeigens::maxSquarableSize cannot overflow when squared.");
+    static_assert(maxSquarableSize + 1 > std::numeric_limits<std::size_t>::max() / (maxSquarableSize + 1),"The variable hmeigens::maxSquarableSize must be the largest possible value that does not overflow when squared.");
 }
 
 #endif

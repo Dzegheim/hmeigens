@@ -4,9 +4,13 @@
 #define HMEIGENS_SQUARE_MATRIX_HPP
 
 #include "hmeigens/scalar.hpp"
+#include "hmeigens/constants.hpp"
+#include "hmeigens/detail/isqrt.hpp"
 
 #include <vector>
-#include <cstddef>  // For std::size_t
+#include <cstddef>      // For std::size_t
+#include <concepts>     // For std::signed_integral, std::floating_point
+#include <algorithm>    // For std::min
 
 namespace hmeigens {
 
@@ -134,6 +138,22 @@ namespace hmeigens {
         // If either coordinate is greater or equal to size, it throws an std::out_of_range exception.
         void checkIndex (std::size_t row, std::size_t col) const;
     };
+
+    /// @brief The maximum size that a square matrix can have.
+    ///
+    /// The maximum size must account for the fact that a matrix contains `size * size` elements. The value `size` is verified against this constant, so if `size  > hmeigens::maxMatrixSize` either:
+    /// - its square would overflow std::size_t;
+    /// - the number of elements cannot be held within hmeigens::SquareMatrix::Container.
+    /// @note This is the only upper bound on the matrix size enforced by this code. If a `1'000'000`x`1'000'000` matrix is created, the user is expected to know what they're doing by creating such a large table of numbers. Who even needs such a large matrix? (:
+    inline constexpr std::size_t maxMatrixSize = std::min(
+        maxSquarableSize,
+        detail::isqrt(
+            hmeigens::SquareMatrix::Container{}.max_size()
+        )
+    );
+    // These two assertions verify that the operation above behaved properly.
+    static_assert(maxMatrixSize <= maxSquarableSize, "The variable hmeigens::maxMatrixSize cannot overflow when squared.");
+    static_assert(maxMatrixSize * maxMatrixSize <= SquareMatrix::Container{}.max_size(), "The variable hmeigens::maxMatrixSize squared must represent a valid number of elements for hmeigens::SquareMatrix::Container.");
 }
 
 #endif

@@ -37,11 +37,13 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);
     - `hmeigens::operator""_hs` returns the expected type and the correct values.
 - **An integer square root function `hmeigens::detail::isqrt()`.** With tests.
+- **A new constant `hmeigens::maxSquarableSize`.** It represents the maximum value squarable without wrapping `std::size_t`.
 
 ### Changed
 - **`hmeigens::SquareMatrix` construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
 - **Manual string concatenation replaced with `std::format` in the exception constructors all around the code.**
 - **The alias `hmeigens::detail::Container` is now `hmeigens::SquareMatrix::Container`.**
+- **The `hmeigens::maxMatrixSize` constant moved and changed in value.** It was moved from `constants.hpp` to `square_matrix.hpp`. Its value is no longer the maximum squarable `std::size_t`, but now the minimum of that value and the integer square root of the maximum amount of elements that can be stored in an `hmeigens::SquareMatrix::Container`.
 
 ### Fixed
 - **Control characters in input text no longer break error messages.** Before a `\0` or `\n` would not be escaped and, when properly rejected by the parser, would be printed literally in the diagnostics messages, breaking them. Printable control characters are rendered as `\n` or `\t`, unprintable ones as three digit octals. Non-ASCII text is still handled like before, so that someone passing an emoji or another special character will still see it in the output.
