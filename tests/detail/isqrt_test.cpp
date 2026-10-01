@@ -27,6 +27,6 @@ TEST_CASE("Integer square root test: values.", "[isqrt]") {
     CHECK(hmeigens::detail::isqrt(16) == 4);
     CHECK(hmeigens::detail::isqrt(17) == 4);
     // Maximum value.
-    // Here hmeigens::maxMatrixSize is by definition the maximum squarable std::size_t.
-    CHECK(hmeigens::detail::isqrt(std::numeric_limits<std::size_t>::max()) == hmeigens::maxMatrixSize);
+    // Here hmeigens::maxSquarableSize is by definition the maximum squarable std::size_t.
+    CHECK(hmeigens::detail::isqrt(std::numeric_limits<std::size_t>::max()) == hmeigens::maxSquarableSize);
 }
