@@ -17,7 +17,7 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::validateSize` and `hmeigens::detail::checkIfAppropriateSize` thoroughly tested.
 - **Tests for `hmeigens::SquareMatrix`.** Specifically:
     - a `SquareMatrix` built with a valid size reports it correctly with `size()`;
-    - invalid or mismatching sizes are rejected;
+    - invalid or mismatching sizes are rejected, including negative ones;
     - the accessors allow reading the element at the requested position;
     - the write accessors also allow editing the elements;
     - `at()` is index safe;
@@ -38,12 +38,15 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::operator""_hs` returns the expected type and the correct values.
 - **An integer square root function `hmeigens::detail::isqrt()`.** With tests.
 - **A new constant `hmeigens::maxSquarableSize`.** It represents the maximum value squarable without wrapping `std::size_t`.
+- **A concept `hmeigens::CanBeSize` that holds a list of types allowed to be interpreted as sizes.** The accepted native types are `short int`, `int`, `long int`, `long long int`, and their `unsigned` versions. Standard-defined types, such as `std::size_t`, work as long as the compiler maps them to one of the eight supported native types.
 
 ### Changed
 - **`hmeigens::SquareMatrix` construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
 - **Manual string concatenation replaced with `std::format` in the exception constructors all around the code.**
 - **The alias `hmeigens::detail::Container` is now `hmeigens::SquareMatrix::Container`.**
 - **The `hmeigens::maxMatrixSize` constant moved and changed in value.** It was moved from `constants.hpp` to `square_matrix.hpp`. Its value is no longer the maximum squarable `std::size_t`, but now the minimum of that value and the integer square root of the maximum amount of elements that can be stored in an `hmeigens::SquareMatrix::Container`.
+- **The `hmeigens::SquareMatrix` constructor taking size as a parameter now accepts only meaningful integers.** The accepted types are those mentioned in `hmeigens::CanBeSize`. Expressions that previously compiled due to indirect conversions, such as `hmeigens::SquareMatrix('A')` or `hmeigens::SquareMatrix(4.2)`, no longer do. Negative values which were previously a narrowing conversion, such as `hmeigens::SquareMatrix{-1}`, now compile and throw `std::invalid_argument`.
+- **Constructors taking floating-points or integers that are not in `hmeigens::CanBeSize` are now deleted.**
 
 ### Fixed
 - **Control characters in input text no longer break error messages.** Before a `\0` or `\n` would not be escaped and, when properly rejected by the parser, would be printed literally in the diagnostics messages, breaking them. Printable control characters are rendered as `\n` or `\t`, unprintable ones as three digit octals. Non-ASCII text is still handled like before, so that someone passing an emoji or another special character will still see it in the output.

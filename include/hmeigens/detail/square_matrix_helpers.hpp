@@ -3,15 +3,16 @@
 #ifndef HMEIGENS_DETAIL_SQUARE_MATRIX_HELPERS_HPP
 #define HMEIGENS_DETAIL_SQUARE_MATRIX_HELPERS_HPP
 
-#include <cstddef>    // For std::size_t
-#include <cstdint>    // For std::intmax_t, std::uintmax_t, SIZE_MAX, UINTMAX_MAX
-#include <concepts>   // For std::signed_integral, std::unsigned_integral
+#include <cstddef>      // For std::size_t
+#include <cstdint>      // For std::intmax_t, std::uintmax_t, SIZE_MAX, UINTMAX_MAX
+#include <concepts>     // For std::signed_integral, std::unsigned_integral, std::same_as
+#include <type_traits>  // For std::remove_const_t
 
 /* ------------------------------*/
 /* --------- IMPORTANT --------- */
 /* ------------------------------*/
 //
-// The main idea behind the functions below is that std::size_t is a useful type, but a little bit of a bastard as well.
+// The main idea behind the hmeigens::detail::validateSize functions below is that std::size_t is a useful type, but a little bit of a bastard as well.
 // On the machine where this code was physically written and tested std::size_t is 64 bit, and so its width matches std::uintmax_t exactly, but it may not be the case on other machines where it is, say, 32 bit.
 // In this implementation the reasoning varies based on 3 (actually 2) cases:
 // SIZE_MAX > UINTMAX_MAX: Impossible. If your machine satisfies this, you're not using standard C++, and this code is not meant for you.
@@ -29,7 +30,6 @@
 // - std::uintmax_t -> NT uintmax_t -> NT size_t;
 // - std::size_t -> NT size_t.
 // [***] This assumes an unsigned int is not size_t. If it were, the template would simply be skipped.
-
 
 namespace hmeigens::detail {
     // Helper function to validate the size of a matrix before constructing it.
@@ -68,7 +68,16 @@ namespace hmeigens::detail {
     // The variable containerSize is assumed to be the valid size of the hmeigens::SquareMatrix::Container passed to the two parameter constructor of the hmeigens::SquareMatrix class.
     // If the equality does not hold, it throws std::invalid_argument.
     [[nodiscard]] std::size_t checkIfAppropriateSize (std::size_t declaredSize, std::size_t containerSize);
+
+
+    // Fold expression that allows for any Allowed type to be accepted, fundamentally an allowlist instead of a forbidlist.
+    // Usage of std::remove_const is because constness is always allowed and does not alter whether a type is good or not to become a size. Any const int is allowed, any const double is not.
+    template <typename Candidate, typename... Allowed>
+    concept IsItAllowed = (std::same_as<std::remove_const_t<Candidate>, Allowed> or ...);
 }
+
+
+
 
 /* ------------------------------*/
 /* -------- Definitions -------- */

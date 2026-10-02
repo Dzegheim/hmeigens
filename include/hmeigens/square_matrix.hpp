@@ -6,13 +6,42 @@
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/constants.hpp"
 #include "hmeigens/detail/isqrt.hpp"
+#include "hmeigens/detail/square_matrix_helpers.hpp"
 
 #include <vector>
 #include <cstddef>      // For std::size_t
-#include <concepts>     // For std::signed_integral, std::floating_point
+#include <type_traits>  // For std::is_arithmetic_v
 #include <algorithm>    // For std::min
 
 namespace hmeigens {
+
+    /// @brief A `concept` holding a list of types that are allowed to become a size.
+    ///
+    /// This is to avoid something like a `bool` or a `wchar_t` being interpreted as a size. If that is meant to be one, it must be explicitly converted, because hmeigens::SquareMatrix('w') is not meaningful.
+    /// The types allowed to be sizes are:
+    /// - `short int`;
+    /// - `int`;
+    /// - `long int`;
+    /// - `long long int`;
+    /// - `unsigned short int`;
+    /// - `unsigned int`;
+    /// - `unsigned long int`;
+    /// - `unsigned long long int`.
+    /// @note All the types defined in `<cstddef>`, `<cstdint>`, etc... work, as long as the compiler used maps them to any of the types above.
+    template <typename Candidate>
+    // A Candidate is checked against the allowlist by hmeigens::detail::IsItAllowed.
+    concept CanBeSize = detail::IsItAllowed<
+        Candidate,
+        // Allowed types.
+        short int,
+        int,
+        long int,
+        long long int,
+        unsigned short int,
+        unsigned int,
+        unsigned long int,
+        unsigned long long int
+        >;
 
     /// @brief Square matrix with complex elements.
     ///
@@ -45,16 +74,16 @@ namespace hmeigens {
         /// @brief Constructor for a zero-filled `size * size` matrix.
         ///
         /// The size of the matrix is validated at creation, and cannot be altered afterwards. A matrix cannot have a size:
-        /// - 0 (meaningless);
+        /// - <=0 (meaningless);
         /// - so large that `size * size` cannot be represented;
         /// - so large that it cannot be stored on the machine.
         /// @param size The size for the matrix.
-        /// @throws std::invalid_argument if `size` is `0`.
-        /// @throws std::length_error if `size * size` cannot be represented within `std::size_t`.
-        /// @throws std::length_error if `size * size` exceeds the maximum allowed number of elements.
+        /// @throws std::invalid_argument if `size` is `<=0`.
+        /// @throws std::length_error if `size > hmeigens::maxMatrixSize`.
         /// @throws std::bad_alloc if the memory could not be allocated on the machine.
         /// @sa SquareMatrix(std::size_t, Container&&).
-        explicit SquareMatrix (std::size_t size);
+        template <CanBeSize Size>
+        explicit SquareMatrix (Size size);
 
         /// @brief Constructor for a `size * size` matrix with an already known `body`.
         ///
@@ -68,8 +97,18 @@ namespace hmeigens {
         /// @throws std::length_error if `size * size` cannot be represented within `std::size_t`.
         /// @throws std::length_error if `size * size` exceeds the maximum allowed number of elements.
         /// @throws std::invalid_argument if there is a mismatch between `size * size` and `body`'s length. This *may* be due to `body`'s length not being a perfect square, i.e. if the body does not map to a square matrix, or it may be due to a simple mismatch in the values.
-        /// @sa SquareMatrix(std::size_t).
+        /// @sa SquareMatrix(Size).
         explicit SquareMatrix (std::size_t size, Container&& body);
+
+        /// @brief Family of deleted constructors.
+        ///
+        /// Any type that satisfies `std::is_arithmetic_v`, i.e. integers and floating-points, but is not a type belonging to `hmeigens::CanBeSize`, is not valid as a size.
+        /// @sa SquareMatrix(size).
+        template <typename Rejected>
+        requires(
+            std::is_arithmetic_v<Rejected> and not CanBeSize<Rejected>
+        )
+        explicit SquareMatrix (Rejected) = delete;
 
         /// @brief A getter for the size of the matrix.
         ///
@@ -155,5 +194,22 @@ namespace hmeigens {
     static_assert(maxMatrixSize <= maxSquarableSize, "The variable hmeigens::maxMatrixSize cannot overflow when squared.");
     static_assert(maxMatrixSize * maxMatrixSize <= SquareMatrix::Container{}.max_size(), "The variable hmeigens::maxMatrixSize squared must represent a valid number of elements for hmeigens::SquareMatrix::Container.");
 }
+
+/* ------------------------------*/
+/* -------- Definitions -------- */
+/* ------------------------------*/
+//
+// One parameter constructor.
+// Takes the size as a parameter, validates it via helper, then if everything's fine it initializes the matrix as a 0 filled hmeigens::SquareMatrix::Container whose length is size*size.
+// If there is a problem with the size, the helper function throws.
+// Fully documented at the declaration.
+template <hmeigens::CanBeSize Size>
+hmeigens::SquareMatrix::SquareMatrix (Size size) :
+    // Validating HERE is important, because if it's done later, there could be an attempt to make a hmeigens::SquareMatrix::Container with an invalid size.
+    size_(hmeigens::detail::validateSize(size)),
+    // Using size_ for initialization makes it so that if the members are somehow swapped in the header, -Wuninitialized (i. e. -Wall) would complain.
+    // The container may generate a std::bad_alloc. That is deliberately not handled here.
+    body_(size_*size_) {}
+
 
 #endif

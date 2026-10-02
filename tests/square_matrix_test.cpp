@@ -120,23 +120,16 @@ TEST_CASE("Square matrix test: invalid sizes are correctly reported.", "[square_
         ),
         std::invalid_argument
     );
-    // NOTE: There is no meaningful way to test for the std::bad_alloc exception. That is generated when the checks pass on the size, but the container cannot allocate, and it's the standard library's job.
-    // In the documentation there is still info that the constructor can throw, but testing for it means testing std::vector.
-}
-
-TEST_CASE("FAILING - Square matrix test: negative sizes are correctly reported.", "[square_matrix][!shouldfail]") {
-    // FAILING CASE: Negative size.
-    // At the moment a negative size is caught as a wrong one, but is incorrectly reported as std::length_error. It should be std::invalid_argument. This is in the process of being fixed.
     CHECK_THROWS_AS(
         hmeigens::SquareMatrix(-1),
         std::invalid_argument
     );
-    // WIP: This is a narrowing conversion and does not compile.
-    // When the issue is fixed it will be an std::invalid_argument.
-    //CHECK_THROWS_AS(
-    //    hmeigens::SquareMatrix{-1},
-    //    std::invalid_argument
-    //);
+    CHECK_THROWS_AS(
+        hmeigens::SquareMatrix{-1},
+        std::invalid_argument
+    );
+    // NOTE: There is no meaningful way to test for the std::bad_alloc exception. That is generated when the checks pass on the size, but the container cannot allocate, and it's the standard library's job.
+    // In the documentation there is still info that the constructor can throw, but testing for it means testing std::vector.
 }
 
 TEST_CASE("Square matrix test: the one parameter constructor is explicit.", "[square_matrix]") {
