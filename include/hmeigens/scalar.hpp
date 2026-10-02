@@ -43,7 +43,7 @@ namespace hmeigens {
 /* ------------------------------*/
 /* -------- Definitions -------- */
 /* ------------------------------*/
-
+//
 // See the declaration for all relevant information.
 // This literal wraps a cast to avoid implicit conversions.
 consteval hmeigens::Scalar hmeigens::operator""_hs (long double toConvert) {
