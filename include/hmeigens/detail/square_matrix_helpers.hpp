@@ -72,6 +72,7 @@ namespace hmeigens::detail {
 
     // Fold expression that allows for any Allowed type to be accepted, fundamentally an allowlist instead of a forbidlist.
     // Usage of std::remove_cv_t is because constness is always allowed and does not alter whether a type is good or not to become a size. Any const int is allowed, any const double is not.
+    // If somewhere somehow a volatile variable is needed it works too. Not used anywhere in this code, just for completeness.
     template <typename Candidate, typename... Allowed>
     concept IsItAllowed = (std::same_as<std::remove_cv_t<Candidate>, Allowed> or ...);
 }

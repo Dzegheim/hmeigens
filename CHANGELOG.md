@@ -38,7 +38,7 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::operator""_hs` returns the expected type and the correct values.
 - **An integer square root function `hmeigens::detail::isqrt()`.** With tests.
 - **A new constant `hmeigens::maxSquarableSize`.** It represents the maximum value squarable without wrapping `std::size_t`.
-- **A concept `hmeigens::CanBeSize` that holds a list of types allowed to be interpreted as sizes.** The accepted native types are `short int`, `int`, `long int`, `long long int`, and their `unsigned` versions. Standard-defined types, such as `std::size_t`, work as long as the compiler maps them to one of the eight supported native types.
+- **A concept `hmeigens::CanBeSize` that holds a list of types allowed to be interpreted as sizes.** The accepted native types are `short int`, `int`, `long int`, `long long int`, and their `unsigned` versions. Standard-defined types, such as `std::size_t`, work as long as the compiler maps them to one of the eight supported native types. All the accepted types also allow for `const` qualification (or even `volatile` if you're feeling spicy).
 
 ### Changed
 - **`hmeigens::SquareMatrix` construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
