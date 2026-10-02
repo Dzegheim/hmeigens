@@ -6,7 +6,7 @@
 #include <cstddef>      // For std::size_t
 #include <cstdint>      // For std::intmax_t, std::uintmax_t, SIZE_MAX, UINTMAX_MAX
 #include <concepts>     // For std::signed_integral, std::unsigned_integral, std::same_as
-#include <type_traits>  // For std::remove_const_t
+#include <type_traits>  // For std::remove_cv_t
 
 /* ------------------------------*/
 /* --------- IMPORTANT --------- */
@@ -71,9 +71,9 @@ namespace hmeigens::detail {
 
 
     // Fold expression that allows for any Allowed type to be accepted, fundamentally an allowlist instead of a forbidlist.
-    // Usage of std::remove_const is because constness is always allowed and does not alter whether a type is good or not to become a size. Any const int is allowed, any const double is not.
+    // Usage of std::remove_cv_t is because constness is always allowed and does not alter whether a type is good or not to become a size. Any const int is allowed, any const double is not.
     template <typename Candidate, typename... Allowed>
-    concept IsItAllowed = (std::same_as<std::remove_const_t<Candidate>, Allowed> or ...);
+    concept IsItAllowed = (std::same_as<std::remove_cv_t<Candidate>, Allowed> or ...);
 }
 
 
