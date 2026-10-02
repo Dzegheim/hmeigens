@@ -11,10 +11,11 @@ Version 0.2.0 is recorded from git history.
 - **Tests for `hmeigens::parseComplex`.** Specifically:
     - values that underflow `hmeigens::Scalar`, as previous testing for out-of-range only would test for overflow;
     - specific tests for `hmeigens::ParseError`.
-- **Tests for the `hmeigens::detail` functions.** Specifically:
+- **Tests for `hmeigens::detail`.** Specifically:
     - `hmeigens::detail::toScalar` thoroughly tested;
     - `hmeigens::detail::isDisplayable` + `hmeigens::detail::escape` thoroughly tested, i.e. control characters, backslash, and quotes in rejected input are escaped;
-    - `hmeigens::detail::validateSize` and `hmeigens::detail::checkIfAppropriateSize` thoroughly tested.
+    - `hmeigens::detail::validateSize` and `hmeigens::detail::checkIfAppropriateSize` thoroughly tested;
+    - `hmeigens::detail::IsItAllowed` thoroughly tested.
 - **Tests for `hmeigens::SquareMatrix`.** Specifically:
     - a `SquareMatrix` built with a valid size reports it correctly with `size()`;
     - invalid or mismatching sizes are rejected, including negative ones;
@@ -22,10 +23,11 @@ Version 0.2.0 is recorded from git history.
     - the write accessors also allow editing the elements;
     - `at()` is index safe;
     - `operator()` is index safe **in debug mode only**;
-    - a `SquareMatrix` constructed with the one parameter constructor is zero-filled;
+    - a `SquareMatrix` constructed with the integer parameter constructor is zero-filled;
     - a `SquareMatrix` constructed with the two parameter constructor is filled with the correct elements in row-major order;
     - `type_traits` tests to assert return types for accessors and their constness (or lack of it);
-    - `type_traits` test to check for the explicitness of the one parameter constructor.
+    - `type_traits` test to check for the explicitness of the integer parameter constructor;
+    - `hmeigens::CanBeSize` and the integer parameter constructor correctly allow intended sizes and refuse undesirable ones.
 - **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
 - **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
 - **Several `hmeigens::SquareMatrix` class features.** Specifically:

@@ -7,7 +7,7 @@ using hmeigens::operator""_hs;
 #include <cstddef>       // For std::size_t
 #include <format>
 #include <string_view>
-#include <type_traits>   // For std::is_same, std::is_assignable_v, std::is_convertible_v
+#include <type_traits>   // For std::is_same, std::is_assignable_v, std::is_convertible_v, std::is_constructible_v
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
@@ -53,16 +53,60 @@ static void checkAllElementsVersus(const hmeigens::SquareMatrix& toCheck, const 
     return;
 }
 
+TEST_CASE("Square matrix test: only the allowed types are accepted as sizes.", "[square_matrix]") {
+    // GIVEN a type
+    // WHEN  checked against the allowed ones
+    // THEN  the allowed ones are accepted, the others are not
+    STATIC_REQUIRE(hmeigens::CanBeSize<short int>);
+    STATIC_REQUIRE(hmeigens::CanBeSize<int>);
+    STATIC_REQUIRE(hmeigens::CanBeSize<long int>);
+    STATIC_REQUIRE(hmeigens::CanBeSize<long long int>);
+    STATIC_REQUIRE(hmeigens::CanBeSize<unsigned short int>);
+    STATIC_REQUIRE(hmeigens::CanBeSize<unsigned int>);
+    STATIC_REQUIRE(hmeigens::CanBeSize<unsigned long int>);
+    STATIC_REQUIRE(hmeigens::CanBeSize<unsigned long long int>);
+    // Integers that are meaningless as sizes.
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<bool>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<char>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<signed char>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<unsigned char>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<char8_t>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<char16_t>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<char32_t>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<wchar_t>);
+    // Floats.
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<float>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<double>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<long double>);
+    // Constness and volatility don't matter.
+    STATIC_REQUIRE(hmeigens::CanBeSize<const volatile int>);
+    STATIC_REQUIRE_FALSE(hmeigens::CanBeSize<const volatile float>);
+    // The aliases used in the code work.
+    STATIC_REQUIRE(hmeigens::CanBeSize<std::size_t>);
+    STATIC_REQUIRE(hmeigens::CanBeSize<std::intmax_t>);
+    STATIC_REQUIRE(hmeigens::CanBeSize<std::uintmax_t>);
+}
+
+TEST_CASE("Square matrix test: the integer parameter constructor accepts valid types and refuses invalid ones.", "[square_matrix]") {
+    // GIVEN a type
+    // WHEN  the compiler checks if it is valid
+    // THEN  the allowed ones are accepted, the others are not
+    STATIC_REQUIRE(std::is_constructible_v<hmeigens::SquareMatrix, int>);
+    STATIC_REQUIRE_FALSE(std::is_constructible_v<hmeigens::SquareMatrix, double>);
+}
+
 TEST_CASE("Square matrix test: a matrix has the size it was constructed with.", "[square_matrix]") {
     // GIVEN a valid size for a matrix
     // WHEN  the matrix is constructed
     // THEN  the size of the matrix is the correct one
     //
-    // One parameter constructor.
-    // Minimum size.
+    // Integer parameter constructor.
+    // Minimum size. Both a signed and an unsigned value.
     CHECK(hmeigens::SquareMatrix{1}.size() == 1);
+    CHECK(hmeigens::SquareMatrix{1u}.size() == 1);
     // Non trivial size.
     CHECK(hmeigens::SquareMatrix{500}.size() == 500);
+    CHECK(hmeigens::SquareMatrix{500u}.size() == 500);
     // Two parameter constructor.
     // Minimum size.
     CHECK(hmeigens::SquareMatrix{1, hmeigens::SquareMatrix::Container(1)}.size() == 1);
@@ -132,7 +176,7 @@ TEST_CASE("Square matrix test: invalid sizes are correctly reported.", "[square_
     // In the documentation there is still info that the constructor can throw, but testing for it means testing std::vector.
 }
 
-TEST_CASE("Square matrix test: the one parameter constructor is explicit.", "[square_matrix]") {
+TEST_CASE("Square matrix test: the integer parameter constructor is explicit.", "[square_matrix]") {
     // GIVEN a size
     // WHEN  an implicit conversion to a matrix is attempted
     // THEN  it is refused

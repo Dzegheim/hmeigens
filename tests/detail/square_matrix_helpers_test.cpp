@@ -174,3 +174,20 @@ TEST_CASE("Square matrix helpers test: mismatching or inappropriate sizes are re
     checkMismatchingSize<std::invalid_argument>(4, "The provided matrix is not 4x4.\n---> Expected elements: 16.\n---> Provided elements: 0.", hmeigens::SquareMatrix::Container{});
     checkMismatchingSize<std::invalid_argument>(2, "The provided matrix is not 2x2.\n---> Expected elements: 4.\n---> Provided elements: 6.", hmeigens::SquareMatrix::Container{1._hs, 2._hs, 3._hs, 4._hs, 5._hs, 6._hs});
 }
+
+TEST_CASE("Square matrix helpers test: listed types are accepted regardless of qualifiers.", "[square_matrix_helpers]") {
+    // GIVEN a type and a parameter pack of types
+    // WHEN  the first type is included in the parameter pack
+    // THEN  hmeigens::detail::IsItAllowed is true regardless of qualifiers
+    STATIC_REQUIRE(hmeigens::detail::IsItAllowed<double, float, double, long double>);
+    STATIC_REQUIRE(hmeigens::detail::IsItAllowed<const volatile char, char, wchar_t>);
+}
+
+TEST_CASE("Square matrix helpers test: unlisted types are refused.", "[square_matrix_helpers]") {
+    // GIVEN a type and a parameter pack of types
+    // WHEN  the first type is not included in the parameter pack
+    // THEN  hmeigens::detail::IsItAllowed is false
+    STATIC_REQUIRE_FALSE(hmeigens::detail::IsItAllowed<char32_t, float, double, long double>);
+    // Even a conversion is refused. Type must be exactly matching.
+    STATIC_REQUIRE_FALSE(hmeigens::detail::IsItAllowed<short int, int>);
+}
