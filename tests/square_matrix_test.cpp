@@ -5,7 +5,7 @@ using hmeigens::operator""_hs;
 
 #include <stdexcept>     // For std::out_of_range, std::length_error, std::invalid_argument
 #include <cstddef>       // For std::size_t
-#include <cstdint>      // For std::intmax_t, std::uintmax_t, SIZE_MAX, UINTMAX_MAX
+#include <cstdint>       // For std::intmax_t, std::uintmax_t
 #include <format>
 #include <string_view>
 #include <type_traits>   // For std::is_same, std::is_assignable_v, std::is_convertible_v, std::is_constructible_v
