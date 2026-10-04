@@ -46,12 +46,13 @@ namespace hmeigens {
     /// @brief Square matrix with complex elements.
     ///
     /// The size is fixed at construction and cannot be changed.
-    /// The `hmeigens::SquareMatrix::Container` `{1,2,3,4,5,6,7,8,9}` represents the matrix:
+    /// The elements are stored in row-major order, so `hmeigens::SquareMatrix::Container` `{1,2,3,4,5,6,7,8,9}` represents the matrix
     /// ```
     /// | 1   2   3 |
     /// | 4   5   6 |
     /// | 7   8   9 |
     /// ```
+    /// with a size of `3`.
     /// @note The size of a matrix is a **positive** number. A size `0` matrix **cannot** be constructed.
     class SquareMatrix {
         public:
@@ -59,7 +60,7 @@ namespace hmeigens {
         ///
         /// At the moment, it is `std::vector<hmeigens::Complex>`.
         using Container = std::vector<Complex>;
-        
+
         private:
         // Size of the matrix.
         // A square matrix is a size_ * size_ table of numbers.
@@ -68,42 +69,76 @@ namespace hmeigens {
         // IMPORTANT: This MUST live after size_ or:
         // - the constructor could try to allocate an invalid size;
         // - the constructor could try to read the size of a container after it has already been moved into body_.
-        Container body_; 
+        Container body_;
 
-        public:       
+        public:
         /// @brief Constructor for a zero-filled `size * size` matrix.
         ///
         /// The size of the matrix is validated at creation, and cannot be altered afterwards. A matrix cannot have a size:
         /// - <=0 (meaningless);
         /// - so large that `size * size` cannot be represented;
         /// - so large that it cannot be stored on the machine.
+        ///
+        /// Example:
+        /// ```cpp
+        /// #include "hmeigens/square_matrix.hpp"
+        ///
+        /// using hmeigens::SquareMatrix;
+        ///
+        /// int main() {
+        ///     // A 1x1 zero-filled matrix.
+        ///     // Note that this is different from SquareMatrix A{{1}}, as that is a 1x1 matrix with (1,0) as its only element.
+        ///     SquareMatrix A{1};
+        ///     // A 3x3 zero-filled matrix.
+        ///     SquareMatrix B{3};
+        /// }
+        /// ```
         /// @param size The size for the matrix.
         /// @throws std::invalid_argument if `size` is `<=0`.
         /// @throws std::length_error if `size > hmeigens::maxMatrixSize`.
         /// @throws std::bad_alloc if the memory could not be allocated on the machine.
-        /// @sa SquareMatrix(std::size_t, Container&&).
+        /// @sa SquareMatrix(Container&&).
         template<CanBeSize Size>
         explicit SquareMatrix(Size size);
 
-        /// @brief Constructor for a `size * size` matrix with an already known `body`.
+        /// @brief Constructor for a matrix with an already known `body`.
         ///
-        /// The size of the matrix is validated at creation, and cannot be altered afterwards. A matrix cannot have a size:
-        /// - `0` (meaningless);
-        /// - so large that `size * size` cannot be represented;
-        /// - so large that it cannot be stored on the machine.
-        /// @param size The size of the matrix.
-        /// @param body The elements of the matrix, row-major. The parameter must have `size * size` elements, and it must be an rvalue, as it is not copied but moved.
-        /// @throws std::invalid_argument if `size` is `0`.
-        /// @throws std::length_error if `size * size` cannot be represented within `std::size_t`.
-        /// @throws std::length_error if `size * size` exceeds the maximum allowed number of elements.
-        /// @throws std::invalid_argument if there is a mismatch between `size * size` and `body`'s length. This *may* be due to `body`'s length not being a perfect square, i.e. if the body does not map to a square matrix, or it may be due to a simple mismatch in the values.
+        /// The size of the matrix is validated at creation, and cannot be altered afterwards. A matrix cannot be built from a `body` that:
+        /// - is empty, as it would have `.size()` 0 (meaningless);
+        /// - has a number of elements that is not a perfect square, as it cannot be interpreted as a square matrix.
+        ///
+        /// Example:
+        /// ```cpp
+        /// #include "hmeigens/square_matrix.hpp"
+        /// #include "hmeigens/scalar.hpp"
+        ///
+        /// using hmeigens::SquareMatrix;
+        /// using hmeigens::operator""_hs;
+        ///
+        /// int main() {
+        ///     // A 1x1 matrix with (4.2, 6.7) as its only element.
+        ///     SquareMatrix A{{{4.2_hs, 6.7_hs}}};
+        ///     // A 1x1 matrix with (1,0) as its only element.
+        ///     // Note that this is different from SquareMatrix B{1}, as that is a 1x1 zero-filled matrix.
+        ///     SquareMatrix B{{1}};
+        ///     // A 3x3 matrix whose members are, in order, the pairs (1,1) to (9,9).
+        ///     SquareMatrix C {
+        ///         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
+        ///          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
+        ///          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
+        ///     };
+        /// }
+        /// ```
+        /// @param body The elements of the matrix, row-major. The parameter must be able to represent a square matrix, i.e. the number of its elements must be a perfect square. The square root of the number of elements will be the `size` of the matrix.
+        /// @throws std::invalid_argument if `body` is empty or not a perfect square.
+        /// @note The parameter `body` is moved into the matrix. It must be an rvalue, and it will not be valid after the operation.
         /// @sa SquareMatrix(Size).
-        explicit SquareMatrix(std::size_t size, Container&& body);
+        explicit SquareMatrix(Container&& body);
 
         /// @brief Family of deleted constructors.
         ///
         /// Any type that satisfies `std::is_arithmetic_v`, i.e. integers and floating-points, but is not a type belonging to `hmeigens::CanBeSize`, is not valid as a size.
-        /// @sa SquareMatrix(size).
+        /// @sa SquareMatrix(Size).
         template<typename Rejected>
         requires(
             std::is_arithmetic_v<Rejected> and not CanBeSize<Rejected>
@@ -199,7 +234,7 @@ namespace hmeigens {
 /* -------- Definitions -------- */
 /* ------------------------------*/
 //
-// One parameter constructor.
+// Size parameter constructor.
 // Takes the size as a parameter, validates it via helper, then if everything's fine it initializes the matrix as a 0 filled hmeigens::SquareMatrix::Container whose length is size*size.
 // If there is a problem with the size, the helper function throws.
 // Fully documented at the declaration.

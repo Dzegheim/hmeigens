@@ -88,7 +88,7 @@ TEST_CASE("Square matrix test: only the allowed types are accepted as sizes.", "
     STATIC_REQUIRE(hmeigens::CanBeSize<std::uintmax_t>);
 }
 
-TEST_CASE("Square matrix test: the integer parameter constructor accepts valid types and refuses invalid ones.", "[square_matrix]") {
+TEST_CASE("Square matrix test: the size parameter constructor accepts valid types and refuses invalid ones.", "[square_matrix]") {
     // GIVEN a type
     // WHEN  the compiler checks if it is valid
     // THEN  the allowed ones are accepted, the others are not
@@ -108,11 +108,11 @@ TEST_CASE("Square matrix test: a matrix has the size it was constructed with.", 
     // Non trivial size.
     CHECK(hmeigens::SquareMatrix{500}.size() == 500);
     CHECK(hmeigens::SquareMatrix{500u}.size() == 500);
-    // Two parameter constructor.
+    // Body parameter constructor.
     // Minimum size.
-    CHECK(hmeigens::SquareMatrix{1, hmeigens::SquareMatrix::Container(1)}.size() == 1);
+    CHECK(hmeigens::SquareMatrix{hmeigens::SquareMatrix::Container(1)}.size() == 1);
     // Non trivial size.
-    CHECK(hmeigens::SquareMatrix{500, hmeigens::SquareMatrix::Container(500*500)}.size() == 500);
+    CHECK(hmeigens::SquareMatrix{hmeigens::SquareMatrix::Container(500*500)}.size() == 500);
 }
 
 TEST_CASE("Square matrix test: invalid sizes are correctly reported.", "[square_matrix]") {
@@ -121,7 +121,7 @@ TEST_CASE("Square matrix test: invalid sizes are correctly reported.", "[square_
     // THEN  the correct exception is thrown
     //
     // The message is not checked here, as it is checked in tests/detail/square_matrix_helpers_test.cpp.
-    // One parameter constructor.
+    // Size parameter constructor.
     // Size 0.
     CHECK_THROWS_AS(
         hmeigens::SquareMatrix(0),
@@ -132,70 +132,59 @@ TEST_CASE("Square matrix test: invalid sizes are correctly reported.", "[square_
         hmeigens::SquareMatrix(hmeigens::maxMatrixSize+1),
         std::length_error
     );
-    // Two parameter constructor.
-    // Mismatch: container is too small.
-    CHECK_THROWS_AS(
-        hmeigens::SquareMatrix(
-            2,
-            hmeigens::SquareMatrix::Container(1)
-        ),
-        std::invalid_argument
-    );
-    // Mismatch: container is too large.
-    CHECK_THROWS_AS(
-        hmeigens::SquareMatrix(
-            2,
-            hmeigens::SquareMatrix::Container(5)
-        ),
-        std::invalid_argument
-    );
-    // Size is too large. The mismatch does not even matter, as the size validator runs first.
-    CHECK_THROWS_AS(
-        hmeigens::SquareMatrix(
-            hmeigens::maxMatrixSize + 1,
-            hmeigens::SquareMatrix::Container(1)
-        ),
-        std::length_error
-    );
-    // Size 0, with a matching size 0 container. This is caught by the size validator.
-    CHECK_THROWS_AS(
-        hmeigens::SquareMatrix(
-            0,
-            hmeigens::SquareMatrix::Container(0)
-        ),
-        std::invalid_argument
-    );
+    // Negative sizes.
     CHECK_THROWS_AS(
         hmeigens::SquareMatrix(-1),
         std::invalid_argument
     );
+    // In a previous version of the code this used to be a compile error, due to a narrowing conversion.
+    // Both the () and {} cases are tested to ensure the validation works correctly.
     CHECK_THROWS_AS(
         hmeigens::SquareMatrix{-1},
+        std::invalid_argument
+    );
+    // Body parameter constructor.
+    // Container is empty.
+    CHECK_THROWS_AS(
+        hmeigens::SquareMatrix(hmeigens::SquareMatrix::Container(0)),
+        std::invalid_argument
+    );
+    // Container cannot be interpreted as a square matrix.
+    CHECK_THROWS_AS(
+        hmeigens::SquareMatrix(hmeigens::SquareMatrix::Container(6)),
         std::invalid_argument
     );
     // NOTE: There is no meaningful way to test for the std::bad_alloc exception. That is generated when the checks pass on the size, but the container cannot allocate, and it's the standard library's job.
     // In the documentation there is still info that the constructor can throw, but testing for it means testing std::vector.
 }
 
-TEST_CASE("Square matrix test: the integer parameter constructor is explicit.", "[square_matrix]") {
+TEST_CASE("Square matrix test: the constructors are explicit.", "[square_matrix]") {
     // GIVEN a size
     // WHEN  an implicit conversion to a matrix is attempted
     // THEN  it is refused
+    //
+    // Size parameter constructor
     STATIC_REQUIRE_FALSE(
         std::is_convertible_v<
             std::size_t,
             hmeigens::SquareMatrix
         >
     );
-    // There is neither need nor a meaningful way to test for the explicitness of the two parameter constructor.
+    // Body parameter constructor
+    STATIC_REQUIRE_FALSE(
+        std::is_convertible_v<
+            hmeigens::SquareMatrix::Container,
+            hmeigens::SquareMatrix
+        >
+    );
 }
 
 TEST_CASE("Square matrix test: accessors return the correct type.", "[square_matrix]") {
     // GIVEN a matrix
     // WHEN  the accessors' return type is checked
     // THEN  the returned type is correctly qualified
-    hmeigens::SquareMatrix testMatrix {2};
-    const hmeigens::SquareMatrix testMatrixConst {2};
+    hmeigens::SquareMatrix testMatrix{2};
+    const hmeigens::SquareMatrix testMatrixConst{2};
     // (0,0) is arbitrary and resolved by decltype without needing an actual element.
     STATIC_REQUIRE(
         std::is_same_v<
@@ -239,7 +228,6 @@ TEST_CASE("Square matrix test: accessor operator() const returns the correct ele
         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}
     };
     const hmeigens::SquareMatrix testMatrixConst {
-        3,
         // Needs a copy of testBody, as the constructor moves it.
         hmeigens::SquareMatrix::Container{testBody}
     };
@@ -259,7 +247,6 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
     // The alternative was using either member-pointers or lambdas. That would be like shooting a fly with a bazooka, so a simple copy-paste here works.
     // The checkAllElementsVersus helper uses only the trusted hmeigens::SquareMatrix::operator() const, so here it would not do what is needed.
     hmeigens::SquareMatrix testMatrix {
-        3,
         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
@@ -334,7 +321,6 @@ TEST_CASE("Square matrix test: edited values persist and are in the right place.
     // Each SECTION produces a new matrix. Since this is an editing test, the test is performed on a fresh matrix.
     // The alternative could be, for example, writing different values. A new matrix is better, as if the accessors fuck something up, the tests still remain truly independent of each other.
     hmeigens::SquareMatrix testMatrix {
-        3,
         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
@@ -364,7 +350,6 @@ TEST_CASE("Square matrix test: the overloads of at() are index safe.", "[square_
     // WHEN  an out-of-range row column index pair is given to hmeigens::SquareMatrix::at()
     // THEN  an exception is thrown with the correct type and message
     hmeigens::SquareMatrix testMatrix {
-        3,
         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
@@ -416,7 +401,6 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
     // This is because Catch2, if a test is skipped even for a single SECTION, reports it entirely as skipped.
     // The choice made here is that, in this specific instance, code duplication is more acceptable than a less clear test result.
     hmeigens::SquareMatrix testMatrix {
-        3,
         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
@@ -455,8 +439,8 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
     }
 }
 
-TEST_CASE("Square matrix test: a matrix constructed with the one parameter constructor is zero-filled.", "[square_matrix]") {
-    // GIVEN a matrix of size n constructed with the one parameter constructor
+TEST_CASE("Square matrix test: a matrix constructed with the size parameter constructor is zero-filled.", "[square_matrix]") {
+    // GIVEN a matrix of size n constructed with the size parameter constructor
     // WHEN  the matrix is read
     // THEN  there are nxn elements whose value is 0.
     //
@@ -467,19 +451,25 @@ TEST_CASE("Square matrix test: a matrix constructed with the one parameter const
     checkAllElementsVersus(hmeigens::SquareMatrix{3}, hmeigens::SquareMatrix::Container(9));
 }
 
-TEST_CASE("Square matrix test: a matrix constructed with the two parameter constructor is filled with the appropriate elements in row-major order.", "[square_matrix]") {
-    // GIVEN a matrix of size n constructed with the two parameter constructor
+TEST_CASE("Square matrix test: a matrix constructed with the body parameter constructor is filled with the appropriate elements in row-major order.", "[square_matrix]") {
+    // GIVEN a matrix of size n constructed with the body parameter constructor
     // WHEN  the matrix is read
     // THEN  there are nxn elements which correspond to the provided ones in row-major order.
     //
     // Trivial size.
     checkAllElementsVersus(
-        hmeigens::SquareMatrix {1, {{6.7_hs, 4.2_hs}}},
+        hmeigens::SquareMatrix{{{6.7_hs, 4.2_hs}}},
         hmeigens::SquareMatrix::Container{{6.7_hs, 4.2_hs}}
+    );
+    // Implicit conversion of int to hmeigens::Complex.
+    // In a previous version hmeigens::SquareMatrix{{1}} would be interpreted as a 1x1 0-filled matrix. This case checks for that solved bug.
+    checkAllElementsVersus(
+        hmeigens::SquareMatrix{{1}},
+        hmeigens::SquareMatrix::Container{{1.0_hs, 0.0_hs}}
     );
     // Non trivial size.
     checkAllElementsVersus(
-        hmeigens::SquareMatrix {2, {{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}},
+        hmeigens::SquareMatrix{{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}},
         hmeigens::SquareMatrix::Container{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}
     );
 }

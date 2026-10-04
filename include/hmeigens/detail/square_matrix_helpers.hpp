@@ -67,13 +67,6 @@ namespace hmeigens::detail {
     // If either is not satisfied, it throws an std::invalid_argument.
     [[nodiscard]] std::size_t sizeFromBodyLength(std::size_t bodyLength);
 
-    // SOON TO BE DELETED.
-    // Helper function to verify that the size provided to the constructor, when squared, is equal to the value of the other parameter.
-    // The variable declaredSize is always assumed to already have been validated by hmeigens::detail::validateSize.
-    // The variable containerSize is assumed to be the valid size of the hmeigens::SquareMatrix::Container passed to the two parameter constructor of the hmeigens::SquareMatrix class.
-    // If the equality does not hold, it throws std::invalid_argument.
-    [[nodiscard]] std::size_t checkIfAppropriateSize(std::size_t declaredSize, std::size_t containerSize);
-
     // Fold expression that allows for any Allowed type to be accepted, fundamentally an allowlist instead of a forbidlist.
     // Usage of std::remove_cv_t is because constness is always allowed and does not alter whether a type is good or not to become a size. Any const int is allowed, any const double is not.
     // If somewhere somehow a volatile variable is needed it works too. Not used anywhere in this code, just for completeness.

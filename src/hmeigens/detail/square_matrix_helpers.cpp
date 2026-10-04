@@ -62,7 +62,7 @@ std::size_t hmeigens::detail::validateSize(std::uintmax_t toValidate) {
             std::format(
                 "A {0}x{0} matrix cannot be created.\n---> Number of elements is too large to be represented by std::size_t. The maximum value that can be represented by the type is {1}.\n---> Note that the maximum size allowed for a matrix with the current build settings is {2}.",
                 toValidate,
-                std::numeric_limits<std::size_t>::max(), 
+                std::numeric_limits<std::size_t>::max(),
                 hmeigens::maxMatrixSize
             )
         };
@@ -83,14 +83,4 @@ std::size_t hmeigens::detail::sizeFromBodyLength(std::size_t bodyLength) {
         throw std::invalid_argument{std::format("The provided container does not represent a square matrix.\n---> Number of elements {0} is not a perfect square.", bodyLength)};
     }
     return root;
-}
-
-// SOON TO BE DELETED.
-std::size_t hmeigens::detail::checkIfAppropriateSize(std::size_t declaredSize, std::size_t containerSize) {
-    if (declaredSize * declaredSize != containerSize) {
-        // If there is a mismatch, throw.
-        // This covers both the wrong size being passed, and the hmeigens::SquareMatrix::Container not being a square matrix, i.e. its size not being a perfect square (it will never match the square of declaredSize).
-        throw std::invalid_argument{std::format("The provided matrix is not {0}x{0}.\n---> Expected elements: {1}.\n---> Provided elements: {2}.", declaredSize, declaredSize * declaredSize, containerSize)};
-    }
-    return declaredSize;
 }

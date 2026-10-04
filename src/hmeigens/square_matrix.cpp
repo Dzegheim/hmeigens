@@ -1,5 +1,4 @@
 #include "hmeigens/square_matrix.hpp"
-#include "hmeigens/constants.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
 
 #include <utility>     // For std::move
@@ -8,17 +7,12 @@
 #include <format>
 
 // Constructor of the hmeigens::SquareMatrix class.
-// Takes a size and a container object, and after validating the size and checking that the container is a square matrix-like object, uses it to fill the matrix.   
-// If there is a problem with the size, the helper functions throw.
+// Takes a container object, and after checking that the container is a non-empty square matrix-like object, uses it to fill the matrix.
+// If there is a problem with the size, the helper function throws.
 // Fully documented in .hpp.
-hmeigens::SquareMatrix::SquareMatrix(std::size_t size, hmeigens::SquareMatrix::Container&& body) :
-    // Size must be validated before checking if it is appropriate for the given body, as it tests for size * size and could overflow otherwise.
-    size_(
-        hmeigens::detail::checkIfAppropriateSize(
-            hmeigens::detail::validateSize(size),
-            body.size()
-        )
-    ),
+hmeigens::SquareMatrix::SquareMatrix(hmeigens::SquareMatrix::Container&& body) :
+    // Size must be checked before body is moved into the square matrix, as it needs to be a valid one.
+    size_(hmeigens::detail::sizeFromBodyLength(body.size())),
     // Here the hmeigens::SquareMatrix::Container is moved into body_. The container itself is not preserved, as its contents end up in the matrix.
     // Nothing that is meant to be kept must be passed here.
     body_(std::move(body)) {}
@@ -29,7 +23,7 @@ std::size_t hmeigens::SquareMatrix::size() const {
     return size_;
 }
 
-// This and the three after are the accesssors.
+// This and the three after are the accessors.
 // Notable thing: The operators are index safe in DEBUG MODE ONLY.
 // All fully documented in .hpp.
 const hmeigens::Complex& hmeigens::SquareMatrix::operator()(std::size_t row, std::size_t col) const {

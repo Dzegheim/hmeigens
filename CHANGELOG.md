@@ -13,25 +13,25 @@ Version 0.2.0 is recorded from git history.
     - specific tests for `hmeigens::ParseError`.
 - **Tests for `hmeigens::detail`.** Specifically:
     - `hmeigens::detail::toScalar` thoroughly tested;
-    - `hmeigens::detail::isDisplayable` + `hmeigens::detail::escape` thoroughly tested, i.e. control characters, backslash, and quotes in rejected input are escaped;
-    - `hmeigens::detail::validateSize`, `hmeigens::detail::sizeFromBodyLength`, and `hmeigens::detail::checkIfAppropriateSize` thoroughly tested;
+    - `hmeigens::detail::isDisplayable` and `hmeigens::detail::escape` thoroughly tested, i.e. control characters, backslash, and quotes in rejected input are escaped;
+    - `hmeigens::detail::validateSize` and `hmeigens::detail::sizeFromBodyLength` thoroughly tested;
     - `hmeigens::detail::IsItAllowed` thoroughly tested.
 - **Tests for `hmeigens::SquareMatrix`.** Specifically:
     - a `SquareMatrix` built with a valid size reports it correctly with `size()`;
-    - invalid or mismatching sizes are rejected, including negative ones;
+    - invalid sizes are rejected, including negative ones;
     - the accessors allow reading the element at the requested position;
     - the write accessors also allow editing the elements;
     - `at()` is index safe;
     - `operator()` is index safe **in debug mode only**;
-    - a `SquareMatrix` constructed with the integer parameter constructor is zero-filled;
-    - a `SquareMatrix` constructed with the two parameter constructor is filled with the correct elements in row-major order;
+    - a `SquareMatrix` constructed with the size parameter constructor is zero-filled;
+    - a `SquareMatrix` constructed with the body parameter constructor is filled with the correct elements in row-major order;
     - `type_traits` tests to assert return types for accessors and their constness (or lack of it);
-    - `type_traits` test to check for the explicitness of the integer parameter constructor;
-    - `hmeigens::CanBeSize` and the integer parameter constructor correctly allow intended sizes and refuse undesirable ones.
+    - `type_traits` test to check for the explicitness of the constructors;
+    - `hmeigens::CanBeSize` and the size parameter constructor correctly allow intended sizes and refuse undesirable ones.
 - **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
 - **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
 - **Several `hmeigens::SquareMatrix` class features.** Specifically:
-    - a new constructor that takes as parameters a size and a body containing numbers (row-major), creating a matrix with the corresponding contents;
+    - a new constructor that takes as parameter a body containing numbers (row-major), creating a matrix with the corresponding contents;
     - both read and write accessor `operator()` (does NOT check that the indexes are safe in release mode, and checks and behaves like `at()` in debug mode when `NDEBUG` is not defined);
     - both read and write safe accessor `at()` (checks the indexes and throws `std::out_of_range` if out of bounds).
 - **A new literal suffix `hmeigens::operator""_hs`.** It turns floating-point values into the current `hmeigens::Scalar` to avoid implicit conversions across the code.
@@ -54,6 +54,7 @@ Version 0.2.0 is recorded from git history.
 - **Control characters in input text no longer break error messages.** Before a `\0` or `\n` would not be escaped and, when properly rejected by the parser, would be printed literally in the diagnostics messages, breaking them. Printable control characters are rendered as `\n` or `\t`, unprintable ones as three digit octals. Non-ASCII text is still handled like before, so that someone passing an emoji or another special character will still see it in the output.
 - **`hmeigens::ParseError`'s two argument constructor now escapes the correct parameter.**
 - **Added missing `#include <cstddef>` in various files that needed it.**
+- **`hmeigens::SquareMatrix{{1}}` is now a `1x1` matrix whose only element is `(1,0)`.** Before it became a `1x1` zero-filled matrix, as the parameter was interpreted as a size.
 
 ## [0.5.0] - 2026-08-27
 ### Added
@@ -77,7 +78,7 @@ Version 0.2.0 is recorded from git history.
 ### Removed
 - **Support for `long double`.** The flag `-DHMEIGENS_SCALAR` now accepts `float` or `double` only. Reasoning: its size and precision are implementation defined, so it was more trouble than it was worth. Specifically:
     - [`std::from_chars`](https://en.cppreference.com/cpp/utility/from_chars) does not read them with the required accuracy of 1 ULP:
-    >  In any case, the resulting value is one of at most two floating-point values closest to the value of the string matching the pattern, after rounding according to `std::round_to_nearest`. 
+    >  In any case, the resulting value is one of at most two floating-point values closest to the value of the string matching the pattern, after rounding according to `std::round_to_nearest`.
     [libstdc++](https://github.com/gcc-mirror/gcc/blob/releases/gcc-15.2.0/libstdc%2B%2B-v3/src/c%2B%2B17/floating_from_chars.cc) verbatim says:
     >  // Either long double is the same as double, or we can't use strtold.
     >  // In the latter case, this might give an incorrect result (e.g. values
