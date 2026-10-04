@@ -16,7 +16,7 @@ namespace hmeigens::detail {
     // The chars before 128 are checked by std::isprint.
     // The parameter is unsigned char because char can be signed or unsigned depending on the compiler, so performing these types of checks on it is dangerous.
     // The argument must be a char, passing an unsigned one compiles and links but throws std::bad_cast at runtime.
-    [[nodiscard]] bool isDisplayable (unsigned char toCheck);
+    [[nodiscard]] bool isDisplayable(unsigned char toCheck);
 
     // This function renders arbitrary input as text that is safe to put in a message by escaping problematic characters.
     // Trusting the user to sanitize input is always a mistake.
@@ -24,7 +24,7 @@ namespace hmeigens::detail {
     // Escapes use three octal digits rather than hexadecimal escapes.
     // From https://en.cppreference.com/cpp/language/escape:
     // "Hexadecimal escape sequences have no length limit and terminate at the first character that is not a valid hexadecimal digit. If the value represented by a single hexadecimal escape sequence does not fit the range of values represented by the character type used in this string literal (char, char8_t, (since C++20)char16_t, char32_t, (since C++11)or wchar_t), the result is unspecified."
-    [[nodiscard]] std::string escape (std::string_view toEscape);
+    [[nodiscard]] std::string escape(std::string_view toEscape);
 }
 
 #endif

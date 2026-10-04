@@ -7,7 +7,7 @@
 namespace hmeigens::detail {
     // This function computes the integer square root of a given value, i.e. the largest integer root such that
     // root * root <= value.
-    [[nodiscard]] constexpr std::size_t isqrt (std::size_t value);
+    [[nodiscard]] constexpr std::size_t isqrt(std::size_t value);
 }
 
 /* ------------------------------*/
@@ -27,7 +27,7 @@ namespace hmeigens::detail {
 // >    large_cand = small_cand + 1
 // >    if large_cand * large_cand > n: return small_cand
 // >    else: return large_cand
-constexpr std::size_t hmeigens::detail::isqrt (std::size_t value) {
+constexpr std::size_t hmeigens::detail::isqrt(std::size_t value) {
     // The pseudocode guards against negative values. Using std::size_t makes this unnecessary.
     // 0 and 1 are fine as is.
     if (value < 2) {

@@ -11,7 +11,7 @@
 
 // Note from https://en.cppreference.com/cpp/utility/from_chars: "the plus sign is not recognized outside of the exponent (only the minus sign is permitted at the beginning)".
 // The case of a leading '+' is accepted in the input, and is handled manually in this function.
-[[nodiscard]] hmeigens::Scalar hmeigens::detail::toScalar (std::string_view toConvert, std::string_view fullInput) {
+[[nodiscard]] hmeigens::Scalar hmeigens::detail::toScalar(std::string_view toConvert, std::string_view fullInput) {
     // Stored here because if a leading "+" is removed, the user can still get the original text meant for conversion in an error message.
     const std::string_view originalToConvert = toConvert;
     // Check that toConvert is not empty, and that the first character is a '+'.
