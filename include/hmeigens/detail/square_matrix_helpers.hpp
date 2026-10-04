@@ -1,5 +1,4 @@
 // File for functions used by hmeigens::SquareMatrix to validate parameters for the constructors.
-
 #ifndef HMEIGENS_DETAIL_SQUARE_MATRIX_HELPERS_HPP
 #define HMEIGENS_DETAIL_SQUARE_MATRIX_HELPERS_HPP
 
@@ -32,6 +31,7 @@
 // [***] This assumes an unsigned int is not size_t. If it were, the template would simply be skipped.
 
 namespace hmeigens::detail {
+
     // Helper function to validate the size of a matrix before constructing it.
     // It rejects 0 and values that are too large to be represented or held by hmeigens::SquareMatrix::Container.
     // If the size is 0, it throws std::invalid_argument.

@@ -5,6 +5,7 @@
 #include <cstddef>  // For std::size_t
 
 namespace hmeigens::detail {
+
     // This function computes the integer square root of a given value, i.e. the largest integer root such that
     // root * root <= value.
     [[nodiscard]] constexpr std::size_t isqrt(std::size_t value);

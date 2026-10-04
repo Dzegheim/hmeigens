@@ -13,7 +13,7 @@
 // This is a helper function to verify that the number read corresponds to the expected one.
 // The expectedValue is a double because Catch2 always checks in double anyway.
 // See comment to checkParse in tests/complex_parse_test.cpp.
-static void checkReads (std::string_view toConvert, double expectedValue) {
+static void checkReads(std::string_view toConvert, double expectedValue) {
     CAPTURE(toConvert, expectedValue);
     constexpr double dblParseTolerance = static_cast<double>(hmeigens::parseTolerance);
     CHECK_THAT(
@@ -26,6 +26,7 @@ static void checkReads (std::string_view toConvert, double expectedValue) {
         ||
         Catch::Matchers::WithinRel(expectedValue, dblParseTolerance)
     );
+    return;
 }
 
 // This is a helper function to test whether text that is not supposed to be parsed:
@@ -34,7 +35,7 @@ static void checkReads (std::string_view toConvert, double expectedValue) {
 // - the exception contains the expected text;
 // - the exception contains the context text.
 // The contextText is defaulted to empty, as not all test cases need it.
-static void checkRejects (std::string_view testString, std::string_view expectedText, std::string_view contextText = {""}) {
+static void checkRejects(std::string_view testString, std::string_view expectedText, std::string_view contextText = {""}) {
     CAPTURE(testString, expectedText, contextText);
     CHECK_THROWS_MATCHES(
         hmeigens::detail::toScalar(testString, contextText),
@@ -45,6 +46,7 @@ static void checkRejects (std::string_view testString, std::string_view expected
             Catch::Matchers::ContainsSubstring(std::string{contextText})
         )
     );
+    return;
 }
 
 TEST_CASE("Text to scalar test: real numbers.", "[to_scalar]") {

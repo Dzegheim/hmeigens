@@ -7,9 +7,10 @@ using std::string_view_literals::operator""sv;
 #include <catch2/catch_test_macros.hpp>
 
 // This is a helper function to verify that the escaped text is the same as the expected one.
-static void checkEscape (std::string_view toEscape, std::string_view expectedText) {
+static void checkEscape(std::string_view toEscape, std::string_view expectedText) {
     CAPTURE(expectedText);
     CHECK(hmeigens::detail::escape(toEscape) == expectedText);
+    return;
 }
 
 TEST_CASE("Displayable chars test: special characters are correctly identified.", "[text_escape]") {

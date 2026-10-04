@@ -1,5 +1,4 @@
 // File for function used to convert strings into floating-point numbers.
-
 #ifndef HMEIGENS_DETAIL_TOSCALAR_HPP
 #define HMEIGENS_DETAIL_TOSCALAR_HPP
 

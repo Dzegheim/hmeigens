@@ -13,7 +13,7 @@ using std::string_view_literals::operator""sv;
 // This is a helper function to test whether the text is parsed correctly.
 // Apparently Catch2's floating-point matchers always compare in double (see catch_matchers_floating_point.hpp).
 // Source: https://github.com/catchorg/Catch2/blob/v3.15.3/docs/comparing-floating-point-numbers.md#withinabs
-static void checkParse (std::string_view testString, double expectedReal, double expectedImag) {
+static void checkParse(std::string_view testString, double expectedReal, double expectedImag) {
     // CAPTURE prints the captured value at the time of capture if the test doesn't pass.
     CAPTURE(testString);
     const auto z = hmeigens::parseComplex(testString);
@@ -34,6 +34,7 @@ static void checkParse (std::string_view testString, double expectedReal, double
         ||
         Catch::Matchers::WithinRel(expectedImag, dblParseTolerance)
     );
+    return;
 }
 
 // This is a helper function to test whether text that is not supposed to be parsed:
@@ -43,7 +44,7 @@ static void checkParse (std::string_view testString, double expectedReal, double
 // - if the error must contain a specific substring, it is present.
 // The optional alsoContains is used to verify the last point.
 // If it is left at its default value, matching it always returns true, so tests that don't care for it are unaffected.
-static void checkRejects (std::string_view testString, std::string_view alsoContains = {""}) {
+static void checkRejects(std::string_view testString, std::string_view alsoContains = {""}) {
     // The function hmeigens::detail::escape is tested independently in another file, therefore its behaviour is not verified again here.
     const std::string escaped = hmeigens::detail::escape(testString);
     // CAPTURE prints the captured value at the time of capture if the test doesn't pass.

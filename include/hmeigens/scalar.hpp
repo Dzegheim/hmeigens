@@ -6,6 +6,7 @@
 /// @note As of v0.3.0 `long double` is unsupported. See [CHANGELOG.md](CHANGELOG.md) for details.
 #ifndef HMEIGENS_SCALAR_HPP
 #define HMEIGENS_SCALAR_HPP
+
 #include <complex>
 #include <string>
 

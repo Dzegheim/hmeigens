@@ -9,6 +9,7 @@
 #include <stdexcept>     // For std::invalid_argument
 
 namespace hmeigens {
+    
     /// @brief Exception thrown when text cannot be parsed as a complex number.
     ///
     /// Inherits from `std::invalid_argument`, so it can be caught as that if it's not caught specifically as `hmeigens::ParseError`.

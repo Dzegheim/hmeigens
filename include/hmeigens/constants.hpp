@@ -9,6 +9,7 @@
 #include <cstddef>  // For std::size_t
 
 namespace hmeigens {
+    
     /// @brief The difference between `1.0` and the next `hmeigens::Scalar`.
     ///
     /// [Values](https://en.cppreference.com/cpp/types/climits):

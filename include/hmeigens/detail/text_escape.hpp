@@ -1,7 +1,5 @@
 // File for functions used to process input strings.
-//
 // Input may contain control characters that may break diagnostics messages.
-
 #ifndef HMEIGENS_DETAIL_TEXT_ESCAPE_HPP
 #define HMEIGENS_DETAIL_TEXT_ESCAPE_HPP
 
@@ -9,6 +7,7 @@
 #include <string_view>
 
 namespace hmeigens::detail {
+
     // This function checks if a character is printable in the way that matters to this code.
     // The locale used is the std::locale::classic(), as it is the only one that will be used inside the code, so that the same input produces the same output independently of the user's locale settings.
     // From 128 onward there is no need to check here, those are not ASCII.

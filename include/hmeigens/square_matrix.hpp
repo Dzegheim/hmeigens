@@ -246,5 +246,4 @@ hmeigens::SquareMatrix::SquareMatrix(Size size) :
     // The container may generate a std::bad_alloc. That is deliberately not handled here.
     body_(size_*size_) {}
 
-
 #endif
