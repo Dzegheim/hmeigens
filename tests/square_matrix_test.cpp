@@ -18,7 +18,7 @@ using hmeigens::operator""_hs;
 // This helper checks that two complex numbers passed to it are "equal", i.e. that their real and imaginary parts are both within 0 ULPs of each other.
 // The 0 ULP tolerance comes from the fact that copying or referencing an element of a matrix must not alter it.
 // Since no arithmetic is performed, it must not be rounded or altered.
-static void checkComplex (const hmeigens::Complex& toCheck, const hmeigens::Complex& expected) {
+static void checkComplex(const hmeigens::Complex& toCheck, const hmeigens::Complex& expected) {
     CAPTURE(toCheck, expected);
     CHECK_THAT(
         // Real part check.
@@ -163,14 +163,14 @@ TEST_CASE("Square matrix test: the constructors are explicit.", "[square_matrix]
     // WHEN  an implicit conversion to a matrix is attempted
     // THEN  it is refused
     //
-    // Size parameter constructor
+    // Size parameter constructor.
     STATIC_REQUIRE_FALSE(
         std::is_convertible_v<
             std::size_t,
             hmeigens::SquareMatrix
         >
     );
-    // Body parameter constructor
+    // Body parameter constructor.
     STATIC_REQUIRE_FALSE(
         std::is_convertible_v<
             hmeigens::SquareMatrix::Container,
@@ -222,12 +222,12 @@ TEST_CASE("Square matrix test: accessor operator() const returns the correct ele
     // Due to encapsulation it is not possible to fully separate their behaviour: either there is a matrix to read, or nothing can be read at all.
     // The test here is performed versus values independent of the class, via testBody.
     // The other behaviours of the constructor (size, exceptions) can and are tested separately.
-    const hmeigens::SquareMatrix::Container testBody {
+    const hmeigens::SquareMatrix::Container testBody{
         {1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}
     };
-    const hmeigens::SquareMatrix testMatrixConst {
+    const hmeigens::SquareMatrix testMatrixConst{
         // Needs a copy of testBody, as the constructor moves it.
         hmeigens::SquareMatrix::Container{testBody}
     };
@@ -246,7 +246,7 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
     // Each check calls the helper checkComplex. Without SECTIONs a failed test does not say which overload it was.
     // The alternative was using either member-pointers or lambdas. That would be like shooting a fly with a bazooka, so a simple copy-paste here works.
     // The checkAllElementsVersus helper uses only the trusted hmeigens::SquareMatrix::operator() const, so here it would not do what is needed.
-    hmeigens::SquareMatrix testMatrix {
+    hmeigens::SquareMatrix testMatrix{
         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
@@ -283,7 +283,7 @@ TEST_CASE("Square matrix test: const accessors do not allow editing, non-consts 
     // GIVEN a matrix
     // WHEN  the accessors' return type is checked
     // THEN  the const accessors return uneditable references, the non const ones return editable ones
-    hmeigens::SquareMatrix testMatrix {2};
+    hmeigens::SquareMatrix testMatrix{2};
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
     // (0,0) is arbitrary and resolved by decltype without needing an actual element.
     STATIC_REQUIRE_FALSE(
@@ -320,7 +320,7 @@ TEST_CASE("Square matrix test: edited values persist and are in the right place.
     // Why SECTIONs here?
     // Each SECTION produces a new matrix. Since this is an editing test, the test is performed on a fresh matrix.
     // The alternative could be, for example, writing different values. A new matrix is better, as if the accessors fuck something up, the tests still remain truly independent of each other.
-    hmeigens::SquareMatrix testMatrix {
+    hmeigens::SquareMatrix testMatrix{
         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
@@ -330,16 +330,16 @@ TEST_CASE("Square matrix test: edited values persist and are in the right place.
     SECTION("hmeigens::SquareMatrix::at()") {
         // Testing both a diagonal and an off-diagonal element.
         // Edit the elements, then see if their value was updated.
-        testMatrix.at(0,0) = hmeigens::Complex {6._hs, 7._hs};
-        testMatrix.at(1,2) = hmeigens::Complex {4._hs, 2._hs};
+        testMatrix.at(0,0) = hmeigens::Complex{6._hs, 7._hs};
+        testMatrix.at(1,2) = hmeigens::Complex{4._hs, 2._hs};
         checkComplex(testMatrixConst(0,0), hmeigens::Complex {6._hs, 7._hs});
         checkComplex(testMatrixConst(1,2), hmeigens::Complex {4._hs, 2._hs});
     }
     SECTION("hmeigens::SquareMatrix::operator()") {
         // Testing both a diagonal and an off-diagonal element.
         // Edit the elements, then see if their value was updated.
-        testMatrix(0,0) = hmeigens::Complex {6._hs, 7._hs};
-        testMatrix(1,2) = hmeigens::Complex {4._hs, 2._hs};
+        testMatrix(0,0) = hmeigens::Complex{6._hs, 7._hs};
+        testMatrix(1,2) = hmeigens::Complex{4._hs, 2._hs};
         checkComplex(testMatrixConst(0,0), hmeigens::Complex {6._hs, 7._hs});
         checkComplex(testMatrixConst(1,2), hmeigens::Complex {4._hs, 2._hs});
     }
@@ -349,7 +349,7 @@ TEST_CASE("Square matrix test: the overloads of at() are index safe.", "[square_
     // GIVEN a matrix
     // WHEN  an out-of-range row column index pair is given to hmeigens::SquareMatrix::at()
     // THEN  an exception is thrown with the correct type and message
-    hmeigens::SquareMatrix testMatrix {
+    hmeigens::SquareMatrix testMatrix{
         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
@@ -400,7 +400,7 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
     // Yes, the code in this CASE is a duplication of the hmeigens::SquareMatrix::at CASE. This is deliberate.
     // This is because Catch2, if a test is skipped even for a single SECTION, reports it entirely as skipped.
     // The choice made here is that, in this specific instance, code duplication is more acceptable than a less clear test result.
-    hmeigens::SquareMatrix testMatrix {
+    hmeigens::SquareMatrix testMatrix{
         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
