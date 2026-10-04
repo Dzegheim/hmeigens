@@ -27,9 +27,9 @@ constexpr int bigEnoughNumber = 10'000;
 // - throws the correct exception type;
 // - exception's message contains the correct information, including the invalid size and the reason why it was invalid.
 // The IntType template parameter selects the appropriate overload of the validator based on whether the passed parameter is signed or not.
-template <typename Exception, std::integral IntType>
+template<typename Exception, std::integral IntType>
 static void checkInvalidSize(IntType size, std::string_view expectedText) {
-    CAPTURE (size, expectedText);
+    CAPTURE(size, expectedText);
     CHECK_THROWS_MATCHES(
         hmeigens::detail::validateSize(size),
         Exception,
@@ -40,13 +40,14 @@ static void checkInvalidSize(IntType size, std::string_view expectedText) {
     return;
 }
 
+// SOON TO BE DELETED.
 // This is a helper function to check whether hmeigens::detail::checkIfAppropriateSize:
 // - throws;
 // - throws the correct exception type;
 // - exception's message contains the correct information, including the mismatch and the expected amount.
-template <typename Exception>
+template<typename Exception>
 static void checkMismatchingSize(std::size_t size, std::string_view expectedText, const hmeigens::SquareMatrix::Container& container) {
-    CAPTURE (size, expectedText, container);
+    CAPTURE(size, expectedText, container);
     CHECK_THROWS_MATCHES(
         hmeigens::detail::checkIfAppropriateSize(size,container.size()),
         Exception,
@@ -156,6 +157,35 @@ TEST_CASE ("Square matrix helpers test: integer values that don't fit std::size_
     );
 }
 
+TEST_CASE("Square matrix helpers test: an appropriate container length is accepted.", "[square_matrix_helpers]") {
+    // GIVEN a perfect square integer
+    // WHEN  hmeigens::detail::sizeFromBodyLength attempts to validate it
+    // THEN  it is accepted and its integer square root is returned
+    CHECK(hmeigens::detail::sizeFromBodyLength(1) == 1);
+    CHECK(hmeigens::detail::sizeFromBodyLength(1'000'000) == 1'000);
+}
+
+TEST_CASE("Square matrix helpers test: an inappropriate container length is refused.", "[square_matrix_helpers]") {
+    // GIVEN 0 or an integer that is not a perfect square
+    // WHEN  hmeigens::detail::sizeFromBodyLength attempts to validate it
+    // THEN  it is rejected and the correct exception type is thrown, with the expected message
+    CHECK_THROWS_MATCHES(
+        hmeigens::detail::sizeFromBodyLength(0),
+        std::invalid_argument,
+        Catch::Matchers::MessageMatches(
+            Catch::Matchers::ContainsSubstring("empty")
+        )
+    );
+    CHECK_THROWS_MATCHES(
+        hmeigens::detail::sizeFromBodyLength(8),
+        std::invalid_argument,
+        Catch::Matchers::MessageMatches(
+            Catch::Matchers::ContainsSubstring("8 is not a perfect square")
+        )
+    );
+}
+
+// SOON TO BE DELETED.
 TEST_CASE("Square matrix helpers test: appropriate size comparison.", "[square_matrix_helpers]") {
     // GIVEN a hmeigens::SquareMatrix::Container with the appropriate size
     // WHEN  hmeigens::detail::checkIfAppropriateSize tries to validate it

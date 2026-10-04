@@ -21,7 +21,7 @@
 //
 // For comments about the design logic, see square_matrix_helpers.hpp.
 
-std::size_t hmeigens::detail::validateSize (std::size_t toValidate) {
+std::size_t hmeigens::detail::validateSize(std::size_t toValidate) {
     // A matrix must have a positive integer as a size.
     // A 0 size has no mathematical meaning.
     // Throws std::invalid_argument because the user provided an invalid argument to the constructor.
@@ -37,7 +37,7 @@ std::size_t hmeigens::detail::validateSize (std::size_t toValidate) {
     return toValidate;
 }
 
-std::size_t hmeigens::detail::validateSize (std::intmax_t toValidate) {
+std::size_t hmeigens::detail::validateSize(std::intmax_t toValidate) {
     // A matrix must have a positive integer as a size.
     // This function checks that the size is non-negative.
     // The other checks are handled by the unsigned overloads.
@@ -53,7 +53,7 @@ std::size_t hmeigens::detail::validateSize (std::intmax_t toValidate) {
 
 #if SIZE_MAX < UINTMAX_MAX
 // See the comment to the declaration in square_matrix_helpers.hpp for the preprocessor #if.
-std::size_t hmeigens::detail::validateSize (std::uintmax_t toValidate) {
+std::size_t hmeigens::detail::validateSize(std::uintmax_t toValidate) {
     // Check that the value fits into an std::size_t.
     if (std::cmp_greater(toValidate, std::numeric_limits<std::size_t>::max())) {
         throw std::length_error{
@@ -72,7 +72,21 @@ std::size_t hmeigens::detail::validateSize (std::uintmax_t toValidate) {
 }
 #endif
 
-std::size_t hmeigens::detail::checkIfAppropriateSize (std::size_t declaredSize, std::size_t containerSize) {
+std::size_t hmeigens::detail::sizeFromBodyLength(std::size_t bodyLength) {
+    // An empty container cannot be used to construct a matrix because it would have size 0.
+    if (bodyLength == 0) {
+        throw std::invalid_argument{"Cannot construct a matrix from an empty container."};
+    }
+    const std::size_t root = hmeigens::detail::isqrt(bodyLength);
+    // A matrix needs to be square, if the body's size is not a perfect square it cannot be mapped appropriately to a square matrix.
+    if (root * root != bodyLength) {
+        throw std::invalid_argument{std::format("The provided container does not represent a square matrix.\n---> Number of elements {0} is not a perfect square.", bodyLength)};
+    }
+    return root;
+}
+
+// SOON TO BE DELETED.
+std::size_t hmeigens::detail::checkIfAppropriateSize(std::size_t declaredSize, std::size_t containerSize) {
     if (declaredSize * declaredSize != containerSize) {
         // If there is a mismatch, throw.
         // This covers both the wrong size being passed, and the hmeigens::SquareMatrix::Container not being a square matrix, i.e. its size not being a perfect square (it will never match the square of declaredSize).
