@@ -473,3 +473,43 @@ TEST_CASE("Square matrix test: a matrix constructed with the body parameter cons
         hmeigens::SquareMatrix::Container{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}
     );
 }
+
+TEST_CASE("Square matrix test: the identity matrix has the correct form.", "[square_matrix]") {
+    // GIVEN a valid size
+    // WHEN  hmeigens::SquareMatrix::identity attempts to build an identity matrix of that size
+    // THEN  the matrix exists, has 1 on the diagonal, 0 everywhere else
+    checkAllElementsVersus(
+        hmeigens::SquareMatrix::identity(1),
+        hmeigens::SquareMatrix::Container{{{1._hs, 0._hs}}}
+    );
+    checkAllElementsVersus(
+        hmeigens::SquareMatrix::identity(3),
+        hmeigens::SquareMatrix::Container{
+            {{1._hs, 0._hs}, {0._hs, 0._hs}, {0._hs, 0._hs},
+             {0._hs, 0._hs}, {1._hs, 0._hs}, {0._hs, 0._hs},
+             {0._hs, 0._hs}, {0._hs, 0._hs}, {1._hs, 0._hs}}
+        }
+    );
+}
+
+TEST_CASE("Square matrix test: identity throws as expected for invalid sizes.", "[square_matrix]") {
+    // GIVEN an invalid size
+    // WHEN  hmeigens::SquareMatrix::identity attempts to build an identity matrix of that size
+    // THEN  it throws exactly like hmeigens::SquareMatrix(Size)
+    //
+    // Size 0.
+    CHECK_THROWS_AS(
+        hmeigens::SquareMatrix::identity(0),
+        std::invalid_argument
+    );
+    // Size too large.
+    CHECK_THROWS_AS(
+        hmeigens::SquareMatrix::identity(hmeigens::maxMatrixSize+1),
+        std::length_error
+    );
+    // Negative sizes.
+    CHECK_THROWS_AS(
+        hmeigens::SquareMatrix::identity(-1),
+        std::invalid_argument
+    );
+}

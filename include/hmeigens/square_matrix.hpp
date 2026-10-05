@@ -97,7 +97,7 @@ namespace hmeigens {
         /// @throws std::invalid_argument if `size` is `<=0`.
         /// @throws std::length_error if `size > hmeigens::maxMatrixSize`.
         /// @throws std::bad_alloc if the memory could not be allocated on the machine.
-        /// @sa SquareMatrix(Container&&).
+        /// @sa SquareMatrix(Container&&)
         template<CanBeSize Size>
         explicit SquareMatrix(Size size);
 
@@ -132,13 +132,13 @@ namespace hmeigens {
         /// @param body The elements of the matrix, row-major. The parameter must be able to represent a square matrix, i.e. the number of its elements must be a perfect square. The square root of the number of elements will be the `size` of the matrix.
         /// @throws std::invalid_argument if `body` is empty or not a perfect square.
         /// @note The parameter `body` is moved into the matrix. It must be an rvalue, and it will not be valid after the operation.
-        /// @sa SquareMatrix(Size).
+        /// @sa SquareMatrix(Size)
         explicit SquareMatrix(Container&& body);
 
         /// @brief Family of deleted constructors.
         ///
         /// Any type that satisfies `std::is_arithmetic_v`, i.e. integers and floating-points, but is not a type belonging to `hmeigens::CanBeSize`, is not valid as a size.
-        /// @sa SquareMatrix(Size).
+        /// @sa SquareMatrix(Size)
         template<typename Rejected>
         requires(
             std::is_arithmetic_v<Rejected> and not CanBeSize<Rejected>
@@ -203,6 +203,17 @@ namespace hmeigens {
         /// @sa at(std::size_t, std::size_t) const
         [[nodiscard]] Complex& at(std::size_t row, std::size_t col);
 
+        /// @brief Static member function that constructs an identity matrix of the given `size`.
+        ///
+        /// @param size The size of the requested identity matrix.
+        /// @return An `hmeigens::SquareMatrix` object of the requested `size` whose body is the corresponding identity matrix.
+        /// @throws std::invalid_argument if `size` is `<=0`.
+        /// @throws std::length_error if `size > hmeigens::maxMatrixSize`.
+        /// @throws std::bad_alloc if the memory could not be allocated on the machine.
+        /// @sa SquareMatrix(Size)
+        template<CanBeSize Size>
+        [[nodiscard]] static SquareMatrix identity(Size size);
+
         private:
         // Member function for computing the index of an element given the row and col (column).
         // All in a single place, so it doesn't need to be repeated every time an index is needed.
@@ -245,5 +256,25 @@ hmeigens::SquareMatrix::SquareMatrix(Size size) :
     // Using size_ for initialization makes it so that if the members are somehow swapped in the header, -Wuninitialized (i. e. -Wall) would complain.
     // The container may generate a std::bad_alloc. That is deliberately not handled here.
     body_(size_*size_) {}
+
+/// @cond
+// Doxygen 1.18.0 (used to write the documentation for this project) sometimes has issues with template member functions defined outside of their namespace.
+// Issue opened at https://github.com/doxygen/doxygen/issues/12379 as no relevant duplicate was found.
+// It thinks this is another function. This conditional prevents it from showing up as an undocumented duplicate.
+//
+// Creates a size * size identity matrix if size is valid.
+// Throws (via the constructor) otherwise.
+// Fully documented at the declaration.
+template<hmeigens::CanBeSize Size>
+hmeigens::SquareMatrix hmeigens::SquareMatrix::identity(Size size) {
+    hmeigens::SquareMatrix id{size};
+    // The value of size could be signed or a different unsigned type.
+    // The loop must be checked against id.size().
+    for (std::size_t row = 0; row < id.size(); ++row) {
+        id(row, row) = {{1.0_hs, 0.0_hs}};
+    }
+    return id;
+}
+/// @endcond
 
 #endif

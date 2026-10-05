@@ -27,13 +27,15 @@ Version 0.2.0 is recorded from git history.
     - a `SquareMatrix` constructed with the body parameter constructor is filled with the correct elements in row-major order;
     - `type_traits` tests to assert return types for accessors and their constness (or lack of it);
     - `type_traits` test to check for the explicitness of the constructors;
-    - `hmeigens::CanBeSize` and the size parameter constructor correctly allow intended sizes and refuse undesirable ones.
+    - `hmeigens::CanBeSize` and the size parameter constructor correctly allow intended sizes and refuse undesirable ones;
+    - `hmeigens::SquareMatrix::identity` constructs a valid identity matrix for valid sizes, and throws for invalid ones.
 - **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
 - **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
 - **Several `hmeigens::SquareMatrix` class features.** Specifically:
     - a new constructor that takes as parameter a body containing numbers (row-major), creating a matrix with the corresponding contents;
     - both read and write accessor `operator()` (does NOT check that the indexes are safe in release mode, and checks and behaves like `at()` in debug mode when `NDEBUG` is not defined);
-    - both read and write safe accessor `at()` (checks the indexes and throws `std::out_of_range` if out of bounds).
+    - both read and write safe accessor `at()` (checks the indexes and throws `std::out_of_range` if out of bounds);
+    - a static `identity` member function that takes a size as parameter and builds the corresponding identity matrix.
 - **A new literal suffix `hmeigens::operator""_hs`.** It turns floating-point values into the current `hmeigens::Scalar` to avoid implicit conversions across the code.
 - **Tests for `scalar.hpp`.** Specifically:
     - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);
