@@ -9,8 +9,10 @@ using hmeigens::operator""_hs;
 #include <format>
 #include <string_view>
 #include <type_traits>   // For std::is_same, std::is_assignable_v, std::is_convertible_v, std::is_constructible_v
+#include <tuple>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_template_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -179,6 +181,175 @@ TEST_CASE("Square matrix test: the constructors are explicit.", "[square_matrix]
     );
 }
 
+// Anonymous namespace to make using aliases not global.
+namespace {
+    // One signed, one unsigned.
+    using ValidTypes = std::tuple<
+        std::uintmax_t,
+        std::intmax_t
+        >;
+    // One integer, one floating point. Covers the two refusals.
+    using InvalidTypes = std::tuple<
+        bool,
+        double
+        >;
+
+    TEMPLATE_LIST_TEST_CASE("Square matrix test: the accessors accept valid types.", "[square_matrix][template]", ValidTypes) {
+        // GIVEN a list of valid types
+        // WHEN  those types are used on the accessors
+        // THEN  they are accepted
+        //
+        // These cases must be run one by one or any one failing would produce incomprehensible diagnostics. They could be shortened with concepts, but it would overcomplicate the testing suite.
+        // The template parameter being named TestType is required by Catch2.
+        // Matching types.
+        STATIC_REQUIRE(
+            requires(
+                hmeigens::SquareMatrix matrix,
+                TestType index
+            ) {
+                matrix(index, index);
+            }
+        );
+        STATIC_REQUIRE(
+            requires(
+                const hmeigens::SquareMatrix matrix,
+                TestType index
+            ) {
+                matrix(index, index);
+            }
+        );
+        STATIC_REQUIRE(
+            requires(
+                hmeigens::SquareMatrix matrix,
+                TestType index
+            ) {
+                matrix.at(index, index);
+            }
+        );
+        STATIC_REQUIRE(
+            requires(
+                const hmeigens::SquareMatrix matrix,
+                TestType index
+            ) {
+                matrix.at(index, index);
+            }
+        );
+        // Mismatching types. A short int is deliberately used to avoid it being any of the max_ts.
+        STATIC_REQUIRE(
+            requires(hmeigens::SquareMatrix matrix,
+                TestType index,
+                short int otherIndex
+            ) {
+                matrix(index, otherIndex);
+            }
+        );
+        STATIC_REQUIRE(
+            requires(
+                const hmeigens::SquareMatrix matrix,
+                TestType index,
+                short int otherIndex
+            ) {
+                matrix(index, otherIndex);
+            }
+        );
+        STATIC_REQUIRE(
+            requires(
+                hmeigens::SquareMatrix matrix,
+                TestType index,
+                short int otherIndex) {
+                    matrix.at(index, otherIndex);
+                }
+            );
+        STATIC_REQUIRE(
+            requires(
+                const hmeigens::SquareMatrix matrix,
+                TestType index,
+                short int otherIndex
+            ) {
+                matrix.at(index, otherIndex);
+            }
+        );
+    }
+
+    TEMPLATE_LIST_TEST_CASE("Square matrix test: the accessors refuse invalid types.", "[square_matrix][template]", InvalidTypes) {
+        // GIVEN a list of invalid types
+        // WHEN  those types are used on the accessors
+        // THEN  they are refused
+        //
+        // These cases must be run one by one or any one failing would produce incomprehensible diagnostics. They could be shortened with concepts, but it would overcomplicate the testing suite.
+        // Also, yes, this case is basically a duplication of the previous one with STATIC_REQUIRE_FALSE. This is unfortunately necessary for the same reason.
+        // The template parameter being named TestType is required by Catch2.
+        // Matching types.
+        STATIC_REQUIRE_FALSE(
+            requires(
+                hmeigens::SquareMatrix matrix,
+                TestType index
+            ) {
+                matrix(index, index);
+            }
+        );
+        STATIC_REQUIRE_FALSE(
+            requires(
+                const hmeigens::SquareMatrix matrix,
+                TestType index
+            ) {
+                matrix(index, index);
+            }
+        );
+        STATIC_REQUIRE_FALSE(
+            requires(
+                hmeigens::SquareMatrix matrix,
+                TestType index
+            ) {
+                matrix.at(index, index);
+            }
+        );
+        STATIC_REQUIRE_FALSE(
+            requires(
+                const hmeigens::SquareMatrix matrix,
+                TestType index
+            ) {
+                matrix.at(index, index);
+            }
+        );
+        // Mismatching types. A short int is deliberately used to avoid it being any of the max_ts.
+        STATIC_REQUIRE_FALSE(
+            requires(hmeigens::SquareMatrix matrix,
+                TestType index,
+                short int otherIndex
+            ) {
+                matrix(index, otherIndex);
+            }
+        );
+        STATIC_REQUIRE_FALSE(
+            requires(
+                const hmeigens::SquareMatrix matrix,
+                TestType index,
+                short int otherIndex
+            ) {
+                matrix(index, otherIndex);
+            }
+        );
+        STATIC_REQUIRE_FALSE(
+            requires(
+                hmeigens::SquareMatrix matrix,
+                TestType index,
+                short int otherIndex) {
+                    matrix.at(index, otherIndex);
+                }
+            );
+        STATIC_REQUIRE_FALSE(
+            requires(
+                const hmeigens::SquareMatrix matrix,
+                TestType index,
+                short int otherIndex
+            ) {
+                matrix.at(index, otherIndex);
+            }
+        );
+    }
+}
+
 TEST_CASE("Square matrix test: accessors return the correct type.", "[square_matrix]") {
     // GIVEN a matrix
     // WHEN  the accessors' return type is checked
@@ -188,25 +359,25 @@ TEST_CASE("Square matrix test: accessors return the correct type.", "[square_mat
     // (0,0) is arbitrary and resolved by decltype without needing an actual element.
     STATIC_REQUIRE(
         std::is_same_v<
-            decltype(testMatrixConst(0, 0)),
+            decltype(testMatrixConst(0,0)),
             const hmeigens::Complex&
         >
     );
     STATIC_REQUIRE(
         std::is_same_v<
-            decltype(testMatrixConst.at(0, 0)),
+            decltype(testMatrixConst.at(0,0)),
             const hmeigens::Complex&
         >
     );
     STATIC_REQUIRE(
         std::is_same_v<
-            decltype(testMatrix(0, 0)),
+            decltype(testMatrix(0,0)),
             hmeigens::Complex&
         >
     );
     STATIC_REQUIRE(
         std::is_same_v<
-            decltype(testMatrix.at(0, 0)),
+            decltype(testMatrix.at(0,0)),
             hmeigens::Complex&
         >
     );
@@ -217,11 +388,11 @@ TEST_CASE("Square matrix test: accessor operator() const returns the correct ele
     // WHEN  hmeigens::SquareMatrix::operator() const is called
     // THEN  the correct element is returned
     //
-    // Note: this test requires trusting that the constructor hmeigens::SquareMatrix::SquareMatrix (std::size_t size, hmeigens::SquareMatrix::Container&& body) works as intended.
+    // Note: this test requires trusting that the constructor hmeigens::SquareMatrix::SquareMatrix (hmeigens::SquareMatrix::Container&& body) works as intended.
     // The constructor is tested below, and its tests require trusting that hmeigens::SquareMatrix::operator() const works as intended.
     // Due to encapsulation it is not possible to fully separate their behaviour: either there is a matrix to read, or nothing can be read at all.
     // The test here is performed versus values independent of the class, via testBody.
-    // The other behaviours of the constructor (size, exceptions) can and are tested separately.
+    // The other behaviours of the constructor (size, exceptions) can be and are tested separately.
     const hmeigens::SquareMatrix::Container testBody{
         {1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
@@ -240,7 +411,7 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
     // WHEN  any accessor except hmeigens::SquareMatrix::operator() const is called
     // THEN  the correct element is returned
     //
-    // Note: this test requires trusting that hmeigens::SquareMatrix::operator() (std::size_t row, std::size_t col) const works as intended.
+    // Note: this test requires trusting that hmeigens::SquareMatrix::operator()(Row row, Col col) const works as intended.
     // The operator is tested above, independently of all these accessors.
     // Why SECTIONs here?
     // Each check calls the helper checkComplex. Without SECTIONs a failed test does not say which overload it was.
@@ -288,25 +459,25 @@ TEST_CASE("Square matrix test: const accessors do not allow editing, non-consts 
     // (0,0) is arbitrary and resolved by decltype without needing an actual element.
     STATIC_REQUIRE_FALSE(
         std::is_assignable_v<
-            decltype(testMatrixConst(0, 0)),
+            decltype(testMatrixConst(0,0)),
             hmeigens::Complex
         >
     );
     STATIC_REQUIRE(
         std::is_assignable_v<
-            decltype(testMatrix(0, 0)),
+            decltype(testMatrix(0,0)),
             hmeigens::Complex
         >
     );
     STATIC_REQUIRE_FALSE(
         std::is_assignable_v<
-            decltype(testMatrixConst.at(0, 0)),
+            decltype(testMatrixConst.at(0,0)),
             hmeigens::Complex
         >
     );
     STATIC_REQUIRE(
         std::is_assignable_v<
-            decltype(testMatrix.at(0, 0)),
+            decltype(testMatrix.at(0,0)),
             hmeigens::Complex
         >
     );
@@ -349,24 +520,21 @@ TEST_CASE("Square matrix test: the overloads of at() are index safe.", "[square_
     // GIVEN a matrix
     // WHEN  an out-of-range row column index pair is given to hmeigens::SquareMatrix::at()
     // THEN  an exception is thrown with the correct type and message
-    hmeigens::SquareMatrix testMatrix{
-        {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
-         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
-         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
-    };
+    hmeigens::SquareMatrix testMatrix{3};
     // A const reference version is needed to check both overloads.
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
     // The string used by std::format to construct the error message.
     constexpr std::string_view indexErrorString = "Invalid index ({0},{1}) for {2}x{2} matrix. Please note matrices are 0-indexed.";
     // This variable is just for readability of the loops below.
-    const std::size_t size = testMatrixConst.size();
+    // The cast is safe because the size is small.
+    const std::intmax_t size = static_cast<std::intmax_t>(testMatrixConst.size());
     // 3 cases are relevant:
     // - row out, column ok;
     // - row ok, column out;
     // - row out, column out.
-    // The loop below tests each overload on values one past the end.
-    for (const std::size_t row : {std::size_t{0}, size}) {
-        for (const std::size_t col : {std::size_t{0}, size}) {
+    // The loop below tests each overload on a negative value, a valid one, and one past the end.
+    for (const std::intmax_t row : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
+        for (const std::intmax_t col : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
             if (row == 0 and col == 0) {
                 // The (0,0) case of the loop needs to be skipped, as it is not an invalid index.
                 continue;
@@ -400,24 +568,21 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
     // Yes, the code in this CASE is a duplication of the hmeigens::SquareMatrix::at CASE. This is deliberate.
     // This is because Catch2, if a test is skipped even for a single SECTION, reports it entirely as skipped.
     // The choice made here is that, in this specific instance, code duplication is more acceptable than a less clear test result.
-    hmeigens::SquareMatrix testMatrix{
-        {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
-         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
-         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
-    };
+    hmeigens::SquareMatrix testMatrix{3};
     // A const reference version is needed to check both overloads.
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
     // The string used by std::format to construct the error message.
     constexpr std::string_view indexErrorString = "Invalid index ({0},{1}) for {2}x{2} matrix. Please note matrices are 0-indexed.";
     // This variable is just for readability of the loops below.
-    const std::size_t size = testMatrixConst.size();
+    // The cast is safe because the size is small.
+    const std::intmax_t size = static_cast<std::intmax_t>(testMatrixConst.size());
     // 3 cases are relevant:
     // - row out, column ok;
     // - row ok, column out;
     // - row out, column out.
-    // The loop below tests each overload on values one past the end.
-    for (const std::size_t row : {std::size_t{0}, size}) {
-        for (const std::size_t col : {std::size_t{0}, size}) {
+    // The loop below tests each overload on a negative value, a valid one, and one past the end.
+    for (const std::intmax_t row : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
+        for (const std::intmax_t col : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
             if (row == 0 and col == 0) {
                 // The (0,0) case of the loop needs to be skipped, as it is not an invalid index.
                 continue;

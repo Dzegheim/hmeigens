@@ -19,6 +19,7 @@ Version 0.2.0 is recorded from git history.
 - **Tests for `hmeigens::SquareMatrix`.** Specifically:
     - a `SquareMatrix` built with a valid size reports it correctly with `size()`;
     - invalid sizes are rejected, including negative ones;
+    - the accessors accept any and only `hmeigens::CanBeSize`;
     - the accessors allow reading the element at the requested position;
     - the write accessors also allow editing the elements;
     - `at()` is index safe;

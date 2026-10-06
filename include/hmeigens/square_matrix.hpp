@@ -12,6 +12,9 @@
 #include <cstddef>      // For std::size_t
 #include <type_traits>  // For std::is_arithmetic_v
 #include <algorithm>    // For std::min
+#include <utility>      // For std::cmp_less, std::cmp_greater_equal
+#include <stdexcept>    // For std::out_of_range
+#include <format>
 
 namespace hmeigens {
 
@@ -93,6 +96,7 @@ namespace hmeigens {
         ///     SquareMatrix B{3};
         /// }
         /// ```
+        /// @tparam Size Any type satisfying `CanBeSize`.
         /// @param size The size for the matrix.
         /// @throws std::invalid_argument if `size` is `<=0`.
         /// @throws std::length_error if `size > hmeigens::maxMatrixSize`.
@@ -153,58 +157,71 @@ namespace hmeigens {
 
         /// @brief Read access operator for the element in position (`row`, `col`), `0`-indexed.
         ///
+        /// @tparam Row Any type satisfying `CanBeSize`.
+        /// @tparam Col Any type satisfying `CanBeSize`.
         /// @param row The row of the element to access.
         /// @param col The column of the element to access.
         /// @return A read-only reference to the element in position (`row`, `col`).
         /// @warning The returned reference is only valid as long as the matrix also is.
-        /// @pre row < size() and col < size()
+        /// @pre 0 <= row < size() and 0 <= col < size()
         /// @warning This operator does not perform out-of-bound checks in release mode. For a range safe version, see `hmeigens::SquareMatrix::at()`.
         /// In debug mode (i.e. if `NDEBUG` is not defined) the operator behaves and throws exactly like `hmeigens::SquareMatrix::at()`.
-        /// @sa operator()(std::size_t, std::size_t)
-        /// @sa at(std::size_t, std::size_t) const
-        /// @sa at(std::size_t, std::size_t)
-        [[nodiscard]] const Complex& operator()(std::size_t row, std::size_t col) const;
+        /// @sa operator()(Row, Col)
+        /// @sa at(Row, Col) const
+        /// @sa at(Row, Col)
+        template<CanBeSize Row, CanBeSize Col>
+        [[nodiscard]] const Complex& operator()(Row row, Col col) const;
 
         /// @brief Write access operator for the element in position (`row`, `col`), `0`-indexed.
         ///
+        /// @tparam Row Any type satisfying `CanBeSize`.
+        /// @tparam Col Any type satisfying `CanBeSize`.
         /// @param row The row of the element to access.
         /// @param col The column of the element to access.
         /// @return A reference to the element in position (`row`, `col`).
         /// @warning The returned reference is only valid as long as the matrix also is.
-        /// @pre row < size() and col < size()
+        /// @pre 0 <= row < size() and 0 <= col < size()
         /// @warning This operator does not perform out-of-bound checks in release mode. For a range safe version, see `hmeigens::SquareMatrix::at()`.
         /// In debug mode (i.e. if `NDEBUG` is not defined) the operator behaves and throws exactly like `hmeigens::SquareMatrix::at()`.
-        /// @sa operator()(std::size_t, std::size_t) const
-        /// @sa at(std::size_t, std::size_t) const
-        /// @sa at(std::size_t, std::size_t)
-        [[nodiscard]] Complex& operator()(std::size_t row, std::size_t col);
+        /// @sa operator()(Row, Col) const
+        /// @sa at(Row, Col) const
+        /// @sa at(Row, Col)
+        template<CanBeSize Row, CanBeSize Col>
+        [[nodiscard]] Complex& operator()(Row row, Col col);
 
         /// @brief Out-of-bound safe read access for the element in position (`row`, `col`), `0`-indexed.
         ///
+        /// @tparam Row Any type satisfying `CanBeSize`.
+        /// @tparam Col Any type satisfying `CanBeSize`.
         /// @param row The row of the element to access.
         /// @param col The column of the element to access.
         /// @return A read-only reference to the element in position (`row`, `col`).
         /// @warning The returned reference is only valid as long as the matrix also is.
-        /// @throws std::out_of_range if `row >= size()` or `col >= size()`.
-        /// @sa operator()(std::size_t, std::size_t) const
-        /// @sa operator()(std::size_t, std::size_t)
-        /// @sa at(std::size_t, std::size_t)
-        [[nodiscard]] const Complex& at(std::size_t row, std::size_t col) const;
+        /// @throws std::out_of_range if `row < 0`, `col < 0`, `row >= size()` or `col >= size()`.
+        /// @sa operator()(Row, Col) const
+        /// @sa operator()(Row, Col)
+        /// @sa at(Row, Col)
+        template<CanBeSize Row, CanBeSize Col>
+        [[nodiscard]] const Complex& at(Row row, Col col) const;
 
         /// @brief Out-of-bound safe write access for the element in position (`row`, `col`), `0`-indexed.
         ///
+        /// @tparam Row Any type satisfying `CanBeSize`.
+        /// @tparam Col Any type satisfying `CanBeSize`.
         /// @param row The row of the element to access.
         /// @param col The column of the element to access.
         /// @return A reference to the element in position (`row`, `col`).
         /// @warning The returned reference is only valid as long as the matrix also is.
-        /// @throws std::out_of_range if `row >= size()` or `col >= size()`.
-        /// @sa operator()(std::size_t, std::size_t) const
-        /// @sa operator()(std::size_t, std::size_t)
-        /// @sa at(std::size_t, std::size_t) const
-        [[nodiscard]] Complex& at(std::size_t row, std::size_t col);
+        /// @throws std::out_of_range if `row < 0`, `col < 0`, `row >= size()` or `col >= size()`.
+        /// @sa operator()(Row, Col) const
+        /// @sa operator()(Row, Col)
+        /// @sa at(Row, Col) const
+        template<CanBeSize Row, CanBeSize Col>
+        [[nodiscard]] Complex& at(Row row, Col col);
 
         /// @brief Static member function that constructs an identity matrix of the given `size`.
         ///
+        /// @tparam Size Any type satisfying `CanBeSize`.
         /// @param size The size of the requested identity matrix.
         /// @return An `hmeigens::SquareMatrix` object of the requested `size` whose body is the corresponding identity matrix.
         /// @throws std::invalid_argument if `size` is `<=0`.
@@ -217,18 +234,20 @@ namespace hmeigens {
         private:
         // Member function for computing the index of an element given the row and col (column).
         // All in a single place, so it doesn't need to be repeated every time an index is needed.
+        // The values passed to it must be valid. Giving out of range values is undefined behaviour.
         [[nodiscard]] std::size_t getIndex(std::size_t row, std::size_t col) const;
 
         // Member function to verify that an index is within the confines of the matrix.
-        // If either coordinate is greater or equal to size, it throws an std::out_of_range exception.
-        void checkIndex(std::size_t row, std::size_t col) const;
+        // If either coordinate is greater or equal to size or negative, it throws an std::out_of_range exception.
+        template<CanBeSize Row, CanBeSize Col>
+        void checkIndex(Row row, Col col) const;
     };
 
     /// @brief The maximum size that a square matrix can have.
     ///
-    /// The maximum size must account for the fact that a matrix contains `size * size` elements. The value `size` is verified against this constant, so if `size  > hmeigens::maxMatrixSize` either:
-    /// - its square would overflow std::size_t;
-    /// - the number of elements cannot be held within hmeigens::SquareMatrix::Container.
+    /// The maximum size must account for the fact that a matrix contains `size * size` elements. The value `size` is verified against this constant, so if `size > hmeigens::maxMatrixSize` either:
+    /// - its square would overflow `std::size_t`;
+    /// - the number of elements cannot be held within `hmeigens::SquareMatrix::Container`.
     /// @note This is the only upper bound on the matrix size enforced by this code. If a `1'000'000`x`1'000'000` matrix is created, the user is expected to know what they're doing by creating such a large table of numbers. Who even needs such a large matrix? (:
     inline constexpr std::size_t maxMatrixSize = std::min(
         maxSquarableSize,
@@ -262,6 +281,73 @@ hmeigens::SquareMatrix::SquareMatrix(Size size) :
 // Issue opened at https://github.com/doxygen/doxygen/issues/12379 as no relevant duplicate was found.
 // It thinks this is another function. This conditional prevents it from showing up as an undocumented duplicate.
 //
+// This and the three after are the accessors.
+// Fully documented at the declaration.
+// Note: The operators are index safe in DEBUG MODE ONLY.
+// Note: The casts are either:
+// - always safe if the index is checked by checkIndex, as the value cannot overflow if checkIndex didn't throw;
+// - deliberately not safe in release mode for the operator()s.
+template<hmeigens::CanBeSize Row, hmeigens::CanBeSize Col>
+const hmeigens::Complex& hmeigens::SquareMatrix::operator()(Row row, Col col) const {
+    #ifndef NDEBUG
+    hmeigens::SquareMatrix::checkIndex(row, col);
+    #endif
+    return body_[hmeigens::SquareMatrix::getIndex(
+        static_cast<std::size_t>(row),
+        static_cast<std::size_t>(col)
+    )];
+}
+
+// Fully documented at the declaration.
+template<hmeigens::CanBeSize Row, hmeigens::CanBeSize Col>
+hmeigens::Complex& hmeigens::SquareMatrix::operator()(Row row, Col col) {
+    #ifndef NDEBUG
+    hmeigens::SquareMatrix::checkIndex(row, col);
+    #endif
+    return body_[hmeigens::SquareMatrix::getIndex(
+        static_cast<std::size_t>(row),
+        static_cast<std::size_t>(col)
+    )];
+}
+
+// Fully documented at the declaration.
+template<hmeigens::CanBeSize Row, hmeigens::CanBeSize Col>
+const hmeigens::Complex& hmeigens::SquareMatrix::at(Row row, Col col) const {
+    hmeigens::SquareMatrix::checkIndex(row, col);
+    return body_[hmeigens::SquareMatrix::getIndex(
+        static_cast<std::size_t>(row),
+        static_cast<std::size_t>(col)
+    )];
+}
+
+// Fully documented at the declaration.
+template<hmeigens::CanBeSize Row, hmeigens::CanBeSize Col>
+hmeigens::Complex& hmeigens::SquareMatrix::at(Row row, Col col) {
+    hmeigens::SquareMatrix::checkIndex(row, col);
+    return body_[hmeigens::SquareMatrix::getIndex(
+        static_cast<std::size_t>(row),
+        static_cast<std::size_t>(col)
+    )];
+}
+
+// Verifies that an index is within the matrix, throws if not.
+// For non-negative values checking for just the expression row * size_ + col < body_.size() could result in wrong indexation being accepted.
+// Something like (0,8) for a 3x3 matrix would give the element in position (2,2), which is not what was asked, as what was asked makes no sense.
+// Not that anyone writing this code would make that mistake and write a comment about it...
+// Fully documented at the declaration.
+template<hmeigens::CanBeSize Row, hmeigens::CanBeSize Col>
+void hmeigens::SquareMatrix::checkIndex(Row row, Col col) const {
+    if (
+        std::cmp_less(row, 0) or
+        std::cmp_less(col, 0) or
+        std::cmp_greater_equal(row, size_) or
+        std::cmp_greater_equal(col, size_)
+    ) {
+        throw std::out_of_range{std::format("Invalid index ({0},{1}) for {2}x{2} matrix. Please note matrices are 0-indexed.", row, col, size_)};
+    }
+    return;
+}
+
 // Creates a size * size identity matrix if size is valid.
 // Throws (via the constructor) otherwise.
 // Fully documented at the declaration.
