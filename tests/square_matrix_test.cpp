@@ -52,8 +52,8 @@ static void checkComplex(const hmeigens::Complex& toCheck, const hmeigens::Compl
 static void checkAllElementsVersus(const hmeigens::SquareMatrix& toCheck, const hmeigens::SquareMatrix::Container& referenceBody) {
     // If the sizes don't match, this test makes no sense.
     REQUIRE(toCheck.size() * toCheck.size() == referenceBody.size());
-    for (std::size_t row = 0; row < toCheck.size(); ++row) {
-        for (std::size_t col = 0; col < toCheck.size(); ++col) {
+    for(std::size_t row = 0; row < toCheck.size(); ++row) {
+        for(std::size_t col = 0; col < toCheck.size(); ++col) {
             CAPTURE(row, col);
             // Every number is verified against the reference body.
             // The container's indexing is the same as the private member hmeigens::SquareMatrix::getIndex().
@@ -495,24 +495,24 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
     // Need both a non const and a const one for the test.
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
     SECTION("hmeigens::SquareMatrix::at() const") {
-        for (std::size_t row = 0; row < testMatrix.size(); ++row) {
-            for (std::size_t col = 0; col < testMatrix.size(); ++col) {
+        for(std::size_t row = 0; row < testMatrix.size(); ++row) {
+            for(std::size_t col = 0; col < testMatrix.size(); ++col) {
                 CAPTURE(row, col);
                 checkComplex(testMatrixConst.at(row, col), testMatrixConst(row, col));
             }
         }
     }
     SECTION("hmeigens::SquareMatrix::at()") {
-        for (std::size_t row = 0; row < testMatrix.size(); ++row) {
-            for (std::size_t col = 0; col < testMatrix.size(); ++col) {
+        for(std::size_t row = 0; row < testMatrix.size(); ++row) {
+            for(std::size_t col = 0; col < testMatrix.size(); ++col) {
                 CAPTURE(row, col);
                 checkComplex(testMatrix.at(row, col), testMatrixConst(row, col));
             }
         }
     }
     SECTION("hmeigens::SquareMatrix::operator()") {
-        for (std::size_t row = 0; row < testMatrix.size(); ++row) {
-            for (std::size_t col = 0; col < testMatrix.size(); ++col) {
+        for(std::size_t row = 0; row < testMatrix.size(); ++row) {
+            for(std::size_t col = 0; col < testMatrix.size(); ++col) {
                 CAPTURE(row, col);
                 checkComplex(testMatrix(row, col), testMatrixConst(row, col));
             }
@@ -603,8 +603,8 @@ TEST_CASE("Square matrix test: the overloads of at() are index safe.", "[square_
     // - row ok, column out;
     // - row out, column out.
     // The loop below tests each overload on a negative value, a valid one, and one past the end.
-    for (const std::intmax_t row : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
-        for (const std::intmax_t col : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
+    for(const std::intmax_t row : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
+        for(const std::intmax_t col : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
             if (row == 0 and col == 0) {
                 // The (0,0) case of the loop needs to be skipped, as it is not an invalid index.
                 continue;
@@ -651,8 +651,8 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
     // - row ok, column out;
     // - row out, column out.
     // The loop below tests each overload on a negative value, a valid one, and one past the end.
-    for (const std::intmax_t row : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
-        for (const std::intmax_t col : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
+    for(const std::intmax_t row : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
+        for(const std::intmax_t col : {std::intmax_t{-1}, std::intmax_t{0}, size}) {
             if (row == 0 and col == 0) {
                 // The (0,0) case of the loop needs to be skipped, as it is not an invalid index.
                 continue;
