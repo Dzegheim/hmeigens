@@ -1,3 +1,11 @@
+// Test file for square_matrix_helpers.hpp/.cpp.
+// Sections:
+// - constants;
+// - helpers;
+// - test cases:
+//      - hmeigens::detail::validateSize;
+//      - hmeigens::detail::sizeFromBodyLength;
+//      - hmeigens::detail::IsItAllowed.
 #include "hmeigens/constants.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
 #include "hmeigens/square_matrix.hpp"
@@ -15,10 +23,18 @@
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 
+/* --------------------------------------------- */
+/* ----------------- Constants ----------------- */
+/* --------------------------------------------- */
+//
 // The value used is a magic number, but the upper boundary of the matrix size varies from machine to machine and may not fit all types.
 // This is, for all intents and purposes, a number big enough to mean something, but small enough that it will always be a theoretically possible size.
 constexpr int bigEnoughNumber = 10'000;
 
+/* --------------------------------------------- */
+/* ------------------ Helpers ------------------ */
+/* --------------------------------------------- */
+//
 // This is a helper function to check whether hmeigens::detail::validateSize:
 // - throws;
 // - throws the correct exception type;
@@ -37,7 +53,15 @@ static void checkInvalidSize(IntType size, std::string_view expectedText) {
     return;
 }
 
-TEST_CASE("Square matrix helpers test: a valid std::size_t is accepted.", "[square_matrix_helpers]") {
+/* ------------------------------------------------ */
+/* ------------------ Test cases ------------------ */
+/* ------------------------------------------------ */
+//
+/* ------------------------------------------------ */
+/* -------- hmeigens::detail::validateSize -------- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Square matrix helpers test: a valid std::size_t is accepted.", "[square_matrix_helpers][detail][validateSize]") {
     // GIVEN a valid std::size_t for a matrix
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the size is reported as valid
@@ -50,7 +74,7 @@ TEST_CASE("Square matrix helpers test: a valid std::size_t is accepted.", "[squa
     CHECK(hmeigens::detail::validateSize(hmeigens::maxMatrixSize) == hmeigens::maxMatrixSize);
 }
 
-TEST_CASE("Square matrix helpers test: a valid signed size is accepted.", "[square_matrix_helpers]") {
+TEST_CASE("Square matrix helpers test: a valid signed size is accepted.", "[square_matrix_helpers][detail][validateSize]") {
     // GIVEN a valid unsigned size for a matrix
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the size is reported as valid
@@ -65,7 +89,7 @@ TEST_CASE("Square matrix helpers test: a valid signed size is accepted.", "[squa
     CHECK(hmeigens::detail::validateSize(static_cast<short int>(bigEnoughNumber)) == bigEnoughNumber);
 }
 
-TEST_CASE("Square matrix helpers test: a valid unsigned size is accepted.", "[square_matrix_helpers]") {
+TEST_CASE("Square matrix helpers test: a valid unsigned size is accepted.", "[square_matrix_helpers][detail][validateSize]") {
     // GIVEN a valid signed size for a matrix
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the size is reported as valid
@@ -82,7 +106,7 @@ TEST_CASE("Square matrix helpers test: a valid unsigned size is accepted.", "[sq
     CHECK(hmeigens::detail::validateSize(static_cast<unsigned short int>(bigEnoughNumber)) == bigEnoughNumber);
 }
 
-TEST_CASE("Square matrix helpers test: size 0 is correctly reported.", "[square_matrix_helpers]") {
+TEST_CASE("Square matrix helpers test: size 0 is correctly reported.", "[square_matrix_helpers][detail][validateSize]") {
     // GIVEN size 0
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the correct exception is thrown, with a message containing the reason and the invalid size
@@ -94,7 +118,7 @@ TEST_CASE("Square matrix helpers test: size 0 is correctly reported.", "[square_
     checkInvalidSize<std::invalid_argument>(static_cast<short int>(0), "Size 0 is invalid for a matrix.");
 }
 
-TEST_CASE("Square matrix helpers test: size over max is correctly reported.", "[square_matrix_helpers]") {
+TEST_CASE("Square matrix helpers test: size over max is correctly reported.", "[square_matrix_helpers][detail][validateSize]") {
     // GIVEN a size over the max
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the correct exception is thrown, with a message containing the reason and the invalid size
@@ -106,7 +130,7 @@ TEST_CASE("Square matrix helpers test: size over max is correctly reported.", "[
     checkInvalidSize<std::length_error>(hmeigens::maxMatrixSize+1, std::format("Note that the maximum size allowed for a matrix with the current build settings is {0}.", hmeigens::maxMatrixSize));
 }
 
-TEST_CASE("Square matrix helpers test: negative sizes are correctly reported.", "[square_matrix_helpers]") {
+TEST_CASE("Square matrix helpers test: negative sizes are correctly reported.", "[square_matrix_helpers][detail][validateSize]") {
     // GIVEN a negative size
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the correct exception is thrown, with a message containing the reason and the invalid size
@@ -117,7 +141,7 @@ TEST_CASE("Square matrix helpers test: negative sizes are correctly reported.", 
     checkInvalidSize<std::invalid_argument>(std::numeric_limits<std::intmax_t>::min(), std::format("Provided value: {0}", std::numeric_limits<std::intmax_t>::min()));
 }
 
-TEST_CASE ("Square matrix helpers test: integer values that don't fit std::size_t are correctly reported.", "[square_matrix_helpers][may_be_skipped]") {
+TEST_CASE ("Square matrix helpers test: integer values that don't fit std::size_t are correctly reported.", "[square_matrix_helpers][detail][validateSize][may_be_skipped]") {
     // GIVEN a value that fits std::intmax_t but not std::size_t
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the correct exception is thrown, with a message containing the reason and the invalid size
@@ -136,7 +160,11 @@ TEST_CASE ("Square matrix helpers test: integer values that don't fit std::size_
     );
 }
 
-TEST_CASE("Square matrix helpers test: an appropriate container length is accepted.", "[square_matrix_helpers]") {
+/* ------------------------------------------------ */
+/* ----- hmeigens::detail::sizeFromBodyLength ----- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Square matrix helpers test: an appropriate container length is accepted.", "[square_matrix_helpers][detail][sizeFromBodyLength]") {
     // GIVEN a perfect square integer
     // WHEN  hmeigens::detail::sizeFromBodyLength attempts to validate it
     // THEN  it is accepted and its integer square root is returned
@@ -144,7 +172,7 @@ TEST_CASE("Square matrix helpers test: an appropriate container length is accept
     CHECK(hmeigens::detail::sizeFromBodyLength(1'000'000) == 1'000);
 }
 
-TEST_CASE("Square matrix helpers test: an inappropriate container length is refused.", "[square_matrix_helpers]") {
+TEST_CASE("Square matrix helpers test: an inappropriate container length is refused.", "[square_matrix_helpers][detail][sizeFromBodyLength]") {
     // GIVEN 0 or an integer that is not a perfect square
     // WHEN  hmeigens::detail::sizeFromBodyLength attempts to validate it
     // THEN  it is rejected and the correct exception type is thrown, with the expected message
@@ -164,7 +192,11 @@ TEST_CASE("Square matrix helpers test: an inappropriate container length is refu
     );
 }
 
-TEST_CASE("Square matrix helpers test: listed types are accepted regardless of qualifiers.", "[square_matrix_helpers]") {
+/* ------------------------------------------------ */
+/* -------- hmeigens::detail::IsItAllowed --------- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Square matrix helpers test: listed types are accepted regardless of qualifiers.", "[square_matrix_helpers][detail][IsItAllowed]") {
     // GIVEN a type and a parameter pack of types
     // WHEN  the first type is included in the parameter pack
     // THEN  hmeigens::detail::IsItAllowed is true regardless of qualifiers
@@ -172,7 +204,7 @@ TEST_CASE("Square matrix helpers test: listed types are accepted regardless of q
     STATIC_REQUIRE(hmeigens::detail::IsItAllowed<const volatile char, char, wchar_t>);
 }
 
-TEST_CASE("Square matrix helpers test: unlisted types are refused.", "[square_matrix_helpers]") {
+TEST_CASE("Square matrix helpers test: unlisted types are refused.", "[square_matrix_helpers][detail][IsItAllowed]") {
     // GIVEN a type and a parameter pack of types
     // WHEN  the first type is not included in the parameter pack
     // THEN  hmeigens::detail::IsItAllowed is false

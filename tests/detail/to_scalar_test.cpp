@@ -1,3 +1,8 @@
+// Test file for to_scalar.hpp/.cpp.
+// Sections:
+// - helpers;
+// - test cases:
+//      - hmeigens::detail::toScalar.
 #include "hmeigens/detail/to_scalar.hpp"
 #include "hmeigens/constants.hpp"
 #include "hmeigens/complex_parse.hpp"
@@ -10,6 +15,10 @@
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 
+/* --------------------------------------------- */
+/* ------------------ Helpers ------------------ */
+/* --------------------------------------------- */
+//
 // This is a helper function to verify that the number read corresponds to the expected one.
 // The expectedValue is a double because Catch2 always checks in double anyway.
 // See comment to checkParse in tests/complex_parse_test.cpp.
@@ -49,26 +58,34 @@ static void checkRejects(std::string_view testString, std::string_view expectedT
     return;
 }
 
-TEST_CASE("Text to scalar test: real numbers.", "[to_scalar]") {
+/* ------------------------------------------------ */
+/* ------------------ Test cases ------------------ */
+/* ------------------------------------------------ */
+//
+/* ------------------------------------------------ */
+/* ---------- hmeigens::detail::toScalar ---------- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Text to scalar test: real numbers.", "[to_scalar][detail][toScalar]") {
     // GIVEN text in the form of an appropriate real number
     // WHEN  it is parsed
     // THEN  the result is the expected number
-    checkReads ("6", 6.);
-    checkReads ("-4.2", -4.2);
-    checkReads (".1", .1);
-    checkReads ("2.", 2.);
-    checkReads ("1e9", 1e9);
+    checkReads("6", 6.);
+    checkReads("-4.2", -4.2);
+    checkReads(".1", .1);
+    checkReads("2.", 2.);
+    checkReads("1e9", 1e9);
 }
 
-TEST_CASE("Text to scalar test: leading \"+\".", "[to_scalar]") {
+TEST_CASE("Text to scalar test: leading \"+\".", "[to_scalar][detail][toScalar]") {
     // GIVEN text in the form of an appropriate real number with a leading "+"
     // WHEN  it is parsed
     // THEN  the result is the expected number
-    checkReads ("+6.7", 6.7);
-    checkReads ("+1e-5", 1e-5);
+    checkReads("+6.7", 6.7);
+    checkReads("+1e-5", 1e-5);
 }
 
-TEST_CASE("Text to scalar rejection test: out of range.", "[to_scalar]") {
+TEST_CASE("Text to scalar rejection test: out of range.", "[to_scalar][detail][toScalar]") {
     // GIVEN text containing a number that is out of range
     // WHEN  it is parsed
     // THEN  the correct exception is thrown with the correct message
@@ -76,7 +93,7 @@ TEST_CASE("Text to scalar rejection test: out of range.", "[to_scalar]") {
     checkRejects("1e-500", "out of range");
 }
 
-TEST_CASE("Text to scalar rejection test: bad input.", "[to_scalar]") {
+TEST_CASE("Text to scalar rejection test: bad input.", "[to_scalar][detail][toScalar]") {
     // GIVEN ill formatted text
     // WHEN  it is parsed
     // THEN  the correct exception is thrown with the correct message
@@ -86,14 +103,14 @@ TEST_CASE("Text to scalar rejection test: bad input.", "[to_scalar]") {
     checkRejects("-1a3", "This is a bug");
 }
 
-TEST_CASE("Text to scalar rejection test: full context is passed.", "[to_scalar]") {
+TEST_CASE("Text to scalar rejection test: full context is passed.", "[to_scalar][detail][toScalar]") {
     // GIVEN ill formatted or out of range text
     // WHEN  it is parsed along with its full context
     // THEN  the correct exception is thrown with the correct message and context
     checkRejects("1e40000", "out of range", "2+1e40000i");
 }
 
-TEST_CASE("Text to scalar rejection test: a leading \"+\" is correctly reported.", "[to_scalar]") {
+TEST_CASE("Text to scalar rejection test: a leading \"+\" is correctly reported.", "[to_scalar][detail][toScalar]") {
     // GIVEN out of range or ill formatted text with a leading "+"
     // WHEN  it is parsed
     // THEN  in the exception text the leading "+" is conserved

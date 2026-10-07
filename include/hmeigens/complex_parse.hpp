@@ -9,7 +9,7 @@
 #include <stdexcept>     // For std::invalid_argument
 
 namespace hmeigens {
-    
+
     /// @brief Exception thrown when text cannot be parsed as a complex number.
     ///
     /// Inherits from `std::invalid_argument`, so it can be caught as that if it's not caught specifically as `hmeigens::ParseError`.
@@ -28,7 +28,7 @@ namespace hmeigens {
 
     /// @brief Converts text into a corresponding complex number.
     ///
-    /// Accepted forms: 
+    /// Accepted forms:
     ///
     /// | Form      | Example        |  (Real, Imaginary)   |
     /// | :-------: | :------------: | :------------------: |
@@ -37,6 +37,7 @@ namespace hmeigens {
     /// |   `bi`    |     `-3.i`     |       (0,-3)         |
     /// |   `i`     |      `+i`      |       (0,1)          |
     /// |  `a,b`    |     `1,-2.3`   |       (1,-2.3)       |
+    ///
     /// In addition:
     /// - numbers may start or end with a `.`: `2.` is perfectly valid;
     /// - leading `+` and `-` are accepted: `+2` is perfectly valid;

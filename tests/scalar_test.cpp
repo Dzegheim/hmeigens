@@ -1,3 +1,8 @@
+// Test file for the header only scalar.hpp.
+// Sections:
+// - test cases:
+//      - hmeigens::Scalar;
+//      - hmeigens::operator""_hs.
 #include "hmeigens/scalar.hpp"
 
 using hmeigens::operator""_hs;
@@ -7,6 +12,14 @@ using hmeigens::operator""_hs;
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+/* ------------------------------------------------ */
+/* ------------------ Test cases ------------------ */
+/* ------------------------------------------------ */
+//
+/* ------------------------------------------------ */
+/* --------------- hmeigens::Scalar --------------- */
+/* ------------------------------------------------ */
+//
 TEST_CASE("Scalar name test: the string naming the type matches the type from the build.", "[scalar]") {
     // GIVEN the project
     // WHEN  it is built
@@ -34,7 +47,11 @@ TEST_CASE("Scalar name test: the string naming the type matches the type from th
     #endif
 }
 
-TEST_CASE("Literal suffix _hs test: the return type matches the one expected from the build.", "[scalar]") {
+/* ------------------------------------------------ */
+/* ----------- hmeigens::operator""_hs ------------ */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Literal suffix _hs test: the return type matches the one expected from the build.", "[scalar][operator\"\"_hs]") {
     // GIVEN a floating-point value with the _hs literal
     // WHEN  its type is compared with the appropriate floating-point one of that build
     // THEN  they're the same type
@@ -55,7 +72,7 @@ TEST_CASE("Literal suffix _hs test: the return type matches the one expected fro
     #endif
 }
 
-TEST_CASE("Literal suffix _hs test: expected values match.", "[scalar]") {
+TEST_CASE("Literal suffix _hs test: expected values match.", "[scalar][operator\"\"_hs]") {
     // GIVEN a floating-point value with the _hs literal
     // WHEN  its value is compared with a corresponding hmeigens::Scalar
     // THEN  they're within 0 ULPs of each other

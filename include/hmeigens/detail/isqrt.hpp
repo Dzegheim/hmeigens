@@ -11,9 +11,9 @@ namespace hmeigens::detail {
     [[nodiscard]] constexpr std::size_t isqrt(std::size_t value);
 }
 
-/* ------------------------------*/
+/* ----------------------------- */
 /* -------- Definitions -------- */
-/* ------------------------------*/
+/* ----------------------------- */
 //
 // This implementation of the integer square root is based on the digit-by-digit algorithm.
 // Main source was https://en.wikipedia.org/wiki/Integer_square_root#Using_bitwise_operations, accessed on 2026-09-30.

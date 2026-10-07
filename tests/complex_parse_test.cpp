@@ -1,3 +1,9 @@
+// Test file for complex_parse.hpp/.cpp.
+// Sections:
+// - helpers;
+// - test cases:
+//      - hmeigens::parseComplex;
+//      - hmeigens::ParseError.
 #include "hmeigens/constants.hpp"
 #include "hmeigens/complex_parse.hpp"
 #include "hmeigens/detail/text_escape.hpp"
@@ -10,6 +16,10 @@ using std::string_view_literals::operator""sv;
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 
+/* --------------------------------------------- */
+/* ------------------ Helpers ------------------ */
+/* --------------------------------------------- */
+//
 // This is a helper function to test whether the text is parsed correctly.
 // Apparently Catch2's floating-point matchers always compare in double (see catch_matchers_floating_point.hpp).
 // Source: https://github.com/catchorg/Catch2/blob/v3.15.3/docs/comparing-floating-point-numbers.md#withinabs
@@ -62,7 +72,15 @@ static void checkRejects(std::string_view testString, std::string_view alsoConta
     );
 }
 
-TEST_CASE("Parse test: real number.", "[parse]") {
+/* ------------------------------------------------ */
+/* ------------------ Test cases ------------------ */
+/* ------------------------------------------------ */
+//
+/* ------------------------------------------------ */
+/* ------------ hmeigens::parseComplex ------------ */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Parse test: real number.", "[complex_parse][parseComplex]") {
     // GIVEN a plain real number
     // WHEN  it is parsed
     // THEN  its result is the expected number with no imaginary part
@@ -77,7 +95,7 @@ TEST_CASE("Parse test: real number.", "[parse]") {
     checkParse ("+6.7", 6.7, 0.0);
 }
 
-TEST_CASE("Parse test: exponential form.", "[parse]") {
+TEST_CASE("Parse test: exponential form.", "[complex_parse][parseComplex]") {
     // GIVEN a real number in exponential form
     // WHEN  it is parsed
     // THEN  its result is the expected number with no imaginary part
@@ -92,7 +110,7 @@ TEST_CASE("Parse test: exponential form.", "[parse]") {
     checkParse ("1e+4", 10000.0, 0.0);
 }
 
-TEST_CASE("Parse test: imaginary number.", "[parse]") {
+TEST_CASE("Parse test: imaginary number.", "[complex_parse][parseComplex]") {
     // GIVEN an imaginary number in algebraic form
     // WHEN  it is parsed
     // THEN  its result is the expected number with no real part
@@ -108,7 +126,7 @@ TEST_CASE("Parse test: imaginary number.", "[parse]") {
     checkParse ("3.i", 0.0, 3.0);
 }
 
-TEST_CASE("Parse test: algebraic form.", "[parse]") {
+TEST_CASE("Parse test: algebraic form.", "[complex_parse][parseComplex]") {
     // GIVEN a complex number in algebraic form
     // WHEN  it is parsed
     // THEN  its result is the expected number
@@ -120,7 +138,7 @@ TEST_CASE("Parse test: algebraic form.", "[parse]") {
     checkParse ("2.1-6e-3i", 2.1, -6e-3);
 }
 
-TEST_CASE("Parse test: ordered pair.", "[parse]") {
+TEST_CASE("Parse test: ordered pair.", "[complex_parse][parseComplex]") {
     // GIVEN an ordered pair a,b
     // WHEN  it is parsed
     // THEN  its result is the expected number
@@ -130,27 +148,7 @@ TEST_CASE("Parse test: ordered pair.", "[parse]") {
     checkParse ("-4,-8e2", -4.0, -800.0);
 }
 
-TEST_CASE("ParseError test: the offending text is escaped in the message.", "[parse]") {
-    // GIVEN text with control characters
-    // WHEN  a hmeigens::ParseError is built with it
-    // THEN  the message carries the escaped text
-    CHECK_THAT(
-        hmeigens::ParseError("4\0.2"sv).what(),
-        Catch::Matchers::ContainsSubstring(R"(4\000.2)")
-    );
-    CHECK_THAT(
-        hmeigens::ParseError("What\twent\nwrong?"sv, "The eggs were raw."sv).what(),
-        Catch::Matchers::ContainsSubstring(R"(What\twent\nwrong?)")
-    );
-    // The errorMessage is not escaped, callers escape their text.
-    // This is to catch if it is escaped twice.
-    CHECK_THAT(
-        hmeigens::ParseError("", R"(These\ncharacters\\would\"be\\adoubled.)").what(),
-        Catch::Matchers::ContainsSubstring(R"(These\ncharacters\\would\"be\\adoubled.)")
-    );
-}
-
-TEST_CASE("Parse rejection test: text that is not a complex number.", "[parse]") {
+TEST_CASE("Parse rejection test: text that is not a complex number.", "[complex_parse][parseComplex]") {
     // GIVEN text that is not a complex number in an accepted form
     // WHEN  it is parsed
     // THEN  a hmeigens::ParseError is thrown with a message carrying the escaped offending text
@@ -183,7 +181,7 @@ TEST_CASE("Parse rejection test: text that is not a complex number.", "[parse]")
     checkRejects(R"(6\0.7i)");
 }
 
-TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
+TEST_CASE("Parse rejection test: values out of range.", "[complex_parse][parseComplex]") {
     // GIVEN a value that is out of range
     // WHEN  it is parsed
     // THEN  a hmeigens::ParseError is thrown with a message carrying the entire offending text and the "out of range" information
@@ -198,7 +196,7 @@ TEST_CASE("Parse rejection test: values out of range.", "[parse]") {
     checkRejects("1e400,1", "out of range");
 }
 
-TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[parse][future]") {
+TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[complex_parse][parseComplex][future]") {
     // GIVEN text that is a complex number in a not yet accepted form
     // WHEN  it is parsed
     // THEN  a hmeigens::ParseError is thrown
@@ -209,9 +207,33 @@ TEST_CASE("Parse rejection test: not yet implemented but planned forms.", "[pars
     checkRejects("2i-3");
 }
 
-TEST_CASE("Parse rejection test: ParseError can be caught as a std::invalid_argument exception.", "[parse]") {
+/* ------------------------------------------------ */
+/* ------------- hmeigens::ParseError ------------- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("ParseError test: ParseError can be caught as a std::invalid_argument exception.", "[complex_parse][ParseError]") {
     // GIVEN something that doesn't recognize hmeigens::ParseError
     // WHEN  an invalid input is parsed
     // THEN  the exception can still be caught as std::invalid_argument
     CHECK_THROWS_AS(hmeigens::parseComplex("?!?"), std::invalid_argument);
+}
+
+TEST_CASE("ParseError test: the offending text is escaped in the message.", "[complex_parse][ParseError]") {
+    // GIVEN text with control characters
+    // WHEN  a hmeigens::ParseError is built with it
+    // THEN  the message carries the escaped text
+    CHECK_THAT(
+        hmeigens::ParseError("4\0.2"sv).what(),
+        Catch::Matchers::ContainsSubstring(R"(4\000.2)")
+    );
+    CHECK_THAT(
+        hmeigens::ParseError("What\twent\nwrong?"sv, "The eggs were raw."sv).what(),
+        Catch::Matchers::ContainsSubstring(R"(What\twent\nwrong?)")
+    );
+    // The errorMessage is not escaped, callers escape their text.
+    // This is to catch if it is escaped twice.
+    CHECK_THAT(
+        hmeigens::ParseError("", R"(These\ncharacters\\would\"be\\adoubled.)").what(),
+        Catch::Matchers::ContainsSubstring(R"(These\ncharacters\\would\"be\\adoubled.)")
+    );
 }

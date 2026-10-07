@@ -1,3 +1,6 @@
+// Source file for all functions in to_scalar.hpp.
+// Contents:
+// - hmeigens::detail::toScalar(std::string_view, std::string_view).
 #include "hmeigens/detail/to_scalar.hpp"
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/complex_parse.hpp"

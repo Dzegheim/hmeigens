@@ -1,3 +1,9 @@
+// Test file for text_escape.hpp/.cpp.
+// Sections:
+// - helpers;
+// - test cases:
+//      - hmeigens::detail::isDisplayable;
+//      - hmeigens::detail::escape.
 #include "hmeigens/detail/text_escape.hpp"
 
 #include <string>
@@ -6,6 +12,10 @@ using std::string_view_literals::operator""sv;
 
 #include <catch2/catch_test_macros.hpp>
 
+/* --------------------------------------------- */
+/* ------------------ Helpers ------------------ */
+/* --------------------------------------------- */
+//
 // This is a helper function to verify that the escaped text is the same as the expected one.
 static void checkEscape(std::string_view toEscape, std::string_view expectedText) {
     CAPTURE(expectedText);
@@ -13,7 +23,15 @@ static void checkEscape(std::string_view toEscape, std::string_view expectedText
     return;
 }
 
-TEST_CASE("Displayable chars test: special characters are correctly identified.", "[text_escape]") {
+/* ------------------------------------------------ */
+/* ------------------ Test cases ------------------ */
+/* ------------------------------------------------ */
+//
+/* ------------------------------------------------ */
+/* -------- hmeigens::detail::isDisplayable ------- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Displayable chars test: special characters are correctly identified.", "[text_escape][detail][isDisplayable]") {
     // GIVEN ASCII and Non-ASCII characters
     // WHEN  they are passed to hmeigens::detail::isDisplayable
     // THEN  the function correctly reports on their displayability in std::locale::classic()
@@ -36,11 +54,12 @@ TEST_CASE("Displayable chars test: special characters are correctly identified."
     CHECK (hmeigens::detail::isDisplayable(255));
 }
 
-// ----------------------------------------------------------
+/* ------------------------------------------------ */
+/* ------------ hmeigens::detail::escape ---------- */
+/* ------------------------------------------------ */
+//
 // The function hmeigens::detail::isDisplayable is tested above, so the tests below do not verify its behaviour again.
-// ----------------------------------------------------------
-
-TEST_CASE ("Escape test: regular printable text is unaffected.", "[text_escape]") {
+TEST_CASE ("Escape test: regular printable text is unaffected.", "[text_escape][detail][escape]") {
     // GIVEN regularly printable text
     // WHEN  it is run through hmeigens::detail::escape
     // THEN  it is completely unaffected
@@ -55,7 +74,7 @@ TEST_CASE ("Escape test: regular printable text is unaffected.", "[text_escape]"
     checkEscape("𓂀𓂀𓂀𓋹𓁈𓃠𓆃☥𓅓𓆣", "𓂀𓂀𓂀𓋹𓁈𓃠𓆃☥𓅓𓆣");
 }
 
-TEST_CASE ("Escape test: control characters are escaped.", "[text_escape]") {
+TEST_CASE ("Escape test: control characters are escaped.", "[text_escape][detail][escape]") {
     // GIVEN text containing control characters
     // WHEN  it is run through hmeigens::detail::escape
     // THEN  the characters are correctly escaped
@@ -74,7 +93,7 @@ TEST_CASE ("Escape test: control characters are escaped.", "[text_escape]") {
     checkEscape("You\0shouldn't\atype\rlike\tthis."sv, R"(You\000shouldn't\007type\rlike\tthis.)");
 }
 
-TEST_CASE ("Escape test: backslash and quotes are escaped.", "[text_escape]") {
+TEST_CASE ("Escape test: backslash and quotes are escaped.", "[text_escape][detail][escape]") {
     // GIVEN text containing backslashes and quotes
     // WHEN  it is run through hmeigens::detail::escape
     // THEN  the characters are correctly escaped
@@ -87,7 +106,7 @@ TEST_CASE ("Escape test: backslash and quotes are escaped.", "[text_escape]") {
     checkEscape(R"("3.3\")", R"(\"3.3\\\")");
 }
 
-TEST_CASE ("Escape test: Non-ASCII and control characters can live in the same string and only controls are escaped.", "[text_escape]") {
+TEST_CASE ("Escape test: Non-ASCII and control characters can live in the same string and only controls are escaped.", "[text_escape][detail][escape]") {
     // GIVEN text containing both non-ASCII characters and control characters
     // WHEN  it is run through hmeigens::detail::escape
     // THEN  non-ASCII are unaffected, the control characters are escaped

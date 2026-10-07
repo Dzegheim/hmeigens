@@ -1,3 +1,7 @@
+// Test file for the header-only isqrt.hpp.
+// Sections:
+// - test cases:
+//      - hmeigens::detail::isqrt.
 #include "hmeigens/detail/isqrt.hpp"
 #include "hmeigens/constants.hpp"
 
@@ -6,15 +10,23 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Integer square root test: values.", "[isqrt]") {
+/* ------------------------------------------------ */
+/* ------------------ Test cases ------------------ */
+/* ------------------------------------------------ */
+//
+/* ------------------------------------------------ */
+/* ------------ hmeigens::detail::isqrt ----------- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Integer square root test: values.", "[isqrt][detail]") {
     // GIVEN an std::size_t
     // WHEN  its integer square root is computed
-    // THEN  the value is the correct one.
+    // THEN  the value is the correct one
     //
     // Trivial values.
     CHECK(hmeigens::detail::isqrt(0) == 0);
     CHECK(hmeigens::detail::isqrt(1) == 1);
-    // First set of non-trivial values;
+    // First set of non-trivial values.
     CHECK(hmeigens::detail::isqrt(2) == 1);
     CHECK(hmeigens::detail::isqrt(3) == 1);
     CHECK(hmeigens::detail::isqrt(4) == 2);

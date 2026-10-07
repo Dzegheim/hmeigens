@@ -1,10 +1,14 @@
+// Source file for all functions in text_escape.hpp.
+// Contents:
+// - hmeigens::detail::isDisplayable(unsigned char);
+// - hmeigens::detail::escape(std::string_view).
 #include "hmeigens/detail/text_escape.hpp"
 
 #include <string>
 #include <string_view>
 #include <format>
 #include <locale>         // For std::isprint, std::locale
-    
+
 // Inside there is a cast because std::isprint has two overloads. This code uses the one in <locale>.
 // According to https://en.cppreference.com/cpp/locale/isprint it needs a std::ctype.
 bool hmeigens::detail::isDisplayable(unsigned char toCheck) {

@@ -1,3 +1,8 @@
+// Source file for all non-template functions in square_matrix.hpp.
+// Contents:
+// - hmeigens::SquareMatrix::SquareMatrix(hmeigens::SquareMatrix::Container&&);
+// - hmeigens::SquareMatrix::size() const;
+// - hmeigens::SquareMatrix::getIndex(std::size_t, std::size_t) const.
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
 

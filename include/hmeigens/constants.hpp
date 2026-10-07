@@ -9,7 +9,7 @@
 #include <cstddef>  // For std::size_t
 
 namespace hmeigens {
-    
+
     /// @brief The difference between `1.0` and the next `hmeigens::Scalar`.
     ///
     /// [Values](https://en.cppreference.com/cpp/types/climits):
@@ -31,7 +31,7 @@ namespace hmeigens {
     inline constexpr std::size_t maxSquarableSize = (std::size_t{1} << (std::numeric_limits<std::size_t>::digits / 2)) - 1;
     // These two assertions verify that the operation above behaved properly.
     static_assert(maxSquarableSize <= std::numeric_limits<std::size_t>::max() / maxSquarableSize, "The variable hmeigens::maxSquarableSize cannot overflow when squared.");
-    static_assert(maxSquarableSize + 1 > std::numeric_limits<std::size_t>::max() / (maxSquarableSize + 1),"The variable hmeigens::maxSquarableSize must be the largest possible value that does not overflow when squared.");
+    static_assert(maxSquarableSize + 1 > std::numeric_limits<std::size_t>::max() / (maxSquarableSize + 1), "The variable hmeigens::maxSquarableSize must be the largest possible value that does not overflow when squared.");
 }
 
 #endif

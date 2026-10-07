@@ -1,3 +1,8 @@
+// Source file for all functions in complex_parse.hpp.
+// Contents:
+// - hmeigens::parseComplex(std::string_view);
+// - hmeigens::ParseError::ParseError(std::string_view);
+// - hmeigens::ParseError::ParseError(std::string_view, std::string_view).
 #include "hmeigens/complex_parse.hpp"
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/detail/text_escape.hpp"
@@ -9,6 +14,8 @@
 #include <stdexcept>      // For std::invalid_argument
 #include <format>
 
+// A function to parse complex numbers from text using regular expressions.
+// Fully documented in .hpp.
 hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
     // String for a generic number with optional exponential part.
     // Structure:
@@ -20,12 +27,12 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
     // String for an (optionally) signed number.
     // This is just to avoid repeating sign + "?" + unsignedNumber many times below.
     static const std::string signedNumber {sign + "?" + unsignedNumber};
-    // This regex matches a real number, with a start and an end of string limitators.
+    // This regex matches a real number, with start-of-string and end-of-string anchors.
     static const std::regex realNumber {"^(" + signedNumber + ")$"};
-    //This regex matches an ordered pair complex number in the form a,b, with a and b both signed numbers.
+    // This regex matches an ordered pair complex number in the form a,b, with a and b both signed numbers.
     static const std::regex orderedPair {"^(" + signedNumber + "),(" + signedNumber + ")$"};
-    //This regex matches the algebraic form of a complex number.
-    //Structure
+    // This regex matches the algebraic form of a complex number.
+    // Structure:
     // ^                   Start of the string
     // (                   Group 1: real part
     // signedNumber
@@ -42,7 +49,7 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
     // Get the start and end of the read data.
     const auto* first = input.data();
     const auto* last  = input.data() + input.size();
-    
+
     // Using cmatch since the input is std::string_view.
     std::cmatch match;
 
@@ -85,7 +92,9 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
     throw hmeigens::ParseError{input};
 }
 
+// Constructor for a hmeigens::ParseError that does not require a second explanation line.
 hmeigens::ParseError::ParseError(std::string_view input) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".", hmeigens::detail::escape(input))) {}
 
+// Constructor for a hmeigens::ParseError that requires a second explanation line.
 // The errorMessage needs no escaping, as it is built by internal functions that escape text on their own.
 hmeigens::ParseError::ParseError(std::string_view input, std::string_view errorMessage) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".\n---> {1}", hmeigens::detail::escape(input), errorMessage)) {}

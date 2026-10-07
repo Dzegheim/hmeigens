@@ -260,9 +260,9 @@ namespace hmeigens {
     static_assert(maxMatrixSize * maxMatrixSize <= SquareMatrix::Container{}.max_size(), "The variable hmeigens::maxMatrixSize squared must represent a valid number of elements for hmeigens::SquareMatrix::Container.");
 }
 
-/* ------------------------------*/
+/* ----------------------------- */
 /* -------- Definitions -------- */
-/* ------------------------------*/
+/* ----------------------------- */
 //
 // Size parameter constructor.
 // Takes the size as a parameter, validates it via helper, then if everything's fine it initializes the matrix as a 0 filled hmeigens::SquareMatrix::Container whose length is size*size.

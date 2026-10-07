@@ -1,3 +1,11 @@
+// Test file for square_matrix.hpp/.cpp.
+// Sections:
+// - helpers;
+// - test cases:
+//      - hmeigens::CanBeSize;
+//      - constructors hmeigens::SquareMatrix(Size) and hmeigens::SquareMatrix(hmeigens::SquareMatrix::Container&&;
+//      - accessors hmeigens::SquareMatrix::operator() and hmeigens::SquareMatrix::at;
+//      - hmeigens::SquareMatrix::identity.
 #include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
 
@@ -17,6 +25,10 @@ using hmeigens::operator""_hs;
 #include <catch2/matchers/catch_matchers_exception.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+/* --------------------------------------------- */
+/* ------------------ Helpers ------------------ */
+/* --------------------------------------------- */
+//
 // This helper checks that two complex numbers passed to it are "equal", i.e. that their real and imaginary parts are both within 0 ULPs of each other.
 // The 0 ULP tolerance comes from the fact that copying or referencing an element of a matrix must not alter it.
 // Since no arithmetic is performed, it must not be rounded or altered.
@@ -56,7 +68,15 @@ static void checkAllElementsVersus(const hmeigens::SquareMatrix& toCheck, const 
     return;
 }
 
-TEST_CASE("Square matrix test: only the allowed types are accepted as sizes.", "[square_matrix]") {
+/* --------------------------------------------------------------- */
+/* ------------------------- Test cases -------------------------- */
+/* --------------------------------------------------------------- */
+//
+/* --------------------------------------------------------------- */
+/* --------------------- hmeigens::CanBeSize --------------------- */
+/* --------------------------------------------------------------- */
+//
+TEST_CASE("Square matrix test: only the allowed types are accepted as sizes.", "[square_matrix][CanBeSize]") {
     // GIVEN a type
     // WHEN  checked against the allowed ones
     // THEN  the allowed ones are accepted, the others are not
@@ -90,7 +110,13 @@ TEST_CASE("Square matrix test: only the allowed types are accepted as sizes.", "
     STATIC_REQUIRE(hmeigens::CanBeSize<std::uintmax_t>);
 }
 
-TEST_CASE("Square matrix test: the size parameter constructor accepts valid types and refuses invalid ones.", "[square_matrix]") {
+/* --------------------------------------------------------------- */
+/* ------------------------ constructors ------------------------- */
+/* -------------- hmeigens::SquareMatrix(Size) and --------------- */
+/* - hmeigens::SquareMatrix(hmeigens::SquareMatrix::Container&&) - */
+/* --------------------------------------------------------------- */
+//
+TEST_CASE("Square matrix test: the size parameter constructor accepts valid types and refuses invalid ones.", "[square_matrix][SquareMatrix][constructor][SquareMatrix(Size)]") {
     // GIVEN a type
     // WHEN  the compiler checks if it is valid
     // THEN  the allowed ones are accepted, the others are not
@@ -98,7 +124,7 @@ TEST_CASE("Square matrix test: the size parameter constructor accepts valid type
     STATIC_REQUIRE_FALSE(std::is_constructible_v<hmeigens::SquareMatrix, double>);
 }
 
-TEST_CASE("Square matrix test: a matrix has the size it was constructed with.", "[square_matrix]") {
+TEST_CASE("Square matrix test: a matrix has the size it was constructed with.", "[square_matrix][SquareMatrix][constructor][SquareMatrix(Size)][SquareMatrix(Container)]") {
     // GIVEN a valid size for a matrix
     // WHEN  the matrix is constructed
     // THEN  the size of the matrix is the correct one
@@ -107,17 +133,17 @@ TEST_CASE("Square matrix test: a matrix has the size it was constructed with.", 
     // Minimum size. Both a signed and an unsigned value.
     CHECK(hmeigens::SquareMatrix{1}.size() == 1);
     CHECK(hmeigens::SquareMatrix{1u}.size() == 1);
-    // Non trivial size.
+    // Non-trivial size.
     CHECK(hmeigens::SquareMatrix{500}.size() == 500);
     CHECK(hmeigens::SquareMatrix{500u}.size() == 500);
     // Body parameter constructor.
     // Minimum size.
     CHECK(hmeigens::SquareMatrix{hmeigens::SquareMatrix::Container(1)}.size() == 1);
-    // Non trivial size.
+    // Non-trivial size.
     CHECK(hmeigens::SquareMatrix{hmeigens::SquareMatrix::Container(500*500)}.size() == 500);
 }
 
-TEST_CASE("Square matrix test: invalid sizes are correctly reported.", "[square_matrix]") {
+TEST_CASE("Square matrix test: the constructors correctly report invalid sizes.", "[square_matrix][SquareMatrix][constructor][SquareMatrix(Size)][SquareMatrix(Container)]") {
     // GIVEN an invalid size
     // WHEN  the matrix is constructed
     // THEN  the correct exception is thrown
@@ -160,7 +186,7 @@ TEST_CASE("Square matrix test: invalid sizes are correctly reported.", "[square_
     // In the documentation there is still info that the constructor can throw, but testing for it means testing std::vector.
 }
 
-TEST_CASE("Square matrix test: the constructors are explicit.", "[square_matrix]") {
+TEST_CASE("Square matrix test: the constructors are explicit.", "[square_matrix][SquareMatrix][constructor][SquareMatrix(Size)][SquareMatrix(Container)]") {
     // GIVEN a size
     // WHEN  an implicit conversion to a matrix is attempted
     // THEN  it is refused
@@ -181,6 +207,50 @@ TEST_CASE("Square matrix test: the constructors are explicit.", "[square_matrix]
     );
 }
 
+TEST_CASE("Square matrix test: a matrix constructed with the size parameter constructor is zero-filled.", "[square_matrix][SquareMatrix][constructor][SquareMatrix(Size)]") {
+    // GIVEN a matrix of size n constructed with the size parameter constructor
+    // WHEN  the matrix is read
+    // THEN  there are nxn elements whose value is 0
+    //
+    // The constructor of hmeigens::SquareMatrix::Container used here fills it with zeroes. It's standard library.
+    // Trivial size.
+    checkAllElementsVersus(hmeigens::SquareMatrix{1}, hmeigens::SquareMatrix::Container(1));
+    // Non-trivial size.
+    checkAllElementsVersus(hmeigens::SquareMatrix{3}, hmeigens::SquareMatrix::Container(9));
+}
+
+TEST_CASE("Square matrix test: a matrix constructed with the body parameter constructor is filled with the appropriate elements in row-major order.", "[square_matrix][SquareMatrix][constructor][SquareMatrix(Container)]") {
+    // GIVEN a matrix of size n constructed with the body parameter constructor
+    // WHEN  the matrix is read
+    // THEN  there are nxn elements which correspond to the provided ones in row-major order
+    //
+    // Trivial size.
+    checkAllElementsVersus(
+        hmeigens::SquareMatrix{{{6.7_hs, 4.2_hs}}},
+        hmeigens::SquareMatrix::Container{{6.7_hs, 4.2_hs}}
+    );
+    // Implicit conversion of int to hmeigens::Complex.
+    // In a previous version hmeigens::SquareMatrix{{1}} would be interpreted as a 1x1 0-filled matrix. This case checks for that solved bug.
+    checkAllElementsVersus(
+        hmeigens::SquareMatrix{{1}},
+        hmeigens::SquareMatrix::Container{{1.0_hs, 0.0_hs}}
+    );
+    // Non-trivial size.
+    checkAllElementsVersus(
+        hmeigens::SquareMatrix{{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}},
+        hmeigens::SquareMatrix::Container{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}
+    );
+}
+
+/* --------------------------------------------------------------- */
+/* ------------------------- accessors --------------------------- */
+/* ------------- hmeigens::SquareMatrix::operator() -------------- */
+/* --------------- and hmeigens::SquareMatrix::at ---------------- */
+/* --------------------------------------------------------------- */
+//
+// There is no independent Catch2 tag for the accessors because the only one ever tested alone is hmeigens::SquareMatrix::operator() const, which gets a specific tag used in its test case only.
+// This is because it is the "trusted" accessor, i.e. it is used to test the others and in the checkAllElementsVersus helper, so the tag makes it runnable on its own.
+//
 // Anonymous namespace to make using aliases not global.
 namespace {
     // One signed, one unsigned.
@@ -194,7 +264,7 @@ namespace {
         double
         >;
 
-    TEMPLATE_LIST_TEST_CASE("Square matrix test: the accessors accept valid types.", "[square_matrix][template]", ValidTypes) {
+    TEMPLATE_LIST_TEST_CASE("Square matrix test: the accessors accept valid types.", "[square_matrix][SquareMatrix][accessors][template]", ValidTypes) {
         // GIVEN a list of valid types
         // WHEN  those types are used on the accessors
         // THEN  they are accepted
@@ -271,7 +341,7 @@ namespace {
         );
     }
 
-    TEMPLATE_LIST_TEST_CASE("Square matrix test: the accessors refuse invalid types.", "[square_matrix][template]", InvalidTypes) {
+    TEMPLATE_LIST_TEST_CASE("Square matrix test: the accessors refuse invalid types.", "[square_matrix][SquareMatrix][accessors][template]", InvalidTypes) {
         // GIVEN a list of invalid types
         // WHEN  those types are used on the accessors
         // THEN  they are refused
@@ -350,7 +420,7 @@ namespace {
     }
 }
 
-TEST_CASE("Square matrix test: accessors return the correct type.", "[square_matrix]") {
+TEST_CASE("Square matrix test: accessors return the correct type.", "[square_matrix][SquareMatrix][accessors]") {
     // GIVEN a matrix
     // WHEN  the accessors' return type is checked
     // THEN  the returned type is correctly qualified
@@ -383,13 +453,13 @@ TEST_CASE("Square matrix test: accessors return the correct type.", "[square_mat
     );
 }
 
-TEST_CASE("Square matrix test: accessor operator() const returns the correct element.", "[square_matrix]") {
+TEST_CASE("Square matrix test: accessor operator() const returns the correct element.", "[square_matrix][SquareMatrix][accessors][operator()_const]") {
     // GIVEN a valid row-column position pair
     // WHEN  hmeigens::SquareMatrix::operator() const is called
     // THEN  the correct element is returned
     //
-    // Note: this test requires trusting that the constructor hmeigens::SquareMatrix::SquareMatrix (hmeigens::SquareMatrix::Container&& body) works as intended.
-    // The constructor is tested below, and its tests require trusting that hmeigens::SquareMatrix::operator() const works as intended.
+    // Note: this test requires trusting that the constructor hmeigens::SquareMatrix::SquareMatrix(hmeigens::SquareMatrix::Container&& body) works as intended.
+    // The constructor is tested in another case, and its tests require trusting that hmeigens::SquareMatrix::operator() const works as intended.
     // Due to encapsulation it is not possible to fully separate their behaviour: either there is a matrix to read, or nothing can be read at all.
     // The test here is performed versus values independent of the class, via testBody.
     // The other behaviours of the constructor (size, exceptions) can be and are tested separately.
@@ -406,7 +476,7 @@ TEST_CASE("Square matrix test: accessor operator() const returns the correct ele
     checkAllElementsVersus(testMatrixConst, testBody);
 }
 
-TEST_CASE("Square matrix test: accessors except operator() const return the correct element.", "[square_matrix]") {
+TEST_CASE("Square matrix test: accessors except operator() const return the correct element.", "[square_matrix][SquareMatrix][accessors]") {
     // GIVEN a valid row-column position pair
     // WHEN  any accessor except hmeigens::SquareMatrix::operator() const is called
     // THEN  the correct element is returned
@@ -450,7 +520,7 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
     }
 }
 
-TEST_CASE("Square matrix test: const accessors do not allow editing, non-consts do.", "[square_matrix]") {
+TEST_CASE("Square matrix test: const accessors do not allow editing, non-consts do.", "[square_matrix][SquareMatrix][accessors]") {
     // GIVEN a matrix
     // WHEN  the accessors' return type is checked
     // THEN  the const accessors return uneditable references, the non const ones return editable ones
@@ -483,7 +553,7 @@ TEST_CASE("Square matrix test: const accessors do not allow editing, non-consts 
     );
 }
 
-TEST_CASE("Square matrix test: edited values persist and are in the right place.", "[square_matrix]") {
+TEST_CASE("Square matrix test: edited values persist and are in the right place.", "[square_matrix][SquareMatrix][accessors]") {
     // GIVEN a matrix
     // WHEN  an edit of a value is attempted through the accessors
     // THEN  the correct element is edited, and the correct value is stored afterwards
@@ -516,7 +586,7 @@ TEST_CASE("Square matrix test: edited values persist and are in the right place.
     }
 }
 
-TEST_CASE("Square matrix test: the overloads of at() are index safe.", "[square_matrix]") {
+TEST_CASE("Square matrix test: the overloads of at() are index safe.", "[square_matrix][SquareMatrix][accessors]") {
     // GIVEN a matrix
     // WHEN  an out-of-range row column index pair is given to hmeigens::SquareMatrix::at()
     // THEN  an exception is thrown with the correct type and message
@@ -556,7 +626,7 @@ TEST_CASE("Square matrix test: the overloads of at() are index safe.", "[square_
     }
 }
 
-TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[square_matrix][may_be_skipped][debug_only]") {
+TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[square_matrix][SquareMatrix][accessors][may_be_skipped][debug_only]") {
     // GIVEN a matrix
     // WHEN  an out-of-range row column index pair is given to hmeigens::SquareMatrix::operator() IN DEBUG MODE
     // THEN  an exception is thrown with the correct type and message
@@ -604,42 +674,11 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
     }
 }
 
-TEST_CASE("Square matrix test: a matrix constructed with the size parameter constructor is zero-filled.", "[square_matrix]") {
-    // GIVEN a matrix of size n constructed with the size parameter constructor
-    // WHEN  the matrix is read
-    // THEN  there are nxn elements whose value is 0.
-    //
-    // The constructor of hmeigens::SquareMatrix::Container used here fills it with zeroes. It's standard library.
-    // Trivial size.
-    checkAllElementsVersus(hmeigens::SquareMatrix{1}, hmeigens::SquareMatrix::Container(1));
-    // Non trivial size.
-    checkAllElementsVersus(hmeigens::SquareMatrix{3}, hmeigens::SquareMatrix::Container(9));
-}
-
-TEST_CASE("Square matrix test: a matrix constructed with the body parameter constructor is filled with the appropriate elements in row-major order.", "[square_matrix]") {
-    // GIVEN a matrix of size n constructed with the body parameter constructor
-    // WHEN  the matrix is read
-    // THEN  there are nxn elements which correspond to the provided ones in row-major order.
-    //
-    // Trivial size.
-    checkAllElementsVersus(
-        hmeigens::SquareMatrix{{{6.7_hs, 4.2_hs}}},
-        hmeigens::SquareMatrix::Container{{6.7_hs, 4.2_hs}}
-    );
-    // Implicit conversion of int to hmeigens::Complex.
-    // In a previous version hmeigens::SquareMatrix{{1}} would be interpreted as a 1x1 0-filled matrix. This case checks for that solved bug.
-    checkAllElementsVersus(
-        hmeigens::SquareMatrix{{1}},
-        hmeigens::SquareMatrix::Container{{1.0_hs, 0.0_hs}}
-    );
-    // Non trivial size.
-    checkAllElementsVersus(
-        hmeigens::SquareMatrix{{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}},
-        hmeigens::SquareMatrix::Container{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}
-    );
-}
-
-TEST_CASE("Square matrix test: the identity matrix has the correct form.", "[square_matrix]") {
+/* --------------------------------------------------------------- */
+/* --------------- hmeigens::SquareMatrix::identity -------------- */
+/* --------------------------------------------------------------- */
+//
+TEST_CASE("Square matrix test: the identity matrix has the correct form.", "[square_matrix][SquareMatrix][identity]") {
     // GIVEN a valid size
     // WHEN  hmeigens::SquareMatrix::identity attempts to build an identity matrix of that size
     // THEN  the matrix exists, has 1 on the diagonal, 0 everywhere else
@@ -657,7 +696,7 @@ TEST_CASE("Square matrix test: the identity matrix has the correct form.", "[squ
     );
 }
 
-TEST_CASE("Square matrix test: identity throws as expected for invalid sizes.", "[square_matrix]") {
+TEST_CASE("Square matrix test: identity throws as expected for invalid sizes.", "[square_matrix][SquareMatrix][identity]") {
     // GIVEN an invalid size
     // WHEN  hmeigens::SquareMatrix::identity attempts to build an identity matrix of that size
     // THEN  it throws exactly like hmeigens::SquareMatrix(Size)

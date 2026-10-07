@@ -7,9 +7,9 @@
 #include <concepts>     // For std::signed_integral, std::unsigned_integral, std::same_as
 #include <type_traits>  // For std::remove_cv_t
 
-/* ------------------------------*/
+/* ----------------------------- */
 /* --------- IMPORTANT --------- */
-/* ------------------------------*/
+/* ----------------------------- */
 //
 // The main idea behind the hmeigens::detail::validateSize functions below is that std::size_t is a useful type, but a little bit of a bastard as well.
 // On the machine where this code was physically written and tested std::size_t is 64 bit, and so its width matches std::uintmax_t exactly, but it may not be the case on other machines where it is, say, 32 bit.
@@ -75,9 +75,9 @@ namespace hmeigens::detail {
 
 }
 
-/* ------------------------------*/
+/* ----------------------------- */
 /* -------- Definitions -------- */
-/* ------------------------------*/
+/* ----------------------------- */
 //
 // See the declaration for all relevant information.
 // These functions are basically a glorified wrapper for hmeigens::detail::validateSize() with the corresponding parameter type.

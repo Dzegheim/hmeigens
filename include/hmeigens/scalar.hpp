@@ -13,7 +13,16 @@
 namespace hmeigens {
 
     #if defined(HMEIGENS_SCALAR_FLOAT)
+    /// @brief Alias for the floating-point type used throughout the project.
+    ///
+    /// Due to algorithm precision reasons the default is set to `double` rather than `float`.
+    /// The reference notes for this project (G. Servizi, *Autovalori*, 2017) show residual errors of the order `1e-8`.
+    /// Since `float` has only 7 decimal digits, it may not pass the more stringent tests.
     using Scalar = float;
+
+    /// @brief An `std::string` variable naming the selected type.
+    ///
+    /// Useful for letting users know at runtime the floating-point type used to build the project.
     inline const std::string scalarType = "float";
     #else
 
@@ -23,6 +32,7 @@ namespace hmeigens {
     /// The reference notes for this project (G. Servizi, *Autovalori*, 2017) show residual errors of the order `1e-8`.
     /// Since `float` has only 7 decimal digits, it may not pass the more stringent tests.
     using Scalar = double;
+
     /// @brief An `std::string` variable naming the selected type.
     ///
     /// Useful for letting users know at runtime the floating-point type used to build the project.
@@ -41,9 +51,9 @@ namespace hmeigens {
     consteval Scalar operator""_hs(long double toConvert);
 }
 
-/* ------------------------------*/
+/* ----------------------------- */
 /* -------- Definitions -------- */
-/* ------------------------------*/
+/* ----------------------------- */
 //
 // See the declaration for all relevant information.
 // This literal wraps a cast to avoid implicit conversions.
