@@ -8,6 +8,8 @@
 #include "hmeigens/detail/text_escape.hpp"
 #include "hmeigens/detail/to_scalar.hpp"
 
+using hmeigens::operator""_hs;
+
 #include <string>
 #include <string_view>
 #include <regex>
@@ -59,7 +61,7 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
             // Matched real part, including sign.
             hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input),
             // Null imaginary part.
-            hmeigens::Scalar {0.0}
+            0.0_hs
         };
     }
     // Ordered pair case.
@@ -77,15 +79,15 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
         // If not matched, it is null.
         const hmeigens::Scalar realPart = match[1].matched ?
         hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input) :
-        hmeigens::Scalar{0.0};
+        0.0_hs;
         // If there is a sign, it is used.
         // If there is no sign, it is a '+'.
-        const hmeigens::Scalar imagSign = (match[2].matched && *match[2].first == '-') ? hmeigens::Scalar{-1.0} : hmeigens::Scalar{1.0};
+        const hmeigens::Scalar imagSign = (match[2].matched && *match[2].first == '-') ? -1.0_hs : 1.0_hs;
         // If there is a magnitude, it is used.
         // If there is no magnitude, it is 1.0.
         const hmeigens::Scalar imagMagnitude = match[3].matched
         ? hmeigens::detail::toScalar(std::string_view{match[3].first, match[3].second}, input) :
-        hmeigens::Scalar{1.0};
+        1.0_hs;
         return hmeigens::Complex{realPart, imagSign * imagMagnitude};
     }
     // If nothing matches an exception is thrown.
