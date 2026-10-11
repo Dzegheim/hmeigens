@@ -34,7 +34,7 @@ namespace hmeigens {
     static_assert(maxSquarableSize <= std::numeric_limits<std::size_t>::max()/maxSquarableSize, "The variable hmeigens::maxSquarableSize cannot overflow when squared.");
     static_assert(maxSquarableSize+1 > std::numeric_limits<std::size_t>::max()/(maxSquarableSize+1), "The variable hmeigens::maxSquarableSize must be the largest possible value that does not overflow when squared.");
 
-    /// @brief Returns the base tolerance for the computation of the norm by (coming soon) hmeigens::SquareMatrix::norm(), used in tests. The true tolerance used in the tests is multiplied by `HMEIGENS_HYPOT_ULPS`.
+    /// @brief Returns the base tolerance for the computation of the norm by hmeigens::SquareMatrix::norm(), used in tests. The true tolerance used in the tests is multiplied by `HMEIGENS_HYPOT_ULPS`.
     ///
     /// The base tolerance is `size*size`, which in the code is always safe to compute provided it comes from an hmeigens::SquareMatrix, as the size of a matrix has the prerequisite of always being squarable within `std::size_t`.
     /// Implementations *usually* guarantee that the precision is less than 1 ULP.

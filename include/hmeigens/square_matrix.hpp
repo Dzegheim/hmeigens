@@ -163,7 +163,7 @@ namespace hmeigens {
         /// @param col The column of the element to access.
         /// @return A read-only reference to the element in position (`row`, `col`).
         /// @warning The returned reference is only valid as long as the matrix also is.
-        /// @pre 0 <= row < size() and 0 <= col < size()
+        /// @pre `0 <= row < size()` and `0 <= col < size()`.
         /// @warning This operator does not perform out-of-bound checks in release mode. For a range safe version, see `hmeigens::SquareMatrix::at()`.
         /// In debug mode (i.e. if `NDEBUG` is not defined) the operator behaves and throws exactly like `hmeigens::SquareMatrix::at()`.
         /// @sa operator()(Row, Col)
@@ -180,7 +180,7 @@ namespace hmeigens {
         /// @param col The column of the element to access.
         /// @return A reference to the element in position (`row`, `col`).
         /// @warning The returned reference is only valid as long as the matrix also is.
-        /// @pre 0 <= row < size() and 0 <= col < size()
+        /// @pre `0 <= row < size()` and `0 <= col < size()`.
         /// @warning This operator does not perform out-of-bound checks in release mode. For a range safe version, see `hmeigens::SquareMatrix::at()`.
         /// In debug mode (i.e. if `NDEBUG` is not defined) the operator behaves and throws exactly like `hmeigens::SquareMatrix::at()`.
         /// @sa operator()(Row, Col) const
@@ -230,6 +230,17 @@ namespace hmeigens {
         /// @sa SquareMatrix(Size)
         template<CanBeSize Size>
         [[nodiscard]] static SquareMatrix identity(Size size);
+
+        /// @brief Frobenius norm of the matrix.
+        ///
+        /// The Frobenius norm of a size @f(n@f) square matrix @f(M@f) with elements @f(m_{ij}@f) is defined as
+        /// @f[
+        /// \left\|M\right\|_F=\sqrt{\sum_{i=1}^{n}\sum_{j=1}^{n}\left|m_{ij}\right|^2}\ ,
+        /// @f]
+        /// where @f(\left|m_{ij}\right|^2@f) is the squared modulus of the element.
+        /// The Frobenius norm is used in this project because it is invariant under unitary operations.
+        /// @return The Frobenius norm of the matrix as an `hmeigens::Scalar`.
+        [[nodiscard]] Scalar norm() const;
 
         private:
         // Member function for computing the index of an element given the row and col (column).
