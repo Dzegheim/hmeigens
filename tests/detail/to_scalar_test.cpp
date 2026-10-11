@@ -4,7 +4,7 @@
 // - test cases:
 //      - hmeigens::detail::toScalar.
 #include "hmeigens/detail/to_scalar.hpp"
-#include "hmeigens/constants.hpp"
+#include "hmeigens/tolerances.hpp"
 #include "hmeigens/complex_parse.hpp"
 
 #include <string>

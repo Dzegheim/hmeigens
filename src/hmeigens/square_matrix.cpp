@@ -10,7 +10,6 @@
 #include <utility>     // For std::move
 #include <cstddef>     // For std::size_t
 #include <cmath>       // For std::hypot
-#include <complex>     // For std::abs
 
 // Constructor of the hmeigens::SquareMatrix class.
 // Takes a container object, and after checking that the container is a non-empty square matrix-like object, uses it to fill the matrix.
@@ -49,7 +48,7 @@ std::size_t hmeigens::SquareMatrix::getIndex(std::size_t row, std::size_t col) c
 // ---- Statement ----
 // Let x_1,...,x_n be real numbers.
 // Let f_0 = 0, f_k = sqrt(x_k^2 + f_(k-1)^2).
-// [i.e. in the code the equivalent of calling std::hypot(std::abs(z), norm).]
+// [i.e. in the code the equivalent of calling std::hypot(std::hypot(z.real(), z.imag()), norm).]
 // Then for all k in 1,...,n f_k=sqrt(sum_(i=1)^k x_i^2).
 // ---- Proof ----
 // Case 1 given 0:
@@ -63,12 +62,13 @@ std::size_t hmeigens::SquareMatrix::getIndex(std::size_t row, std::size_t col) c
 // ---- Q.E.D. ----
 // This call of std::hypot is equivalent to the definition of the Frobenius norm.
 // Of course std::hypot is slower, but this implementation cannot explode to infinity in the middle of the computation.
+// The norm needs to be computed only once in the triangularization process, so it being slower does not really matter.
 hmeigens::Scalar hmeigens::SquareMatrix::norm() const {
     // Initialize the norm to 0.
     hmeigens::Scalar norm = 0._hs;
     // The body_ is just an hmeigens::SquareMatrix::Container. The order of the elements here does not matter.
     for(const auto& z : body_) {
-        norm = std::hypot(std::abs(z), norm);
+        norm = std::hypot(std::hypot(z.real(), z.imag()), norm);
     }
     return norm;
 }

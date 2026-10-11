@@ -29,9 +29,14 @@ include(Catch)
 catch_discover_tests(${PROJECT_NAME_LOWER}_tests)
 
 # This is a multiplicative constant for the number of ULPs a computed norm has as tolerance for the tests of the function hmeigens::SquareMatrix::norm().
-# The actual tolerance is HMEIGENS_HYPOT_ULPS*size^2, where size is the size of the matrix.
-# The default is set to 2. Reasoning is provided in the documentation for hmeigens::normTolerance.
+# The actual tolerance is HMEIGENS_HYPOT_ULPS*2*size^2, where size is the size of the matrix.
+# The default is set to 2 in the library. Reasoning is provided in the documentation for HMEIGENS_HYPOT_ULPS in tolerances.hpp.
 # This value is left modifiable if the tests fail due to implementation-specific rounding errors (which matter less and less for large matrices, as the odds of all size^2 errors moving in the same direction are low).
-set(HMEIGENS_HYPOT_ULPS 2 CACHE STRING "This is a multiplicative constant for the number of ULPs a computed norm has as tolerance for the tests of the function hmeigens::SquareMatrix::norm(). See documentation for details.")
-# Private to prevent carrying over flags.
-target_compile_definitions(${PROJECT_NAME_LOWER}_tests PRIVATE HMEIGENS_HYPOT_ULPS=${HMEIGENS_HYPOT_ULPS})
+set(HMEIGENS_HYPOT_ULPS "" CACHE STRING "This is a multiplicative constant for the number of ULPs a computed norm has as tolerance for the tests of the function hmeigens::SquareMatrix::norm(). Uses the default in tolerances.hpp if empty. See documentation for details.")
+if(NOT HMEIGENS_HYPOT_ULPS STREQUAL "")
+    if(NOT HMEIGENS_HYPOT_ULPS MATCHES "^[1-9][0-9]*$")
+        message(FATAL_ERROR "HMEIGENS_HYPOT_ULPS must be a positive integer, got \"${HMEIGENS_HYPOT_ULPS}\".")
+    endif()
+    # Private to prevent carrying over flags.
+    target_compile_definitions(${PROJECT_NAME_LOWER}_tests PRIVATE HMEIGENS_HYPOT_ULPS=${HMEIGENS_HYPOT_ULPS})
+endif()

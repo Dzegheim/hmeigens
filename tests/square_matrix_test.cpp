@@ -1,13 +1,13 @@
 // Test file for square_matrix.hpp/.cpp.
 // Sections:
-// - constants;
 // - helpers;
 // - test cases:
 //      - hmeigens::CanBeSize;
-//      - constructors hmeigens::SquareMatrix(Size) and hmeigens::SquareMatrix(hmeigens::SquareMatrix::Container&&;
+//      - constructors hmeigens::SquareMatrix(Size) and hmeigens::SquareMatrix(hmeigens::SquareMatrix::Container&&);
 //      - accessors hmeigens::SquareMatrix::operator() and hmeigens::SquareMatrix::at;
-//      - hmeigens::SquareMatrix::identity.
-#include "hmeigens/constants.hpp"
+//      - hmeigens::SquareMatrix::identity;
+//      - hmeigens::SquareMatrix::norm.
+#include "hmeigens/tolerances.hpp"
 #include "hmeigens/square_matrix.hpp"
 
 using hmeigens::operator""_hs;
@@ -27,13 +27,6 @@ using hmeigens::operator""_hs;
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
-
-/* --------------------------------------------- */
-/* ----------------- Constants ----------------- */
-/* --------------------------------------------- */
-//
-// See the documentation of hmeigens::normTolerance in constants.hpp.
-constexpr std::uint64_t addedTolerance = HMEIGENS_HYPOT_ULPS;
 
 /* --------------------------------------------- */
 /* ------------------ Helpers ------------------ */
@@ -79,11 +72,6 @@ static void checkAllElementsVersus(const hmeigens::SquareMatrix& toCheck, const 
         }
     }
     return;
-}
-
-// This helper simply multiplies the values of addedTolerance and hmeigens::normTolerance() to improve readability.
-static std::uint64_t getNormTolerance(const std::size_t size) {
-    return addedTolerance*hmeigens::normTolerance(size);
 }
 
 /* --------------------------------------------------------------- */
@@ -753,7 +741,7 @@ TEST_CASE("Square matrix test: identity throws as expected for invalid sizes.", 
 /* ----------------- hmeigens::SquareMatrix::norm ---------------- */
 /* --------------------------------------------------------------- */
 //
-// The tolerance for the tests is variable due to limitations of std::hypot. The precision is implementation defined. For an extensive discussion see the definition of hmeigens::normTolerance in constants.hpp.
+// The tolerance for the tests is variable due to limitations of std::hypot. The precision is implementation defined. For an extensive discussion see the documentation of hmeigens::normTolerance in tolerances.hpp.
 //
 TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "[square_matrix][SquareMatrix][norm]") {
     // GIVEN a matrix
@@ -765,12 +753,12 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     checkReal(hmeigens::SquareMatrix{100}.norm(), 0._hs, 0);
     // Identity: the norm must be sqrt(size).
     // Note that std::sqrt() is REQUIRED to be precise by the (IEEE) standard. See https://en.cppreference.com/cpp/numeric/math/sqrt.
-    checkReal(hmeigens::SquareMatrix::identity(1).norm(), 1._hs, getNormTolerance(1));
-    checkReal(hmeigens::SquareMatrix::identity(3).norm(), std::sqrt(3._hs), getNormTolerance(3));
-    checkReal(hmeigens::SquareMatrix::identity(10).norm(), std::sqrt(10._hs), getNormTolerance(10));
+    checkReal(hmeigens::SquareMatrix::identity(1).norm(), 1._hs, hmeigens::normTolerance(1));
+    checkReal(hmeigens::SquareMatrix::identity(3).norm(), std::sqrt(3._hs), hmeigens::normTolerance(3));
+    checkReal(hmeigens::SquareMatrix::identity(10).norm(), std::sqrt(10._hs), hmeigens::normTolerance(10));
     // Arbitrary matrices.
     // The following norms have been computed by hand and then double checked on WolframAlpha.
-    checkReal(hmeigens::SquareMatrix{{4._hs}}.norm(), 4._hs, getNormTolerance(1));
+    checkReal(hmeigens::SquareMatrix{{4._hs}}.norm(), 4._hs, hmeigens::normTolerance(1));
     checkReal(
         hmeigens::SquareMatrix{
             {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
@@ -778,7 +766,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
              {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
         }.norm(),
         std::sqrt(570._hs),
-        getNormTolerance(3)
+        hmeigens::normTolerance(3)
     );
     checkReal(
         hmeigens::SquareMatrix{
@@ -787,7 +775,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
              {0.006_hs, 7._hs},{0.000005_hs, 0._hs},  {-90._hs, 0._hs}}
         }.norm(),
         std::sqrt(8978.960012000026_hs),
-        getNormTolerance(3)
+        hmeigens::normTolerance(3)
     );
     checkReal(
         hmeigens::SquareMatrix{
@@ -795,7 +783,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
              {3333e13_hs, 0._hs}, {-444e16_hs, 0._hs}}
         }.norm(),
         std::sqrt(197147148989e26_hs),
-        getNormTolerance(2)
+        hmeigens::normTolerance(2)
     );
     // Matrices whose elements squared over/underflow. The norm is still a valid number in range. Using std::hypot guarantees the result cannot overflow in the middle of calculations.
     // Value whose square always overflows.
@@ -855,7 +843,7 @@ TEST_CASE("Square matrix test: the Frobenius norm behaves like a norm.", "[squar
             {{9._hs, 0.5_hs},   {2._hs, -11._hs},
              {-.25_hs, -8._hs}, {0._hs, 0._hs}}
         }.norm(),
-        3*getNormTolerance(2)
+        3*hmeigens::normTolerance(2)
     );
     // Axiom 3: triangle inequality.
     // The third matrix is the sum of the first two. Computation was done by hand and double-checked with WolframAlpha.

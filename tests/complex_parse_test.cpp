@@ -4,7 +4,7 @@
 // - test cases:
 //      - hmeigens::parseComplex;
 //      - hmeigens::ParseError.
-#include "hmeigens/constants.hpp"
+#include "hmeigens/tolerances.hpp"
 #include "hmeigens/complex_parse.hpp"
 #include "hmeigens/detail/text_escape.hpp"
 
