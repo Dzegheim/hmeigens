@@ -10,6 +10,8 @@
 #include "hmeigens/tolerances.hpp"
 #include "hmeigens/square_matrix.hpp"
 
+#include "comparison_helpers.hpp"
+
 #include <stdexcept>     // For std::out_of_range, std::length_error, std::invalid_argument
 #include <cstddef>       // For std::size_t
 #include <cstdint>       // For std::intmax_t, std::uintmax_t, std::uint64_t
@@ -33,25 +35,9 @@
 /* ------------------ Helpers ------------------ */
 /* --------------------------------------------- */
 //
-// This helper checks that two real numbers are within the expected tolerance of one another.
-static void checkReal(const hmeigens::Scalar toCheck, const hmeigens::Scalar expected, const std::uint64_t toleranceULPs) {
-    CAPTURE(toCheck, expected);
-    CHECK_THAT(
-        toCheck,
-        Catch::Matchers::WithinULP(expected, toleranceULPs)
-    );
-    return;
-}
-
-// This helper checks that two complex numbers passed to it are "equal enough", i.e. that their real and imaginary parts are both within toleranceULPs of each other.
-static void checkComplex(const hmeigens::Complex& toCheck, const hmeigens::Complex& expected, const std::uint64_t toleranceULPs) {
-    CAPTURE(toCheck, expected);
-    // Real part check.
-    checkReal(toCheck.real(), expected.real(), toleranceULPs);
-    // Imaginary part check.
-    checkReal(toCheck.imag(), expected.imag(), toleranceULPs);
-    return;
-}
+// Readability of tests.
+using hmeigens::test::checkRealULPs;
+using hmeigens::test::checkComplexULPs;
 
 // This helper checks that all elements of a matrix match the ones of a reference hmeigens::SquareMatrix::Container within toleranceULPs.
 // It accesses the elements via hmeigens::SquareMatrix::operator() const.
@@ -65,7 +51,7 @@ static void checkAllElementsVersus(const hmeigens::SquareMatrix& toCheck, const 
             // The container's indexing is the same as the private member hmeigens::SquareMatrix::getIndex().
             // Here it is written explicitly so that it is independent from the class.
             // This also enforces the row-major order of the elements. This helper IS MEANT TO break if the class' internal index computation changes, as the class is supposed to be row-major.
-            checkComplex(
+            checkComplexULPs(
                 toCheck(row, col),
                 referenceBody[row * toCheck.size() + col],
                 toleranceULPs
@@ -497,7 +483,7 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
     // Note: this test requires trusting that hmeigens::SquareMatrix::operator()(Row row, Col col) const works as intended.
     // The operator is tested above, independently of all these accessors.
     // Why SECTIONs here?
-    // Each check calls the helper checkComplex. Without SECTIONs a failed test does not say which overload it was.
+    // Each check calls the helper checkComplexULPs. Without SECTIONs a failed test does not say which overload it was.
     // The alternative was using either member-pointers or lambdas. That would be like shooting a fly with a bazooka, so a simple copy-paste here works.
     // The checkAllElementsVersus helper uses only the trusted hmeigens::SquareMatrix::operator() const, so here it would not do what is needed.
     // The 0 ULP tolerance comes from the fact that copying or referencing an element of a matrix must not alter it. Since no arithmetic is performed, it must not be rounded or altered.
@@ -512,7 +498,7 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
         for(std::size_t row = 0; row < testMatrix.size(); ++row) {
             for(std::size_t col = 0; col < testMatrix.size(); ++col) {
                 CAPTURE(row, col);
-                checkComplex(testMatrixConst.at(row, col), testMatrixConst(row, col), 0);
+                checkComplexULPs(testMatrixConst.at(row, col), testMatrixConst(row, col), 0);
             }
         }
     }
@@ -520,7 +506,7 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
         for(std::size_t row = 0; row < testMatrix.size(); ++row) {
             for(std::size_t col = 0; col < testMatrix.size(); ++col) {
                 CAPTURE(row, col);
-                checkComplex(testMatrix.at(row, col), testMatrixConst(row, col), 0);
+                checkComplexULPs(testMatrix.at(row, col), testMatrixConst(row, col), 0);
             }
         }
     }
@@ -528,7 +514,7 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
         for(std::size_t row = 0; row < testMatrix.size(); ++row) {
             for(std::size_t col = 0; col < testMatrix.size(); ++col) {
                 CAPTURE(row, col);
-                checkComplex(testMatrix(row, col), testMatrixConst(row, col), 0);
+                checkComplexULPs(testMatrix(row, col), testMatrixConst(row, col), 0);
             }
         }
     }
@@ -588,16 +574,16 @@ TEST_CASE("Square matrix test: edited values persist and are in the right place.
         // Edit the elements, then see if their value was updated.
         testMatrix.at(0,0) = hmeigens::Complex{HMS(6.), HMS(7.)};
         testMatrix.at(1,2) = hmeigens::Complex{HMS(4.), HMS(2.)};
-        checkComplex(testMatrixConst(0,0), hmeigens::Complex {HMS(6.), HMS(7.)}, 0);
-        checkComplex(testMatrixConst(1,2), hmeigens::Complex {HMS(4.), HMS(2.)}, 0);
+        checkComplexULPs(testMatrixConst(0,0), hmeigens::Complex {HMS(6.), HMS(7.)}, 0);
+        checkComplexULPs(testMatrixConst(1,2), hmeigens::Complex {HMS(4.), HMS(2.)}, 0);
     }
     SECTION("hmeigens::SquareMatrix::operator()") {
         // Testing both a diagonal and an off-diagonal element.
         // Edit the elements, then see if their value was updated.
         testMatrix(0,0) = hmeigens::Complex{HMS(6.), HMS(7.)};
         testMatrix(1,2) = hmeigens::Complex{HMS(4.), HMS(2.)};
-        checkComplex(testMatrixConst(0,0), hmeigens::Complex {HMS(6.), HMS(7.)}, 0);
-        checkComplex(testMatrixConst(1,2), hmeigens::Complex {HMS(4.), HMS(2.)}, 0);
+        checkComplexULPs(testMatrixConst(0,0), hmeigens::Complex {HMS(6.), HMS(7.)}, 0);
+        checkComplexULPs(testMatrixConst(1,2), hmeigens::Complex {HMS(4.), HMS(2.)}, 0);
     }
 }
 
@@ -750,17 +736,17 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     // THEN  the value returned is the expected one
     //
     // Null matrix: the norm must be exactly 0.
-    checkReal(hmeigens::SquareMatrix{1}.norm(), HMS(0.), 0);
-    checkReal(hmeigens::SquareMatrix{100}.norm(), HMS(0.), 0);
+    checkRealULPs(hmeigens::SquareMatrix{1}.norm(), HMS(0.), 0);
+    checkRealULPs(hmeigens::SquareMatrix{100}.norm(), HMS(0.), 0);
     // Identity: the norm must be sqrt(size).
     // Note that std::sqrt() is REQUIRED to be precise by the (IEEE) standard. See https://en.cppreference.com/cpp/numeric/math/sqrt.
-    checkReal(hmeigens::SquareMatrix::identity(1).norm(), HMS(1.), hmeigens::normTolerance(1));
-    checkReal(hmeigens::SquareMatrix::identity(3).norm(), std::sqrt(HMS(3.)), hmeigens::normTolerance(3));
-    checkReal(hmeigens::SquareMatrix::identity(10).norm(), std::sqrt(HMS(10.)), hmeigens::normTolerance(10));
+    checkRealULPs(hmeigens::SquareMatrix::identity(1).norm(), HMS(1.), hmeigens::normTolerance(1));
+    checkRealULPs(hmeigens::SquareMatrix::identity(3).norm(), std::sqrt(HMS(3.)), hmeigens::normTolerance(3));
+    checkRealULPs(hmeigens::SquareMatrix::identity(10).norm(), std::sqrt(HMS(10.)), hmeigens::normTolerance(10));
     // Arbitrary matrices.
     // The following norms have been computed by hand and then double checked on WolframAlpha.
-    checkReal(hmeigens::SquareMatrix{{HMS(4.)}}.norm(), HMS(4.), hmeigens::normTolerance(1));
-    checkReal(
+    checkRealULPs(hmeigens::SquareMatrix{{HMS(4.)}}.norm(), HMS(4.), hmeigens::normTolerance(1));
+    checkRealULPs(
         hmeigens::SquareMatrix{
             {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)}, {HMS(3.), HMS(3.)},
              {HMS(4.), HMS(4.)}, {HMS(5.), HMS(5.)}, {HMS(6.), HMS(6.)},
@@ -769,7 +755,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
         std::sqrt(HMS(570.)),
         hmeigens::normTolerance(3)
     );
-    checkReal(
+    checkRealULPs(
         hmeigens::SquareMatrix{
             {{HMS(3.), HMS(-1.)},  {HMS(0.), HMS(1.4)},       {HMS(0.), HMS(0.)},
              {HMS(0.), HMS(-1.)},  {HMS(11.999999), HMS(0.)}, {HMS(23.), HMS(-12.)},
@@ -778,7 +764,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
         std::sqrt(HMS(8978.960012000026)),
         hmeigens::normTolerance(3)
     );
-    checkReal(
+    checkRealULPs(
         hmeigens::SquareMatrix{
             {{HMS(1e14), HMS(0.)},    {HMS(2e15), HMS(0.)},
              {HMS(3333e13), HMS(0.)}, {HMS(-444e16), HMS(0.)}}
@@ -788,7 +774,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     );
     // Matrices whose elements squared over/underflow. The norm is still a valid number in range. Using std::hypot guarantees the result cannot overflow in the middle of calculations.
     // Value whose square always overflows.
-    checkReal(
+    checkRealULPs(
         hmeigens::SquareMatrix{
             {std::numeric_limits<hmeigens::Scalar>::max(), HMS(0.),
              HMS(0.),                                        HMS(0.)}
@@ -799,7 +785,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
         0
     );
     // Value whose square always underflows.
-    checkReal(
+    checkRealULPs(
         hmeigens::SquareMatrix{
             {std::numeric_limits<hmeigens::Scalar>::min(), HMS(0.),
              HMS(0.),                                        HMS(0.)}
@@ -834,7 +820,7 @@ TEST_CASE("Square matrix test: the Frobenius norm behaves like a norm.", "[squar
     // One norm is multiplied by 5. The multiplication is correctly rounded, as per IEEE, so it adds no extra tolerance.
     // The value of the norm is however already rounded, and multiplying it at most doubles its rounding error in ULPs. This means the tolerance on the first parameter must be doubled.
     // Since norm() is used twice, the second parameter's tolerance must also be added to the first one, giving a total of 2+1=3 tolerance.
-    checkReal(
+    checkRealULPs(
         HMS(5.)*
         hmeigens::SquareMatrix{
             {{HMS(1.), HMS(1.5)},   {HMS(2.), HMS(-1.)},
