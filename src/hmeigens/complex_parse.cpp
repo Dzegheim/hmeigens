@@ -8,13 +8,14 @@
 #include "hmeigens/detail/text_escape.hpp"
 #include "hmeigens/detail/to_scalar.hpp"
 
-using hmeigens::operator""_hs;
-
 #include <string>
 #include <string_view>
 #include <regex>
 #include <stdexcept>      // For std::invalid_argument
 #include <format>
+
+// Local brief alias for the conversion macro to improve legibility.
+#define HMS HMEIGENS_MAKE_SCALAR
 
 // A function to parse complex numbers from text using regular expressions.
 // Fully documented in .hpp.
@@ -61,7 +62,7 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
             // Matched real part, including sign.
             hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input),
             // Null imaginary part.
-            0.0_hs
+            HMS(0.)
         };
     }
     // Ordered pair case.
@@ -79,15 +80,15 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
         // If not matched, it is null.
         const hmeigens::Scalar realPart = match[1].matched ?
         hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input) :
-        0.0_hs;
+        HMS(0.);
         // If there is a sign, it is used.
         // If there is no sign, it is a '+'.
-        const hmeigens::Scalar imagSign = (match[2].matched && *match[2].first == '-') ? -1.0_hs : 1.0_hs;
+        const hmeigens::Scalar imagSign = (match[2].matched && *match[2].first == '-') ? HMS(-1.) : HMS(1.);
         // If there is a magnitude, it is used.
         // If there is no magnitude, it is 1.0.
         const hmeigens::Scalar imagMagnitude = match[3].matched
         ? hmeigens::detail::toScalar(std::string_view{match[3].first, match[3].second}, input) :
-        1.0_hs;
+        HMS(1.);
         return hmeigens::Complex{realPart, imagSign * imagMagnitude};
     }
     // If nothing matches an exception is thrown.
@@ -100,3 +101,5 @@ hmeigens::ParseError::ParseError(std::string_view input) : std::invalid_argument
 // Constructor for a hmeigens::ParseError that requires a second explanation line.
 // The errorMessage needs no escaping, as it is built by internal functions that escape text on their own.
 hmeigens::ParseError::ParseError(std::string_view input, std::string_view errorMessage) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".\n---> {1}", hmeigens::detail::escape(input), errorMessage)) {}
+
+#undef HMS

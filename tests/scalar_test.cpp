@@ -2,15 +2,12 @@
 // Sections:
 // - test cases:
 //      - hmeigens::Scalar;
-//      - hmeigens::operator""_hs.
+//      - HMEIGENS_MAKE_SCALAR.
 #include "hmeigens/scalar.hpp"
-
-using hmeigens::operator""_hs;
 
 #include <type_traits>
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 /* ------------------------------------------------ */
 /* ------------------ Test cases ------------------ */
@@ -48,46 +45,55 @@ TEST_CASE("Scalar name test: the string naming the type matches the type from th
 }
 
 /* ------------------------------------------------ */
-/* ----------- hmeigens::operator""_hs ------------ */
+/* ------------ HMEIGENS_MAKE_SCALAR -------------- */
 /* ------------------------------------------------ */
 //
-TEST_CASE("Literal suffix _hs test: the return type matches the one expected from the build.", "[scalar][operator\"\"_hs]") {
-    // GIVEN a floating-point value with the _hs literal
+
+// Local brief alias for the conversion macro to improve legibility.
+#define HMS HMEIGENS_MAKE_SCALAR
+TEST_CASE("HMEIGENS_MAKE_SCALAR test: the converted literal's type matches the one expected from the build.", "[scalar][HMEIGENS_MAKE_SCALAR]") {
+    // GIVEN a floating-point value in the HMEIGENS_MAKE_SCALAR macro
     // WHEN  its type is compared with the appropriate floating-point one of that build
     // THEN  they're the same type
     #ifdef HMEIGENS_SCALAR_FLOAT
         STATIC_REQUIRE(
             std::is_same_v<
-                decltype(1.2345_hs),
+                decltype(HMS(1.2345)),
+                float
+            >
+        );
+        STATIC_REQUIRE(
+            std::is_same_v<
+                decltype(HMS(1e0)),
+                float
+            >
+        );
+        STATIC_REQUIRE(
+            std::is_same_v<
+                decltype(HMS(-1.)),
                 float
             >
         );
     #else
         STATIC_REQUIRE(
             std::is_same_v<
-                decltype(1.2345_hs),
+                decltype(HMS(1.2345)),
+                double
+            >
+        );
+        STATIC_REQUIRE(
+            std::is_same_v<
+                decltype(HMS(1e0)),
+                double
+            >
+        );
+        STATIC_REQUIRE(
+            std::is_same_v<
+                decltype(HMS(-1.)),
                 double
             >
         );
     #endif
 }
 
-TEST_CASE("Literal suffix _hs test: expected values match.", "[scalar][operator\"\"_hs]") {
-    // GIVEN a floating-point value with the _hs literal
-    // WHEN  its value is compared with a corresponding hmeigens::Scalar
-    // THEN  they're within 0 ULPs of each other
-    // This value is exactly representable both in float and double.
-    CHECK_THAT(
-        1._hs,
-        Catch::Matchers::WithinULP(static_cast<hmeigens::Scalar>(1.), 0)
-    );
-    // These two values are modified by the conversion. The tests check that they are modified in the same way, as is expected.
-    CHECK_THAT(
-        1.2345_hs,
-        Catch::Matchers::WithinULP(static_cast<hmeigens::Scalar>(1.2345), 0)
-    );
-    CHECK_THAT(
-        1e-3_hs,
-        Catch::Matchers::WithinULP(static_cast<hmeigens::Scalar>(1e-3), 0)
-    );
-}
+#undef HMS

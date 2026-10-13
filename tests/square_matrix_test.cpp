@@ -10,8 +10,6 @@
 #include "hmeigens/tolerances.hpp"
 #include "hmeigens/square_matrix.hpp"
 
-using hmeigens::operator""_hs;
-
 #include <stdexcept>     // For std::out_of_range, std::length_error, std::invalid_argument
 #include <cstddef>       // For std::size_t
 #include <cstdint>       // For std::intmax_t, std::uintmax_t, std::uint64_t
@@ -27,6 +25,9 @@ using hmeigens::operator""_hs;
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
+
+// Local brief alias for the conversion macro to improve legibility.
+#define HMS HMEIGENS_MAKE_SCALAR
 
 /* --------------------------------------------- */
 /* ------------------ Helpers ------------------ */
@@ -234,21 +235,21 @@ TEST_CASE("Square matrix test: a matrix constructed with the body parameter cons
     // The 0 ULP tolerance comes from the fact that copying or referencing an element of a matrix must not alter it. Since no arithmetic is performed, it must not be rounded or altered.
     // Trivial size.
     checkAllElementsVersus(
-        hmeigens::SquareMatrix{{{6.7_hs, 4.2_hs}}},
-        hmeigens::SquareMatrix::Container{{6.7_hs, 4.2_hs}},
+        hmeigens::SquareMatrix{{{HMS(6.7), HMS(4.2)}}},
+        hmeigens::SquareMatrix::Container{{HMS(6.7), HMS(4.2)}},
         0
     );
     // Implicit conversion of int to hmeigens::Complex.
     // In a previous version hmeigens::SquareMatrix{{1}} would be interpreted as a 1x1 0-filled matrix. This case checks for that solved bug.
     checkAllElementsVersus(
         hmeigens::SquareMatrix{{1}},
-        hmeigens::SquareMatrix::Container{{1.0_hs, 0.0_hs}},
+        hmeigens::SquareMatrix::Container{{HMS(1.), HMS(0.)}},
         0
     );
     // Non-trivial size.
     checkAllElementsVersus(
-        hmeigens::SquareMatrix{{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}}},
-        hmeigens::SquareMatrix::Container{{1.1_hs, 2.2_hs}, {3.3_hs, 4.4_hs}, {5.5_hs, 6.6_hs}, {7.7_hs, 8.8_hs}},
+        hmeigens::SquareMatrix{{{HMS(1.1), HMS(2.2)}, {HMS(3.3), HMS(4.4)}, {HMS(5.5), HMS(6.6)}, {HMS(7.7), HMS(8.8)}}},
+        hmeigens::SquareMatrix::Container{{HMS(1.1), HMS(2.2)}, {HMS(3.3), HMS(4.4)}, {HMS(5.5), HMS(6.6)}, {HMS(7.7), HMS(8.8)}},
         0
     );
 }
@@ -475,9 +476,9 @@ TEST_CASE("Square matrix test: accessor operator() const returns the correct ele
     // The test here is performed versus values independent of the class, via testBody.
     // The other behaviours of the constructor (size, exceptions) can be and are tested separately.
     const hmeigens::SquareMatrix::Container testBody{
-        {1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
-        {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
-        {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}
+        {HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)}, {HMS(3.), HMS(3.)},
+        {HMS(4.), HMS(4.)}, {HMS(5.), HMS(5.)}, {HMS(6.), HMS(6.)},
+        {HMS(7.), HMS(7.)}, {HMS(8.), HMS(8.)}, {HMS(9.), HMS(9.)}
     };
     const hmeigens::SquareMatrix testMatrixConst{
         // Needs a copy of testBody, as the constructor moves it.
@@ -501,9 +502,9 @@ TEST_CASE("Square matrix test: accessors except operator() const return the corr
     // The checkAllElementsVersus helper uses only the trusted hmeigens::SquareMatrix::operator() const, so here it would not do what is needed.
     // The 0 ULP tolerance comes from the fact that copying or referencing an element of a matrix must not alter it. Since no arithmetic is performed, it must not be rounded or altered.
     hmeigens::SquareMatrix testMatrix{
-        {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
-         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
-         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
+        {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)}, {HMS(3.), HMS(3.)},
+         {HMS(4.), HMS(4.)}, {HMS(5.), HMS(5.)}, {HMS(6.), HMS(6.)},
+         {HMS(7.), HMS(7.)}, {HMS(8.), HMS(8.)}, {HMS(9.), HMS(9.)}}
     };
     // Need both a non const and a const one for the test.
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
@@ -575,9 +576,9 @@ TEST_CASE("Square matrix test: edited values persist and are in the right place.
     // Each SECTION produces a new matrix. Since this is an editing test, the test is performed on a fresh matrix.
     // The alternative could be, for example, writing different values. A new matrix is better, as if the accessors fuck something up, the tests still remain truly independent of each other.
     hmeigens::SquareMatrix testMatrix{
-        {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
-         {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
-         {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
+        {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)}, {HMS(3.), HMS(3.)},
+         {HMS(4.), HMS(4.)}, {HMS(5.), HMS(5.)}, {HMS(6.), HMS(6.)},
+         {HMS(7.), HMS(7.)}, {HMS(8.), HMS(8.)}, {HMS(9.), HMS(9.)}}
     };
     // A const reference version is needed, as the trusted function for checks is hmeigens::SquareMatrix::operator() const.
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
@@ -585,18 +586,18 @@ TEST_CASE("Square matrix test: edited values persist and are in the right place.
     SECTION("hmeigens::SquareMatrix::at()") {
         // Testing both a diagonal and an off-diagonal element.
         // Edit the elements, then see if their value was updated.
-        testMatrix.at(0,0) = hmeigens::Complex{6._hs, 7._hs};
-        testMatrix.at(1,2) = hmeigens::Complex{4._hs, 2._hs};
-        checkComplex(testMatrixConst(0,0), hmeigens::Complex {6._hs, 7._hs}, 0);
-        checkComplex(testMatrixConst(1,2), hmeigens::Complex {4._hs, 2._hs}, 0);
+        testMatrix.at(0,0) = hmeigens::Complex{HMS(6.), HMS(7.)};
+        testMatrix.at(1,2) = hmeigens::Complex{HMS(4.), HMS(2.)};
+        checkComplex(testMatrixConst(0,0), hmeigens::Complex {HMS(6.), HMS(7.)}, 0);
+        checkComplex(testMatrixConst(1,2), hmeigens::Complex {HMS(4.), HMS(2.)}, 0);
     }
     SECTION("hmeigens::SquareMatrix::operator()") {
         // Testing both a diagonal and an off-diagonal element.
         // Edit the elements, then see if their value was updated.
-        testMatrix(0,0) = hmeigens::Complex{6._hs, 7._hs};
-        testMatrix(1,2) = hmeigens::Complex{4._hs, 2._hs};
-        checkComplex(testMatrixConst(0,0), hmeigens::Complex {6._hs, 7._hs}, 0);
-        checkComplex(testMatrixConst(1,2), hmeigens::Complex {4._hs, 2._hs}, 0);
+        testMatrix(0,0) = hmeigens::Complex{HMS(6.), HMS(7.)};
+        testMatrix(1,2) = hmeigens::Complex{HMS(4.), HMS(2.)};
+        checkComplex(testMatrixConst(0,0), hmeigens::Complex {HMS(6.), HMS(7.)}, 0);
+        checkComplex(testMatrixConst(1,2), hmeigens::Complex {HMS(4.), HMS(2.)}, 0);
     }
 }
 
@@ -700,15 +701,15 @@ TEST_CASE("Square matrix test: the identity matrix has the correct form.", "[squ
     // The 0 ULP tolerance comes from the fact that copying or referencing an element of a matrix must not alter it. Since no arithmetic is performed, it must not be rounded or altered.
     checkAllElementsVersus(
         hmeigens::SquareMatrix::identity(1),
-        hmeigens::SquareMatrix::Container{{{1._hs, 0._hs}}},
+        hmeigens::SquareMatrix::Container{{{HMS(1.), HMS(0.)}}},
         0
     );
     checkAllElementsVersus(
         hmeigens::SquareMatrix::identity(3),
         hmeigens::SquareMatrix::Container{
-            {{1._hs, 0._hs}, {0._hs, 0._hs}, {0._hs, 0._hs},
-             {0._hs, 0._hs}, {1._hs, 0._hs}, {0._hs, 0._hs},
-             {0._hs, 0._hs}, {0._hs, 0._hs}, {1._hs, 0._hs}}
+            {{HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
+             {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)},
+             {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}}
         },
         0
     );
@@ -749,48 +750,48 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     // THEN  the value returned is the expected one
     //
     // Null matrix: the norm must be exactly 0.
-    checkReal(hmeigens::SquareMatrix{1}.norm(), 0._hs, 0);
-    checkReal(hmeigens::SquareMatrix{100}.norm(), 0._hs, 0);
+    checkReal(hmeigens::SquareMatrix{1}.norm(), HMS(0.), 0);
+    checkReal(hmeigens::SquareMatrix{100}.norm(), HMS(0.), 0);
     // Identity: the norm must be sqrt(size).
     // Note that std::sqrt() is REQUIRED to be precise by the (IEEE) standard. See https://en.cppreference.com/cpp/numeric/math/sqrt.
-    checkReal(hmeigens::SquareMatrix::identity(1).norm(), 1._hs, hmeigens::normTolerance(1));
-    checkReal(hmeigens::SquareMatrix::identity(3).norm(), std::sqrt(3._hs), hmeigens::normTolerance(3));
-    checkReal(hmeigens::SquareMatrix::identity(10).norm(), std::sqrt(10._hs), hmeigens::normTolerance(10));
+    checkReal(hmeigens::SquareMatrix::identity(1).norm(), HMS(1.), hmeigens::normTolerance(1));
+    checkReal(hmeigens::SquareMatrix::identity(3).norm(), std::sqrt(HMS(3.)), hmeigens::normTolerance(3));
+    checkReal(hmeigens::SquareMatrix::identity(10).norm(), std::sqrt(HMS(10.)), hmeigens::normTolerance(10));
     // Arbitrary matrices.
     // The following norms have been computed by hand and then double checked on WolframAlpha.
-    checkReal(hmeigens::SquareMatrix{{4._hs}}.norm(), 4._hs, hmeigens::normTolerance(1));
+    checkReal(hmeigens::SquareMatrix{{HMS(4.)}}.norm(), HMS(4.), hmeigens::normTolerance(1));
     checkReal(
         hmeigens::SquareMatrix{
-            {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
-             {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
-             {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
+            {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)}, {HMS(3.), HMS(3.)},
+             {HMS(4.), HMS(4.)}, {HMS(5.), HMS(5.)}, {HMS(6.), HMS(6.)},
+             {HMS(7.), HMS(7.)}, {HMS(8.), HMS(8.)}, {HMS(9.), HMS(9.)}}
         }.norm(),
-        std::sqrt(570._hs),
+        std::sqrt(HMS(570.)),
         hmeigens::normTolerance(3)
     );
     checkReal(
         hmeigens::SquareMatrix{
-            {{3._hs, -1._hs},  {0._hs, 1.4_hs},       {0._hs, 0._hs},
-             {0._hs, -1._hs},  {11.999999_hs, 0._hs}, {23._hs, -12._hs},
-             {0.006_hs, 7._hs},{0.000005_hs, 0._hs},  {-90._hs, 0._hs}}
+            {{HMS(3.), HMS(-1.)},  {HMS(0.), HMS(1.4)},       {HMS(0.), HMS(0.)},
+             {HMS(0.), HMS(-1.)},  {HMS(11.999999), HMS(0.)}, {HMS(23.), HMS(-12.)},
+             {HMS(0.006), HMS(7.)},{HMS(0.000005), HMS(0.)},  {HMS(-90.), HMS(0.)}}
         }.norm(),
-        std::sqrt(8978.960012000026_hs),
+        std::sqrt(HMS(8978.960012000026)),
         hmeigens::normTolerance(3)
     );
     checkReal(
         hmeigens::SquareMatrix{
-            {{1e14_hs, 0._hs},    {2e15_hs, 0._hs},
-             {3333e13_hs, 0._hs}, {-444e16_hs, 0._hs}}
+            {{HMS(1e14), HMS(0.)},    {HMS(2e15), HMS(0.)},
+             {HMS(3333e13), HMS(0.)}, {HMS(-444e16), HMS(0.)}}
         }.norm(),
-        std::sqrt(197147148989e26_hs),
+        std::sqrt(HMS(197147148989e26)),
         hmeigens::normTolerance(2)
     );
     // Matrices whose elements squared over/underflow. The norm is still a valid number in range. Using std::hypot guarantees the result cannot overflow in the middle of calculations.
     // Value whose square always overflows.
     checkReal(
         hmeigens::SquareMatrix{
-            {std::numeric_limits<hmeigens::Scalar>::max(), 0._hs,
-             0._hs,                                        0._hs}
+            {std::numeric_limits<hmeigens::Scalar>::max(), HMS(0.),
+             HMS(0.),                                        HMS(0.)}
         }.norm(),
         std::numeric_limits<hmeigens::Scalar>::max(),
         // In Catch2 Infinity is 1 ULP more than FLT_MAX/DBL_MAX, so this relation must be exact to check it doesn't overflow.
@@ -800,8 +801,8 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     // Value whose square always underflows.
     checkReal(
         hmeigens::SquareMatrix{
-            {std::numeric_limits<hmeigens::Scalar>::min(), 0._hs,
-             0._hs,                                        0._hs}
+            {std::numeric_limits<hmeigens::Scalar>::min(), HMS(0.),
+             HMS(0.),                                        HMS(0.)}
         }.norm(),
         std::numeric_limits<hmeigens::Scalar>::min(),
         0
@@ -809,8 +810,8 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     // Overflow is inf.
     CHECK(
         std::isinf(hmeigens::SquareMatrix{
-            {std::numeric_limits<hmeigens::Scalar>::max(), 0._hs,
-             std::numeric_limits<hmeigens::Scalar>::max(), 0._hs}
+            {std::numeric_limits<hmeigens::Scalar>::max(), HMS(0.),
+             std::numeric_limits<hmeigens::Scalar>::max(), HMS(0.)}
         }.norm())
     );
 }
@@ -826,7 +827,7 @@ TEST_CASE("Square matrix test: the Frobenius norm behaves like a norm.", "[squar
     // The case norm(O)=0, with O null matrix, is tested for in the "expected values" case.
     // The case norm(A)>0 for A!=O is indirectly tested for in the "expected values" case, as all expected values are positive.
     // The value that is closest to 0 still gives a non-zero norm.
-    CHECK(hmeigens::SquareMatrix{{std::numeric_limits<hmeigens::Scalar>::denorm_min()}}.norm()>0._hs);
+    CHECK(hmeigens::SquareMatrix{{std::numeric_limits<hmeigens::Scalar>::denorm_min()}}.norm()>HMS(0.));
     // Axiom 2: absolute homogeneity.
     // Given a scalar chosen as 3-4i, its norm is 5.
     // The second matrix is the first multiplied by 3-4i. Computation was done by hand and double-checked with WolframAlpha.
@@ -834,14 +835,14 @@ TEST_CASE("Square matrix test: the Frobenius norm behaves like a norm.", "[squar
     // The value of the norm is however already rounded, and multiplying it at most doubles its rounding error in ULPs. This means the tolerance on the first parameter must be doubled.
     // Since norm() is used twice, the second parameter's tolerance must also be added to the first one, giving a total of 2+1=3 tolerance.
     checkReal(
-        5._hs*
+        HMS(5.)*
         hmeigens::SquareMatrix{
-            {{1._hs, 1.5_hs},   {2._hs, -1._hs},
-             {1.25_hs, -1._hs}, {0._hs, 0._hs}}
+            {{HMS(1.), HMS(1.5)},   {HMS(2.), HMS(-1.)},
+             {HMS(1.25), HMS(-1.)}, {HMS(0.), HMS(0.)}}
         }.norm(),
         hmeigens::SquareMatrix{
-            {{9._hs, 0.5_hs},   {2._hs, -11._hs},
-             {-.25_hs, -8._hs}, {0._hs, 0._hs}}
+            {{HMS(9.), HMS(0.5)},   {HMS(2.), HMS(-11.)},
+             {HMS(-.25), HMS(-8.)}, {HMS(0.), HMS(0.)}}
         }.norm(),
         3*hmeigens::normTolerance(2)
     );
@@ -850,16 +851,16 @@ TEST_CASE("Square matrix test: the Frobenius norm behaves like a norm.", "[squar
     // Tolerance here is meaningless as the values are very far apart.
     CHECK(
         hmeigens::SquareMatrix{
-            {{1._hs, 0._hs},  {2._hs, 0._hs},
-             {-2._hs, 0._hs}, {9._hs, 0._hs}}
+            {{HMS(1.), HMS(0.)},  {HMS(2.), HMS(0.)},
+             {HMS(-2.), HMS(0.)}, {HMS(9.), HMS(0.)}}
         }.norm() +
         hmeigens::SquareMatrix{
-            {{-1._hs, 3._hs},   {2._hs, -2._hs},
-             {-1.3_hs, 7.6_hs}, {9._hs, 9._hs}}
+            {{HMS(-1.), HMS(3.)},   {HMS(2.), HMS(-2.)},
+             {HMS(-1.3), HMS(7.6)}, {HMS(9.), HMS(9.)}}
         }.norm() >=
         hmeigens::SquareMatrix{
-            {{0._hs, 3._hs},    {4._hs, -2._hs},
-             {-3.3_hs, 7.6_hs}, {18._hs, 9._hs}}
+            {{HMS(0.), HMS(3.)},    {HMS(4.), HMS(-2.)},
+             {HMS(-3.3), HMS(7.6)}, {HMS(18.), HMS(9.)}}
         }.norm()
     );
 }
@@ -884,3 +885,5 @@ TEST_CASE("Square matrix test: the Frobenius norm is invariant under unitary sim
     // THEN  it holds
     SKIP("The members hmeigens::SquareMatrix::adjoint and hmeigens::SquareMatrix::operator* are not implemented yet.");
 }
+
+#undef HMS

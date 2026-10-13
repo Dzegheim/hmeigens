@@ -39,10 +39,10 @@ Version 0.2.0 is recorded from git history.
     - both read and write safe accessor `at()` (checks the indexes and throws `std::out_of_range` if out of bounds);
     - a static `identity` member function that takes a size as parameter and builds the corresponding identity matrix;
     - a `norm()` member that computes the Frobenius norm of a matrix.
-- **A new literal suffix `hmeigens::operator""_hs`.** It turns floating-point values into the current `hmeigens::Scalar` to avoid implicit conversions across the code.
+- **A new macro `HMEIGENS_MAKE_SCALAR`.** It appends an `f` suffix to numeric literals when building with `-DHMEIGENS_SCALAR_FLOAT` and leaves the value unchanged otherwise. This is to avoid implicit value conversions of literals throughout the code.
 - **Tests for `scalar.hpp`.** Specifically:
     - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);
-    - `hmeigens::operator""_hs` returns the expected type and the correct values.
+    - `HMEIGENS_MAKE_SCALAR` produces a value that the compiler interprets as the expected type.
 - **An integer square root function `hmeigens::detail::isqrt()`.** With tests.
 - **A new constant `hmeigens::maxSquarableSize`.** It represents the maximum value squarable without wrapping `std::size_t`.
 - **A concept `hmeigens::CanBeSize` that holds a list of types allowed to be interpreted as sizes.** The accepted native types are `short int`, `int`, `long int`, `long long int`, and their `unsigned` versions. Standard-defined types, such as `std::size_t`, work as long as the compiler maps them to one of the eight supported native types. All the accepted types also allow for `const` qualification (or even `volatile` if you're feeling spicy).

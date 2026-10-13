@@ -65,7 +65,7 @@ std::size_t hmeigens::SquareMatrix::getIndex(std::size_t row, std::size_t col) c
 // The norm needs to be computed only once in the triangularization process, so it being slower does not really matter.
 hmeigens::Scalar hmeigens::SquareMatrix::norm() const {
     // Initialize the norm to 0.
-    hmeigens::Scalar norm = 0._hs;
+    hmeigens::Scalar norm = HMEIGENS_MAKE_SCALAR(0.);
     // The body_ is just an hmeigens::SquareMatrix::Container. The order of the elements here does not matter.
     for(const auto& z : body_) {
         norm = std::hypot(std::hypot(z.real(), z.imag()), norm);

@@ -116,20 +116,21 @@ namespace hmeigens {
         /// #include "hmeigens/square_matrix.hpp"
         /// #include "hmeigens/scalar.hpp"
         ///
+        /// #define HMS HMEIGENS_MAKE_SCALAR
+        ///
         /// using hmeigens::SquareMatrix;
-        /// using hmeigens::operator""_hs;
         ///
         /// int main() {
         ///     // A 1x1 matrix with (4.2, 6.7) as its only element.
-        ///     SquareMatrix A{{{4.2_hs, 6.7_hs}}};
+        ///     SquareMatrix A{{{HMS(4.2), HMS(6.7)}}};
         ///     // A 1x1 matrix with (1,0) as its only element.
         ///     // Note that this is different from SquareMatrix B{1}, as that is a 1x1 zero-filled matrix.
         ///     SquareMatrix B{{1}};
         ///     // A 3x3 matrix whose members are, in order, the pairs (1,1) to (9,9).
         ///     SquareMatrix C {
-        ///         {{1._hs, 1._hs}, {2._hs, 2._hs}, {3._hs, 3._hs},
-        ///          {4._hs, 4._hs}, {5._hs, 5._hs}, {6._hs, 6._hs},
-        ///          {7._hs, 7._hs}, {8._hs, 8._hs}, {9._hs, 9._hs}}
+        ///         {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)}, {HMS(3.), HMS(3.)},
+        ///          {HMS(4.), HMS(4.)}, {HMS(5.), HMS(5.)}, {HMS(6.), HMS(6.)},
+        ///          {HMS(7.), HMS(7.)}, {HMS(8.), HMS(8.)}, {HMS(9.), HMS(9.)}}
         ///     };
         /// }
         /// ```
@@ -368,7 +369,10 @@ hmeigens::SquareMatrix hmeigens::SquareMatrix::identity(Size size) {
     // The value of size could be signed or a different unsigned type.
     // The loop must be checked against id.size().
     for (std::size_t row = 0; row < id.size(); ++row) {
-        id(row, row) = {{1.0_hs, 0.0_hs}};
+        id(row, row) = {{
+            HMEIGENS_MAKE_SCALAR(1.),
+            HMEIGENS_MAKE_SCALAR(0.)
+        }};
     }
     return id;
 }

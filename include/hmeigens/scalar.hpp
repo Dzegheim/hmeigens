@@ -7,6 +7,20 @@
 #ifndef HMEIGENS_SCALAR_HPP
 #define HMEIGENS_SCALAR_HPP
 
+/// @brief Preprocessor macro used to prevent implicit conversions.
+///
+/// The macro simply appends the suffix `f` in the `float` build, and leaves the value unchanged in the `double` build.
+/// Since this code can be compiled in both modes via the `-DHMEIGENS_SCALAR_FLOAT` flag, typing something like `hmeigens::Scalar value = 1.23456;` works perfectly when the selected scalar type is `double`, but can alter the value when it is `float`.
+/// This is because [the value is rounded twice](https://www.exploringbinary.com/double-rounding-errors-in-floating-point-conversions/), both by the compiler when changing the literal to a `double`, and then when it is converted to `float`.
+/// To avoid this issue, values in the code are wrapped by this macro.
+/// @note If a value has neither `.` nor an exponent, e.g. `HMEIGENS_MAKE_SCALAR(6)`, it could either be a compile error (for `float`) or an `int` (for `double`). Values in the code always have a trailing `.`, even when they're whole numbers.
+/// @param number The value of the number that may need the suffix appended.
+#ifdef HMEIGENS_SCALAR_FLOAT
+#define HMEIGENS_MAKE_SCALAR(number) number##f
+#else
+#define HMEIGENS_MAKE_SCALAR(number) number
+#endif
+
 #include <complex>
 #include <string>
 
@@ -41,24 +55,6 @@ namespace hmeigens {
 
     /// @brief Alias for complex numbers with the chosen `hmeigens::Scalar` value type.
     using Complex = std::complex<Scalar>;
-
-    /// @brief Literal suffix for floating-point values that performs a `static_cast` to whatever `hmeigens::Scalar` is.
-    ///
-    /// Useful to avoid implicit conversions when building in `float`.
-    /// The initials `hs` stand for `hmeigens` and `Scalar` respectively.
-    /// @param toConvert A floating-point value to turn into a `hmeigens::Scalar`.
-    /// @return A `static_cast` to `hmeigens::Scalar` of the input.
-    consteval Scalar operator""_hs(long double toConvert);
-}
-
-/* ----------------------------- */
-/* -------- Definitions -------- */
-/* ----------------------------- */
-//
-// See the declaration for all relevant information.
-// This literal wraps a cast to avoid implicit conversions.
-consteval hmeigens::Scalar hmeigens::operator""_hs(long double toConvert) {
-    return static_cast<Scalar>(toConvert);
 }
 
 #endif
