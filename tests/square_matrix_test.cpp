@@ -6,7 +6,9 @@
 //      - constructors hmeigens::SquareMatrix(Size) and hmeigens::SquareMatrix(hmeigens::SquareMatrix::Container&&);
 //      - accessors hmeigens::SquareMatrix::operator() and hmeigens::SquareMatrix::at;
 //      - hmeigens::SquareMatrix::identity;
-//      - hmeigens::SquareMatrix::norm.
+//      - hmeigens::SquareMatrix::norm;
+//      - hmeigens::SquareMatrix::adjointInPlace;
+//      - hmeigens::SquareMatrix::adjoint.
 #include "hmeigens/tolerances.hpp"
 #include "hmeigens/square_matrix.hpp"
 
@@ -803,7 +805,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
 }
 
 TEST_CASE("Square matrix test: the Frobenius norm behaves like a norm.", "[square_matrix][SquareMatrix][norm]") {
-    // GIVEN a matrix M
+    // GIVEN a matrix
     // WHEN  the norm axioms are tested for
     // THEN  they are satisfied
     //
@@ -862,14 +864,105 @@ TEST_CASE("Square matrix test: the Frobenius norm satisfies the trace identity."
     // GIVEN a matrix M and its adjoint M_h
     // WHEN  the equality norm(M) =  sqrt(trace(M_h * M)) is tested for
     // THEN  it holds
-    SKIP("The members hmeigens::SquareMatrix::adjoint, hmeigens::SquareMatrix::operator*, and hmeigens::SquareMatrix::trace are not implemented yet.");
+    SKIP("The members hmeigens::SquareMatrix::operator* and hmeigens::SquareMatrix::trace are not implemented yet.");
 }
 
 TEST_CASE("Square matrix test: the Frobenius norm is invariant under unitary similarity transformations.", "[square_matrix][SquareMatrix][norm]") {
     // GIVEN a matrix M, a unitary matrix U, and its adjoint U_h
     // WHEN  the equality norm(M) = norm(U*M*U_h) is tested for
     // THEN  it holds
-    SKIP("The members hmeigens::SquareMatrix::adjoint and hmeigens::SquareMatrix::operator* are not implemented yet.");
+    SKIP("The member hmeigens::SquareMatrix::operator* is not implemented yet.");
+}
+
+/* --------------------------------------------------------------- */
+/* ------------ hmeigens::SquareMatrix::adjointInPlace ----------- */
+/* --------------------------------------------------------------- */
+//
+TEST_CASE("Square matrix test: the in-place adjoint is correct.", "[square_matrix][SquareMatrix][adjointInPlace]") {
+    // GIVEN a matrix
+    // WHEN  its adjoint is computed in-place
+    // THEN  it is modified as expected
+    hmeigens::SquareMatrix testMatrix {
+        {{HMS(1.), HMS(-1.)}, {HMS(3.5), HMS(0.)}, {HMS(0.), HMS(0.5)},
+         {HMS(-1.), HMS(2.)}, {HMS(-3.), HMS(3.)}, {HMS(1.23), HMS(1.44)},
+         {HMS(2.), HMS(-8.)}, {HMS(0.), HMS(.125)}, {HMS(0.), HMS(0.)}}
+    };
+    hmeigens::SquareMatrix::Container testConj {
+        {HMS(1.), HMS(1.)}, {HMS(-1.), HMS(-2.)}, {HMS(2.), HMS(8.)},
+        {HMS(3.5), HMS(0.)}, {HMS(-3.), HMS(-3.)}, {HMS(0.), HMS(-.125)},
+        {HMS(0.), HMS(-.5)}, {HMS(1.23), HMS(-1.44)}, {HMS(0.), HMS(0.)}
+    };
+    // Perform the in-place adjoint computation.
+    testMatrix.adjointInPlace();
+    // Tolerance is 0 ULPs as no algebra is performed on the numbers.
+    // (Changing a sign does not round the number.)
+    checkAllElementsVersus(testMatrix, testConj, 0);
+}
+
+TEST_CASE("Square matrix test: the in-place adjoint returns the correct reference.", "[square_matrix][SquareMatrix][adjointInPlace]") {
+    // GIVEN a matrix
+    // WHEN  its adjoint is computed in-place
+    // THEN  the returned reference matches the one of the matrix it was called on
+    hmeigens::SquareMatrix testMatrix{1};
+    CHECK(&testMatrix == &testMatrix.adjointInPlace());
+}
+
+TEST_CASE("Square matrix test: the in-place adjoint is involutory.", "[square_matrix][SquareMatrix][adjointInPlace]") {
+    // GIVEN a matrix
+    // WHEN  its adjoint is computed in-place twice
+    // THEN  it is unchanged
+    hmeigens::SquareMatrix::Container testBody {
+        {HMS(1.), HMS(-1.)}, {HMS(3.5), HMS(0.)}, {HMS(0.), HMS(0.5)},
+        {HMS(-1.), HMS(2.)}, {HMS(-3.), HMS(3.)}, {HMS(1.23), HMS(1.44)},
+        {HMS(2.), HMS(-8.)}, {HMS(0.), HMS(.125)}, {HMS(0.), HMS(0.)}
+    };
+    hmeigens::SquareMatrix testMatrix {
+        // Needs a copy of testBody, as the constructor moves it.
+        hmeigens::SquareMatrix::Container{testBody}
+    };
+    // Perform the in-place adjoint computation twice.
+    testMatrix.adjointInPlace();
+    testMatrix.adjointInPlace();
+    // The matrix's body must be equal to the initial body.
+    // Tolerance is 0 ULPs as no algebra is performed on the numbers.
+    // (Changing a sign does not round the number.)
+    checkAllElementsVersus(testMatrix, testBody, 0);
+}
+
+/* --------------------------------------------------------------- */
+/* --------------- hmeigens::SquareMatrix::adjoint --------------- */
+/* --------------------------------------------------------------- */
+//
+// The function hmeigens::SquareMatrix::adjoint() simply makes a copy of the matrix it is called on, then performs an in-place adjoint operation on the copy.
+// The only necessary test case is that the matrix is untouched while the adjoint is actually the expected value.
+// These two behaviours are not independent of each other, as the function needs to guarantee both at the same time.
+// Other behaviours can be tested on hmeigens::SquareMatrix::adjointInPlace().
+TEST_CASE("Square matrix test: the adjoint operation gives the correct value and leaves the original matrix untouched.", "[square_matrix][SquareMatrix][adjoint]") {
+    // GIVEN a matrix
+    // WHEN  its adjoint is computed
+    // THEN  the adjoint has the expected value and the original matrix is untouched
+    hmeigens::SquareMatrix::Container testBody {
+        {HMS(1.), HMS(-1.)}, {HMS(3.5), HMS(0.)}, {HMS(0.), HMS(0.5)},
+        {HMS(-1.), HMS(2.)}, {HMS(-3.), HMS(3.)}, {HMS(1.23), HMS(1.44)},
+        {HMS(2.), HMS(-8.)}, {HMS(0.), HMS(.125)}, {HMS(0.), HMS(0.)}
+    };
+    hmeigens::SquareMatrix testMatrix {
+        // Needs a copy of testBody, as the constructor moves it.
+        hmeigens::SquareMatrix::Container{testBody}
+    };
+    hmeigens::SquareMatrix::Container testConj {
+        {HMS(1.), HMS(1.)}, {HMS(-1.), HMS(-2.)}, {HMS(2.), HMS(8.)},
+        {HMS(3.5), HMS(0.)}, {HMS(-3.), HMS(-3.)}, {HMS(0.), HMS(-.125)},
+        {HMS(0.), HMS(-.5)}, {HMS(1.23), HMS(-1.44)}, {HMS(0.), HMS(0.)}
+    };
+    // Perform the adjoint computation.
+    auto testMatrixConj = testMatrix.adjoint();
+    // original matrix is untouched.
+    checkAllElementsVersus(testMatrix, testBody, 0);
+    // Adjoint is computed correctly.
+    // Tolerance is 0 ULPs as no algebra is performed on the numbers.
+    // (Changing a sign does not round the number.)
+    checkAllElementsVersus(testMatrixConj, testConj, 0);
 }
 
 #undef HMS

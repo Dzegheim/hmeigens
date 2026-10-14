@@ -243,6 +243,19 @@ namespace hmeigens {
         /// @return The Frobenius norm of the matrix as an `hmeigens::Scalar`.
         [[nodiscard]] Scalar norm() const;
 
+        /// @brief Transforms a matrix into its adjoint.
+        ///
+        /// The given matrix is turned into its adjoint (i.e. the transpose complex-conjugate).
+        /// @return A reference to the given `hmeigens::SquareMatrix`, modified to be the adjoint.
+        SquareMatrix& adjointInPlace();
+
+        /// @brief Adjoint of the matrix.
+        ///
+        /// Computes the adjoint (i.e. the transpose complex-conjugate) of the given matrix.
+        /// @return An `hmeigens::SquareMatrix` that is the adjoint of the given matrix.
+        /// @throws std::bad_alloc if the memory could not be allocated on the machine.
+        [[nodiscard]] SquareMatrix adjoint() const;
+
         private:
         // Member function for computing the index of an element given the row and col (column).
         // All in a single place, so it doesn't need to be repeated every time an index is needed.

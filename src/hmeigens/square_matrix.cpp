@@ -10,6 +10,7 @@
 #include <utility>     // For std::move
 #include <cstddef>     // For std::size_t
 #include <cmath>       // For std::hypot
+#include <complex>     // For std::conj
 
 // Constructor of the hmeigens::SquareMatrix class.
 // Takes a container object, and after checking that the container is a non-empty square matrix-like object, uses it to fill the matrix.
@@ -71,4 +72,32 @@ hmeigens::Scalar hmeigens::SquareMatrix::norm() const {
         norm = std::hypot(std::hypot(z.real(), z.imag()), norm);
     }
     return norm;
+}
+
+// In-place adjoint of the matrix.
+// Fully documented in .hpp.
+hmeigens::SquareMatrix& hmeigens::SquareMatrix::adjointInPlace() {
+    for (std::size_t i = 0; i < size(); ++i) {
+        // Conjugate diagonal elements.
+        (*this)(i,i) = std::conj((*this)(i,i));
+        // Pass through all subdiagonal elements.
+        for (std::size_t j = 0; j < i; ++j) {
+            // Store the first one and conjugate it.
+            auto temp = std::conj((*this)(i, j));
+            // Overwrite the first one with the second one's conjugate.
+            (*this)(i, j) = std::conj((*this)(j, i));
+            // Overwrite the second one with the stored temporary.
+            (*this)(j, i) = temp;
+        }
+    }
+    return *this;
+}
+
+// Adjoint of the matrix.
+// Fully documented in .hpp.
+hmeigens::SquareMatrix hmeigens::SquareMatrix::adjoint() const {
+    // These lines are split to allow for the local to be returned by name, so the compiler can perform NRVO and not copy twice.
+    hmeigens::SquareMatrix adj = *this;
+    adj.adjointInPlace();
+    return adj;
 }
