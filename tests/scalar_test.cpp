@@ -62,18 +62,6 @@ TEST_CASE("HMEIGENS_MAKE_SCALAR test: the converted literal's type matches the o
                 float
             >
         );
-        STATIC_REQUIRE(
-            std::is_same_v<
-                decltype(HMS(1e0)),
-                float
-            >
-        );
-        STATIC_REQUIRE(
-            std::is_same_v<
-                decltype(HMS(-1.)),
-                float
-            >
-        );
     #else
         STATIC_REQUIRE(
             std::is_same_v<
@@ -81,18 +69,23 @@ TEST_CASE("HMEIGENS_MAKE_SCALAR test: the converted literal's type matches the o
                 double
             >
         );
-        STATIC_REQUIRE(
-            std::is_same_v<
-                decltype(HMS(1e0)),
-                double
-            >
-        );
-        STATIC_REQUIRE(
-            std::is_same_v<
-                decltype(HMS(-1.)),
-                double
-            >
-        );
+    #endif
+}
+
+TEST_CASE("HMEIGENS_MAKE_SCALAR test: the converted literal's value matches the one expected from the build.", "[scalar][HMEIGENS_MAKE_SCALAR]") {
+    // GIVEN a floating-point value in the HMEIGENS_MAKE_SCALAR macro
+    // WHEN  its value is compared with the corresponding literal
+    // THEN  they're bit-identical
+    //
+    // Normally comparing floating-point values with == is not a good practice, but here they MUST match bit by bit. The macro MUST either leave the literal it receives untouched, so that something like 6.7 == 6.7 holds in the double build, or append the f so that 6.7f == 6.7f holds in the float build.
+    #ifdef HMEIGENS_SCALAR_FLOAT
+        STATIC_REQUIRE(HMS(6.7) == 6.7f);
+        STATIC_REQUIRE(HMS(1e1) == 1e1f);
+        STATIC_REQUIRE(HMS(-1.) == -1.f);
+    #else
+        STATIC_REQUIRE(HMS(6.7) == 6.7);
+        STATIC_REQUIRE(HMS(1e1) == 1e1);
+        STATIC_REQUIRE(HMS(-1.) == -1.);
     #endif
 }
 

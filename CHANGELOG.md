@@ -42,7 +42,7 @@ Version 0.2.0 is recorded from git history.
 - **A new macro `HMEIGENS_MAKE_SCALAR`.** It appends an `f` suffix to numeric literals when building with `-DHMEIGENS_SCALAR_FLOAT` and leaves the value unchanged otherwise. This is to avoid implicit value conversions of literals throughout the code.
 - **Tests for `scalar.hpp`.** Specifically:
     - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);
-    - `HMEIGENS_MAKE_SCALAR` produces a value that the compiler interprets as the expected type.
+    - `HMEIGENS_MAKE_SCALAR` produces a value that the compiler interprets as the expected type, and the value it produces matches the expected one exactly.
 - **An integer square root function `hmeigens::detail::isqrt()`.** With tests.
 - **A new constant `hmeigens::maxSquarableSize`.** It represents the maximum value squarable without wrapping `std::size_t`.
 - **A concept `hmeigens::CanBeSize` that holds a list of types allowed to be interpreted as sizes.** The accepted native types are `short int`, `int`, `long int`, `long long int`, and their `unsigned` versions. Standard-defined types, such as `std::size_t`, work as long as the compiler maps them to one of the eight supported native types. All the accepted types also allow for `const` qualification (or even `volatile` if you're feeling spicy).
