@@ -8,41 +8,34 @@
 #include "hmeigens/complex_parse.hpp"
 #include "hmeigens/detail/text_escape.hpp"
 
+#include "comparison_helpers.hpp"
+
 #include <string_view>
 using std::string_view_literals::operator""sv;
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
+
+// Local brief alias for the conversion macro to improve legibility.
+#define HMS HMEIGENS_MAKE_SCALAR
 
 /* --------------------------------------------- */
 /* ------------------ Helpers ------------------ */
 /* --------------------------------------------- */
 //
+// Readability of tests.
+using hmeigens::test::checkComplexULPs;
+
 // This is a helper function to test whether the text is parsed correctly.
-// Apparently Catch2's floating-point matchers always compare in double (see catch_matchers_floating_point.hpp).
-// Source: https://github.com/catchorg/Catch2/blob/v3.15.3/docs/comparing-floating-point-numbers.md#withinabs
-static void checkParse(std::string_view testString, double expectedReal, double expectedImag) {
+// Tolerance is documented in tolerances.hpp.
+static void checkParse(std::string_view testString, hmeigens::Complex expected) {
     // CAPTURE prints the captured value at the time of capture if the test doesn't pass.
-    CAPTURE(testString);
-    const auto z = hmeigens::parseComplex(testString);
-    // This function only checks against doubles.
-    // It's what Catch2 would do anyway, so here it's explicit.
-    const auto real = static_cast<double>(z.real());
-    const auto imag = static_cast<double>(z.imag());
-    constexpr double dblParseTolerance = static_cast<double>(hmeigens::parseTolerance);
-    CHECK_THAT(
-        real,
-        Catch::Matchers::WithinAbs(expectedReal, dblParseTolerance)
-        ||
-        Catch::Matchers::WithinRel(expectedReal, dblParseTolerance)
-    );
-    CHECK_THAT(
-        imag,
-        Catch::Matchers::WithinAbs(expectedImag, dblParseTolerance)
-        ||
-        Catch::Matchers::WithinRel(expectedImag, dblParseTolerance)
+    CAPTURE(testString, expected);
+    checkComplexULPs(
+        hmeigens::parseComplex(testString),
+        expected,
+        hmeigens::parseTolerance
     );
     return;
 }
@@ -84,68 +77,68 @@ TEST_CASE("Parse test: real number.", "[complex_parse][parseComplex]") {
     // GIVEN a plain real number
     // WHEN  it is parsed
     // THEN  its result is the expected number with no imaginary part
-    checkParse ("0", 0.0, 0.0);
-    checkParse ("6", 6, 0.0);
-    checkParse ("+6", 6, 0.0);
-    checkParse ("-6", -6, 0.0);
-    checkParse ("6.7", 6.7, 0.0);
-    checkParse (".7", .7, 0.0);
-    checkParse ("6.", 6., 0.0);
-    checkParse ("-6.7", -6.7, 0.0);
-    checkParse ("+6.7", 6.7, 0.0);
+    checkParse ("0", {HMS(0.), HMS(0.)});
+    checkParse ("6", {HMS(6.), HMS(0.)});
+    checkParse ("+6", {HMS(6.), HMS(0.)});
+    checkParse ("-6", {HMS(-6.), HMS(0.)});
+    checkParse ("6.7", {HMS(6.7), HMS(0.)});
+    checkParse (".7", {HMS(.7), HMS(0.)});
+    checkParse ("6.", {HMS(6.), HMS(0.)});
+    checkParse ("-6.7", {HMS(-6.7), HMS(0.)});
+    checkParse ("+6.7", {HMS(6.7), HMS(0.)});
 }
 
 TEST_CASE("Parse test: exponential form.", "[complex_parse][parseComplex]") {
     // GIVEN a real number in exponential form
     // WHEN  it is parsed
     // THEN  its result is the expected number with no imaginary part
-    checkParse ("1e0", 1.0, 0.0);
-    checkParse ("1e-0", 1.0, 0.0);
-    checkParse ("1.e-7", 1e-7, 0.0);
-    checkParse ("-2.34e10", -2.34e10, 0.0);
-    checkParse ("1E3", 1000.0, 0.0);
-    checkParse ("0E3", 0.0, 0.0);
-    checkParse (".1e7", 1000000, 0.0);
-    checkParse ("1.e2", 100.0, 0.0);
-    checkParse ("1e+4", 10000.0, 0.0);
+    checkParse ("1e0", {HMS(1.), HMS(0.)});
+    checkParse ("1e-0", {HMS(1.), HMS(0.)});
+    checkParse ("1.e-7", {HMS(1e-7), HMS(0.)});
+    checkParse ("-2.34e10", {HMS(-2.34e10), HMS(0.)});
+    checkParse ("1E3", {HMS(1000.), HMS(0.)});
+    checkParse ("0E3", {HMS(0.), HMS(0.)});
+    checkParse (".1e7", {HMS(1000000.), HMS(0.)});
+    checkParse ("1.e2", {HMS(100.), HMS(0.)});
+    checkParse ("1e+4", {HMS(10000.), HMS(0.)});
 }
 
 TEST_CASE("Parse test: imaginary number.", "[complex_parse][parseComplex]") {
     // GIVEN an imaginary number in algebraic form
     // WHEN  it is parsed
     // THEN  its result is the expected number with no real part
-    checkParse ("i", 0.0, 1.0);
-    checkParse ("3i", 0.0, 3.0);
-    checkParse ("0i", 0.0, 0.0);
-    checkParse ("I", 0.0, 1.0);
-    checkParse ("-i", 0.0, -1.0);
-    checkParse ("+i", 0.0, 1.0);
-    checkParse ("1.1i", 0.0, 1.1);
-    checkParse ("-3e14i", 0.0, -3e14);
-    checkParse (".7i", 0.0, 0.7);
-    checkParse ("3.i", 0.0, 3.0);
+    checkParse ("i", {HMS(0.), HMS(1.)});
+    checkParse ("3i", {HMS(0.), HMS(3.)});
+    checkParse ("0i", {HMS(0.), HMS(0.)});
+    checkParse ("I", {HMS(0.), HMS(1.)});
+    checkParse ("-i", {HMS(0.), HMS(-1.)});
+    checkParse ("+i", {HMS(0.), HMS(1.)});
+    checkParse ("1.1i", {HMS(0.), HMS(1.1)});
+    checkParse ("-3e14i", {HMS(0.), HMS(-3e14)});
+    checkParse (".7i", {HMS(0.), HMS(0.7)});
+    checkParse ("3.i", {HMS(0.), HMS(3.)});
 }
 
 TEST_CASE("Parse test: algebraic form.", "[complex_parse][parseComplex]") {
     // GIVEN a complex number in algebraic form
     // WHEN  it is parsed
     // THEN  its result is the expected number
-    checkParse ("2.3-.4i", 2.3, -0.4);
-    checkParse ("2+i", 2.0, 1.0);
-    checkParse ("2-i", 2.0, -1.0);
-    checkParse ("2+6i", 2.0, 6.0);
-    checkParse ("2+6I", 2.0, 6.0);
-    checkParse ("2.1-6e-3i", 2.1, -6e-3);
+    checkParse ("2.3-.4i", {HMS(2.3), HMS(-0.4)});
+    checkParse ("2+i", {HMS(2.), HMS(1.)});
+    checkParse ("2-i", {HMS(2.), HMS(-1.)});
+    checkParse ("2+6i", {HMS(2.), HMS(6.)});
+    checkParse ("2+6I", {HMS(2.), HMS(6.)});
+    checkParse ("2.1-6e-3i", {HMS(2.1), HMS(-6e-3)});
 }
 
 TEST_CASE("Parse test: ordered pair.", "[complex_parse][parseComplex]") {
     // GIVEN an ordered pair a,b
     // WHEN  it is parsed
     // THEN  its result is the expected number
-    checkParse ("2.1,-6e-3", 2.1, -6e-3);
-    checkParse ("0,4", 0.0, 4.0);
-    checkParse ("4,0", 4.0, 0.0);
-    checkParse ("-4,-8e2", -4.0, -800.0);
+    checkParse ("2.1,-6e-3", {HMS(2.1), HMS(-6e-3)});
+    checkParse ("0,4", {HMS(0.), HMS(4.)});
+    checkParse ("4,0", {HMS(4.), HMS(0.)});
+    checkParse ("-4,-8e2", {HMS(-4.), HMS(-800.)});
 }
 
 TEST_CASE("Parse rejection test: text that is not a complex number.", "[complex_parse][parseComplex]") {
@@ -237,3 +230,5 @@ TEST_CASE("ParseError test: the offending text is escaped in the message.", "[co
         Catch::Matchers::ContainsSubstring(R"(These\ncharacters\\would\"be\\adoubled.)")
     );
 }
+
+#undef HMS

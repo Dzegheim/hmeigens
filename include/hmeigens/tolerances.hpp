@@ -3,9 +3,6 @@
 #ifndef HMEIGENS_TOLERANCES_HPP
 #define HMEIGENS_TOLERANCES_HPP
 
-#include "hmeigens/scalar.hpp"
-#include "hmeigens/constants.hpp"
-
 #include <cstddef>  // For std::size_t
 #include <cstdint>  // For std::uint64_t
 
@@ -22,13 +19,20 @@
 
 namespace hmeigens {
 
-    /// @brief Tolerance for parsing tests.
+    /// @brief Tolerance for parsing tests: `1` ULP.
     ///
-    /// The parsed value must be within 1 ULP of the input.
-    /// No arithmetic is performed on the value, so the tolerance is the tightest each type allows.
+    /// The parsed value must be within `1` ULP of the expected value, which is a literal in the tests.
+    /// All parsing of numbers is ultimately done by `std::from_chars`. No arithmetic is performed on the value, so the tolerance is the tightest the standard guarantees.
+    /// For `std::from_chars` the error is `0` ULPs.
     /// [Source](https://en.cppreference.com/cpp/utility/from_chars):
     /// > In any case, the resulting value is one of at most two floating-point values closest to the value of the string matching the pattern, after rounding according to `std::round_to_nearest`.
-    inline constexpr Scalar parseTolerance = epsilon;
+    ///
+    /// This means the only rounding that can happen *not to nearest* on the values is that done by the compiler when reading literals, that is at most `1` ULP.
+    /// [Source (note that this is NOT an ISO publication)](https://timsong-cpp.github.io/cppwp/n4861/lex.fcon#3):
+    /// > If the scaled value is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point-literal is the scaled value if representable, else the larger or smaller representable value nearest the scaled value, chosen in an implementation-defined manner.
+    ///
+    /// Depending on the implementation, the rounding could go to either value, so the `1` ULP tolerance is enough.
+    inline constexpr std::uint64_t parseTolerance = 1;
 
     /// @brief Returns the tolerance for the computation of the norm by `hmeigens::SquareMatrix::norm()`.
     ///

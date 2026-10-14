@@ -7,33 +7,35 @@
 #include "hmeigens/tolerances.hpp"
 #include "hmeigens/complex_parse.hpp"
 
+#include "../comparison_helpers.hpp"
+
 #include <string>
 #include <string_view>
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
+
+// Local brief alias for the conversion macro to improve legibility.
+#define HMS HMEIGENS_MAKE_SCALAR
 
 /* --------------------------------------------- */
 /* ------------------ Helpers ------------------ */
 /* --------------------------------------------- */
 //
+// Readability of tests.
+using hmeigens::test::checkRealULPs;
+
 // This is a helper function to verify that the number read corresponds to the expected one.
-// The expectedValue is a double because Catch2 always checks in double anyway.
-// See comment to checkParse in tests/complex_parse_test.cpp.
-static void checkReads(std::string_view toConvert, double expectedValue) {
+// Tolerance is documented in tolerances.hpp.
+static void checkReads(std::string_view toConvert, hmeigens::Scalar expectedValue) {
     CAPTURE(toConvert, expectedValue);
-    constexpr double dblParseTolerance = static_cast<double>(hmeigens::parseTolerance);
-    CHECK_THAT(
+    checkRealULPs(
         // The second parameter of hmeigens::detail::toScalar is only ever used for error message construction.
         // Here it is left empty as this helper only ever checks inputs that should convert.
-        static_cast<double> (
-            hmeigens::detail::toScalar(toConvert, "")
-        ),
-        Catch::Matchers::WithinAbs(expectedValue, dblParseTolerance)
-        ||
-        Catch::Matchers::WithinRel(expectedValue, dblParseTolerance)
+        hmeigens::detail::toScalar(toConvert, ""),
+        expectedValue,
+        hmeigens::parseTolerance
     );
     return;
 }
@@ -70,19 +72,19 @@ TEST_CASE("Text to scalar test: real numbers.", "[to_scalar][detail][toScalar]")
     // GIVEN text in the form of an appropriate real number
     // WHEN  it is parsed
     // THEN  the result is the expected number
-    checkReads("6", 6.);
-    checkReads("-4.2", -4.2);
-    checkReads(".1", .1);
-    checkReads("2.", 2.);
-    checkReads("1e9", 1e9);
+    checkReads("6", HMS(6.));
+    checkReads("-4.2", HMS(-4.2));
+    checkReads(".1", HMS(.1));
+    checkReads("2.", HMS(2.));
+    checkReads("1e9", HMS(1e9));
 }
 
 TEST_CASE("Text to scalar test: leading \"+\".", "[to_scalar][detail][toScalar]") {
     // GIVEN text in the form of an appropriate real number with a leading "+"
     // WHEN  it is parsed
     // THEN  the result is the expected number
-    checkReads("+6.7", 6.7);
-    checkReads("+1e-5", 1e-5);
+    checkReads("+6.7", HMS(6.7));
+    checkReads("+1e-5", HMS(1e-5));
 }
 
 TEST_CASE("Text to scalar rejection test: out of range.", "[to_scalar][detail][toScalar]") {
@@ -119,3 +121,5 @@ TEST_CASE("Text to scalar rejection test: a leading \"+\" is correctly reported.
     checkRejects("+1e3000", "+1e3000");
     checkRejects("+garbage", "+garbage");
 }
+
+#undef HMS
