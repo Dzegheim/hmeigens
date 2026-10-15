@@ -289,6 +289,18 @@ namespace hmeigens {
 /* -------- Definitions -------- */
 /* ----------------------------- */
 //
+// Given a row and a column, gives the corresponding index for the body.
+// Fully documented at the declaration.
+inline std::size_t hmeigens::SquareMatrix::getIndex(std::size_t row, std::size_t col) const {
+    return row * size_ + col;
+}
+
+// Gives the size of a matrix.
+// Fully documented at the declaration.
+inline std::size_t hmeigens::SquareMatrix::size() const {
+    return size_;
+}
+
 // Size parameter constructor.
 // Takes the size as a parameter, validates it via helper, then if everything's fine it initializes the matrix as a 0 filled hmeigens::SquareMatrix::Container whose length is size*size.
 // If there is a problem with the size, the helper function throws.

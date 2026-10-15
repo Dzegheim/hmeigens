@@ -1,8 +1,6 @@
 // Source file for all non-template functions in square_matrix.hpp.
 // Contents:
 // - hmeigens::SquareMatrix::SquareMatrix(hmeigens::SquareMatrix::Container&&);
-// - hmeigens::SquareMatrix::size() const;
-// - hmeigens::SquareMatrix::getIndex(std::size_t, std::size_t) const;
 // - hmeigens::SquareMatrix::norm() const.
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
@@ -22,18 +20,6 @@ hmeigens::SquareMatrix::SquareMatrix(hmeigens::SquareMatrix::Container&& body) :
     // Here the hmeigens::SquareMatrix::Container is moved into body_. The container itself is not preserved, as its contents end up in the matrix.
     // Nothing that is meant to be kept must be passed here.
     body_(std::move(body)) {}
-
-// Gives the size of a matrix.
-// Fully documented in .hpp.
-std::size_t hmeigens::SquareMatrix::size() const {
-    return size_;
-}
-
-// Given a row and a column, gives the corresponding index for the body.
-// Fully documented in .hpp.
-std::size_t hmeigens::SquareMatrix::getIndex(std::size_t row, std::size_t col) const {
-    return row * size_ + col;
-}
 
 // Frobenius norm of a matrix.
 // Fully documented in .hpp.
