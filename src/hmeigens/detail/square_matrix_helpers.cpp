@@ -3,7 +3,8 @@
 // - hmeigens::detail::validateSize(std::size_t);
 // - hmeigens::detail::validateSize(std::intmax_t);
 // - hmeigens::detail::validateSize(std::uintmax_t);
-// - hmeigens::detail::sizeFromBodyLength(std::size_t).
+// - hmeigens::detail::sizeFromBodyLength(std::size_t);
+// - hmeigens::detail::checkSizeMatch(std::size_t, std::size_t, std::string_view).
 #include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
@@ -78,6 +79,7 @@ std::size_t hmeigens::detail::validateSize(std::uintmax_t toValidate) {
 }
 #endif
 
+// Fully documented in .hpp.
 std::size_t hmeigens::detail::sizeFromBodyLength(std::size_t bodyLength) {
     // An empty container cannot be used to construct a matrix because it would have size 0.
     if (bodyLength == 0) {
@@ -89,4 +91,13 @@ std::size_t hmeigens::detail::sizeFromBodyLength(std::size_t bodyLength) {
         throw std::invalid_argument{std::format("The provided container does not represent a square matrix.\n---> Number of elements {0} is not a perfect square.", bodyLength)};
     }
     return root;
+}
+
+// Fully documented in .hpp.
+std::size_t hmeigens::detail::checkSizeMatch(std::size_t sizeOne, std::size_t sizeTwo, std::string_view operationName) {
+    // Sizes are assumed valid, i.e. 0 < sizeOne <= hmeigens::maxMatrixSize and the same for sizeTwo.
+    if (sizeOne != sizeTwo) {
+        throw std::invalid_argument{std::format("Invalid operands for binary operation {0}: the sizes do not match.\n---> Given sizes: {1} for the left operand, {2} for the right operand.", operationName, sizeOne, sizeTwo)};
+    }
+    return sizeOne;
 }

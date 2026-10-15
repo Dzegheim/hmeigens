@@ -6,6 +6,7 @@
 #include <cstdint>      // For std::intmax_t, std::uintmax_t, SIZE_MAX, UINTMAX_MAX
 #include <concepts>     // For std::signed_integral, std::unsigned_integral, std::same_as
 #include <type_traits>  // For std::remove_cv_t
+#include <string_view>
 
 /* ----------------------------- */
 /* --------- IMPORTANT --------- */
@@ -72,6 +73,12 @@ namespace hmeigens::detail {
     // If somewhere somehow a volatile variable is needed it works too. Not used anywhere in this code, just for completeness.
     template<typename Candidate, typename... Allowed>
     concept IsItAllowed = (std::same_as<std::remove_cv_t<Candidate>, Allowed> or ...);
+
+    // This helper checks that two sizes passed to it are equal.
+    // It returns the first one if they are, and throws std::invalid_argument if not.
+    // The variable operationName is used to construct the error to specify which operation caused the issue.
+    // Note: the sizes are not checked for validity and are assumed to be positive and smaller than or equal to hmeigens::maxMatrixSize.
+    [[nodiscard]] std::size_t checkSizeMatch(std::size_t sizeOne, std::size_t sizeTwo, std::string_view operationName);
 
 }
 

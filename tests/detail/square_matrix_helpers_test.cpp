@@ -5,7 +5,8 @@
 // - test cases:
 //      - hmeigens::detail::validateSize;
 //      - hmeigens::detail::sizeFromBodyLength;
-//      - hmeigens::detail::IsItAllowed.
+//      - hmeigens::detail::IsItAllowed;
+//      - hmeigens::detail::checkSizeMatch.
 #include "hmeigens/constants.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
 #include "hmeigens/square_matrix.hpp"
@@ -211,4 +212,44 @@ TEST_CASE("Square matrix helpers test: unlisted types are refused.", "[square_ma
     STATIC_REQUIRE_FALSE(hmeigens::detail::IsItAllowed<char32_t, float, double, long double>);
     // Even a conversion is refused. Type must be exactly matching.
     STATIC_REQUIRE_FALSE(hmeigens::detail::IsItAllowed<short int, int>);
+}
+
+/* ------------------------------------------------ */
+/* ------- hmeigens::detail::checkSizeMatch ------- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Square matrix helpers test: matching sizes are accepted and the size is reported.", "[square_matrix_helpers][detail][checkSizeMatch]") {
+    // GIVEN two matching sizes
+    // WHEN  hmeigens::detail::checkSizeMatch compares them
+    // THEN  they are accepted and the return value matches them
+    //
+    // The third parameter is only ever used in the error construction, so here it is not important as the sizes are valid.
+    // Valid size.
+    CHECK(hmeigens::detail::checkSizeMatch(4, 4, "") == 4);
+    // The two cases below check that the function accepts two inputs that are invalid as sizes. If validation is ever added to the helper, these will fail. They're here because in that case tests for bad inputs would be needed.
+    CHECK(hmeigens::detail::checkSizeMatch(0, 0, "") == 0);
+    // Note that a negative value here wraps as the parameters are std::size_t.
+    CHECK(hmeigens::detail::checkSizeMatch(-1, -1, "") == std::size_t(-1));
+}
+
+TEST_CASE("Square matrix helpers test: mismatching sizes are refused with the correct exception type and message.", "[square_matrix_helpers][detail][checkSizeMatch]") {
+    // GIVEN two mismatching sizes
+    // WHEN  hmeigens::detail::checkSizeMatch compares them
+    // THEN  they are rejected and the correct exception type is thrown, with the expected message
+    // Verify the exception type and that the provided string appears in the message.
+    CHECK_THROWS_MATCHES(
+        hmeigens::detail::checkSizeMatch(0, 1, "test operation"),
+        std::invalid_argument,
+        Catch::Matchers::MessageMatches(
+            Catch::Matchers::ContainsSubstring("binary operation test operation:")
+        )
+    );
+    // Verify the error message contains the invalid sizes.
+    CHECK_THROWS_MATCHES(
+        hmeigens::detail::checkSizeMatch(6, 7, ""),
+        std::invalid_argument,
+        Catch::Matchers::MessageMatches(
+            Catch::Matchers::ContainsSubstring("Given sizes: 6 for the left operand, 7 for the right operand.")
+        )
+    );
 }

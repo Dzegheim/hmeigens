@@ -15,7 +15,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::toScalar` thoroughly tested;
     - `hmeigens::detail::isDisplayable` and `hmeigens::detail::escape` thoroughly tested, i.e. control characters, backslash, and quotes in rejected input are escaped;
     - `hmeigens::detail::validateSize` and `hmeigens::detail::sizeFromBodyLength` thoroughly tested;
-    - `hmeigens::detail::IsItAllowed` thoroughly tested.
+    - `hmeigens::detail::IsItAllowed` thoroughly tested;
+    - `hmeigens::detail::checkSizeMatch` thoroughly tested.
 - **Tests for `hmeigens::SquareMatrix`.** Specifically:
     - a `SquareMatrix` built with a valid size reports it correctly with `size()`;
     - invalid sizes are rejected, including negative ones;
