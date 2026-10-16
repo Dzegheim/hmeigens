@@ -53,6 +53,8 @@ Version 0.2.0 is recorded from git history.
 - **A new file `tolerances.hpp`.** It holds parameters that are used in testing and that the tests enforce.
 - **Tolerance for norm tests.** The new function `hmeigens::normTolerance` and the CMake cache variable `HMEIGENS_HYPOT_ULPS` allow for testing the norm of a matrix with variable tolerance due to implementation-defined limitations.
 - **A new file `comparison_helpers.hpp` in `tests/`.** It houses helpers that multiple tests use to compare values.
+- **Benchmarks.** They can be built and run via `HMEIGENS_BUILD_BENCHMARKS`. Specifically:
+    - `complex_multiplication_bench.cpp` compares the standard `operator*` from `<complex>` against an explicitly written complex multiplication.
 
 ### Changed
 - **`hmeigens::SquareMatrix` construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
@@ -62,6 +64,7 @@ Version 0.2.0 is recorded from git history.
 - **The `hmeigens::SquareMatrix` constructor taking size as a parameter now accepts only meaningful integers.** The accepted types are those mentioned in `hmeigens::CanBeSize`. Expressions that previously compiled due to indirect conversions, such as `hmeigens::SquareMatrix('A')` or `hmeigens::SquareMatrix(4.2)`, no longer do. Negative values which were previously a narrowing conversion, such as `hmeigens::SquareMatrix{-1}`, now compile and throw `std::invalid_argument`.
 - **Constructors taking floating-points or integers that are not in `hmeigens::CanBeSize` are now deleted.**
 - **The `hmeigens::parseTolerance` constant was moved to the new file `tolerances.hpp` and now measures ULPs.** Before it was in `constants.hpp` and was an `hmeigens::Scalar`. It is now a `std::uint64_t` that measures `1` ULP.
+- **The Catch2 dependency was moved from the tests only to the top-level `CMakeLists.txt`.** The benchmarks share the dependency, so this makes it possible to enforce the same one uniformly across the whole project.
 
 ### Fixed
 - **Control characters in input text no longer break error messages.** Before a `\0` or `\n` would not be escaped and, when properly rejected by the parser, would be printed literally in the diagnostics messages, breaking them. Printable control characters are rendered as `\n` or `\t`, unprintable ones as three digit octals. Non-ASCII text is still handled like before, so that someone passing an emoji or another special character will still see it in the output.

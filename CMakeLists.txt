@@ -111,13 +111,35 @@ if(HMEIGENS_COVERAGE)
     target_link_options(${PROJECT_NAME_LOWER}_core PUBLIC --coverage)
 endif()
 
-# Testing is performed with Catch2 (https://github.com/catchorg/Catch2).
+# Testing and benchmarking are performed with Catch2 (https://github.com/catchorg/Catch2).
+# Options to enable/disable them are controlled by the HMEIGENS_BUILD_TESTS and HMEIGENS_BUILD_BENCHMARKS variables.
+# This just declares the dependency.
+# Downloading of content only happens if the tests or benchmarks are enabled with FetchContent_MakeAvailable.
+include(FetchContent)
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.15.3
+    GIT_SHALLOW    TRUE)
+
 # Below are the options to build the tests.
+# On by default.
 option(HMEIGENS_BUILD_TESTS "Build the test suite." ON)
 
 if(HMEIGENS_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+# Below are the options to build benchmarks.
+# Off by default.
+option(HMEIGENS_BUILD_BENCHMARKS "Build the benchmarks." OFF)
+
+if(HMEIGENS_BUILD_BENCHMARKS)
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Release" OR HMEIGENS_COVERAGE)
+        message(WARNING "HMEIGENS_BUILD_BENCHMARKS is active on a non-optimized build. The bench timings are meaningless.")
+    endif()
+    add_subdirectory(benchmarks)
 endif()
 
 message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION}")

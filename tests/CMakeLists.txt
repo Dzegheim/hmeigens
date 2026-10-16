@@ -1,12 +1,5 @@
-include(FetchContent)
-
 # Testing is performed with Catch2. Options to enable/disable them are controlled by the HMEIGENS_BUILD_TESTS variable.
-FetchContent_Declare(
-    Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG        v3.15.3
-    GIT_SHALLOW    TRUE)
-
+# Its dependency is declared in the top-level CMakeLists.txt.
 FetchContent_MakeAvailable(Catch2)
 
 # Source code for the tests.
@@ -27,6 +20,8 @@ target_link_libraries(${PROJECT_NAME_LOWER}_tests PRIVATE ${PROJECT_NAME_LOWER}_
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(Catch)
 catch_discover_tests(${PROJECT_NAME_LOWER}_tests)
+
+# Below are variables that may be useful for testing.
 
 # This is a multiplicative constant for the number of ULPs a computed norm has as tolerance for the tests of the function hmeigens::SquareMatrix::norm().
 # The actual tolerance is HMEIGENS_HYPOT_ULPS*2*size^2, where size is the size of the matrix.

@@ -39,12 +39,23 @@
       "cacheVariables": {
         "HMEIGENS_COVERAGE": "ON"
       }
+    },
+    {
+      "name": "benchmark",
+      "inherits": "release",
+      "displayName": "Benchmark",
+      "description": "Release build of the benchmarks only.",
+      "cacheVariables": {
+        "HMEIGENS_BUILD_TESTS": "OFF",
+        "HMEIGENS_BUILD_BENCHMARKS": "ON"
+      }
     }
   ],
   "buildPresets": [
     { "name": "release", "configurePreset": "release" },
     { "name": "debug", "configurePreset": "debug" },
-    { "name": "coverage", "configurePreset": "coverage" }
+    { "name": "coverage", "configurePreset": "coverage" },
+    { "name": "benchmark", "configurePreset": "benchmark" }
   ],
   "testPresets": [
     {
