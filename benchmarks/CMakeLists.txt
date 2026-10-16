@@ -5,6 +5,7 @@ FetchContent_MakeAvailable(Catch2)
 # Source code for the benchmarks.
 set(HMEIGENS_BENCHMARK_SOURCES
     complex_multiplication_bench.cpp
+    matrix_multiplication_bench.cpp
     )
 
 add_executable(${PROJECT_NAME_LOWER}_benchmarks ${HMEIGENS_BENCHMARK_SOURCES})

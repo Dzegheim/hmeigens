@@ -54,7 +54,8 @@ Version 0.2.0 is recorded from git history.
 - **Tolerance for norm tests.** The new function `hmeigens::normTolerance` and the CMake cache variable `HMEIGENS_HYPOT_ULPS` allow for testing the norm of a matrix with variable tolerance due to implementation-defined limitations.
 - **A new file `comparison_helpers.hpp` in `tests/`.** It houses helpers that multiple tests use to compare values.
 - **Benchmarks.** They can be built and run via `HMEIGENS_BUILD_BENCHMARKS`. Specifically:
-    - `complex_multiplication_bench.cpp` compares the standard `operator*` from `<complex>` against an explicitly written complex multiplication.
+    - `complex_multiplication_bench.cpp` compares the standard `operator*` from `<complex>` against an explicitly written complex multiplication;
+    - `matrix_multiplication_bench.cpp` compares three different ways of implementing matrix multiplication, all `O(n^3)`: classic definition, rearranged inner loop, transposition and parallel walking (see the file for details on each).
 
 ### Changed
 - **`hmeigens::SquareMatrix` construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
