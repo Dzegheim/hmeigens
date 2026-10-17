@@ -1,4 +1,16 @@
 // File for functions used by hmeigens::SquareMatrix to validate parameters for the constructors.
+// Declarations (hmeigens::detail):
+//     - validateSize(std::size_t);
+//     - validateSize(std::intmax_t);
+//     - validateSize(std::uintmax_t);
+//     - <std::signed_integral> validateSize(SigInt);
+//     - <std::unsigned_integral> validateSize(UnsigInt);
+//     - sizeFromBodyLength(std::size_t);
+//     - <typename, typename...> IsItAllowed;
+//     - checkSizeMatch(std::size_t, std::size_t, std::string_view).
+// Definitions (hmeigens::detail):
+//     - <std::signed_integral> validateSize(SigInt);
+//     - <std::unsigned_integral> validateSize(UnsigInt).
 #ifndef HMEIGENS_DETAIL_SQUARE_MATRIX_HELPERS_HPP
 #define HMEIGENS_DETAIL_SQUARE_MATRIX_HELPERS_HPP
 

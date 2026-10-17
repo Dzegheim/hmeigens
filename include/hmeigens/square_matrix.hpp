@@ -1,5 +1,38 @@
 /// @file
 /// @brief A class for square matrices with complex elements.
+// Declarations (hmeigens):
+//     - <typename> CanBeSize.
+// Class (hmeigens::SquareMatrix):
+//     - Container;
+//     - size_;
+//     - body_;
+//     - <CanBeSize> SquareMatrix(Size);
+//     - SquareMatrix(Container&&);
+//     - <typename> SquareMatrix(Rejected);
+//     - size() const;
+//     - <CanBeSize, CanBeSize> operator()(Row, Col) const;
+//     - <CanBeSize, CanBeSize> operator()(Row, Col);
+//     - <CanBeSize, CanBeSize> at(Row, Col) const;
+//     - <CanBeSize, CanBeSize> at(Row, Col);
+//     - static <CanBeSize> identity(Size);
+//     - norm() const;
+//     - adjointInPlace();
+//     - adjoint() const;
+//     - getIndex(std::size_t, std::size_t) const;
+//     - <CanBeSize, CanBeSize> checkIndex(Row, Col).
+// Declarations (hmeigens):
+//     - maxMatrixSize;
+//     - operator*(const SquareMatrix&, const SquareMatrix&).
+// Definitions (hmeigens::SquareMatrix):
+//     - getIndex(std::size_t, std::size_t) const;
+//     - size() const;
+//     - <CanBeSize> SquareMatrix(Size);
+//     - <CanBeSize, CanBeSize> operator()(Row, Col) const;
+//     - <CanBeSize, CanBeSize> operator()(Row, Col);
+//     - <CanBeSize, CanBeSize> at(Row, Col) const;
+//     - <CanBeSize, CanBeSize> at(Row, Col);
+//     - <CanBeSize, CanBeSize> checkIndex(Row, Col);
+//     - static <CanBeSize> identity(Size).
 #ifndef HMEIGENS_SQUARE_MATRIX_HPP
 #define HMEIGENS_SQUARE_MATRIX_HPP
 

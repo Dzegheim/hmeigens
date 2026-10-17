@@ -1,7 +1,7 @@
 // Source file for all functions in text_escape.hpp.
-// Contents:
-// - hmeigens::detail::isDisplayable(unsigned char);
-// - hmeigens::detail::escape(std::string_view).
+// Definitions (hmeigens::detail):
+//     - isDisplayable(unsigned char);
+//     - escape(std::string_view).
 #include "hmeigens/detail/text_escape.hpp"
 
 #include <string>

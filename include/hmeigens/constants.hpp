@@ -1,5 +1,8 @@
 /// @file
 /// @brief Constants used throughout the project.
+// Declarations (hmeigens):
+//     - epsilon;
+//     - maxSquarableSize.
 #ifndef HMEIGENS_CONSTANTS_HPP
 #define HMEIGENS_CONSTANTS_HPP
 

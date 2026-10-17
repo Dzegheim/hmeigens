@@ -1,5 +1,8 @@
 // File for functions used to process input strings.
 // Input may contain control characters that may break diagnostics messages.
+// Declarations (hmeigens::detail):
+//     - isDisplayable(unsigned char);
+//     - escape(std::string_view).
 #ifndef HMEIGENS_DETAIL_TEXT_ESCAPE_HPP
 #define HMEIGENS_DETAIL_TEXT_ESCAPE_HPP
 

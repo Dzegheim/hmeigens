@@ -48,7 +48,7 @@ Version 0.2.0 is recorded from git history.
     - a `norm()` member that computes the Frobenius norm of a matrix;
     - two member functions `adjoint()` and `adjointInPlace()` that compute the transpose complex-conjugate of a given matrix, the first returning a copy, the second working directly on the original matrix and returning a reference to it.
 - **Matrix multiplication `hmeigens::operator*`.** It throws `std::invalid_argument` for mismatching sizes. All elements of matrices passed to it must be finite.
-- **A new macro `HMEIGENS_MAKE_SCALAR`.** It appends an `f` suffix to numeric literals when building with `-DHMEIGENS_SCALAR_FLOAT` and leaves the value unchanged otherwise. This is to avoid implicit value conversions of literals throughout the code.
+- **A new macro `HMEIGENS_MAKE_SCALAR`.** It appends an `f` suffix to numeric literals when building with `-DHMEIGENS_SCALAR=float` and leaves the value unchanged otherwise. This is to avoid implicit value conversions of literals throughout the code.
 - **Tests for `scalar.hpp`.** Specifically:
     - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);
     - `HMEIGENS_MAKE_SCALAR` produces a value that the compiler interprets as the expected type, and the value it produces matches the expected one exactly.

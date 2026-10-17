@@ -1,8 +1,9 @@
 // Source file for all functions in complex_parse.hpp.
-// Contents:
-// - hmeigens::parseComplex(std::string_view);
-// - hmeigens::ParseError::ParseError(std::string_view);
-// - hmeigens::ParseError::ParseError(std::string_view, std::string_view).
+// Definitions (hmeigens):
+//     - parseComplex(std::string_view).
+// Definitions (hmeigens::ParseError):
+//     - ParseError(std::string_view);
+//     - ParseError(std::string_view, std::string_view).
 #include "hmeigens/complex_parse.hpp"
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/detail/text_escape.hpp"

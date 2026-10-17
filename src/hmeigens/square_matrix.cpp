@@ -1,7 +1,11 @@
 // Source file for all non-template functions in square_matrix.hpp.
-// Contents:
-// - hmeigens::SquareMatrix::SquareMatrix(hmeigens::SquareMatrix::Container&&);
-// - hmeigens::SquareMatrix::norm() const.
+// Definitions (hmeigens::SquareMatrix):
+//     - SquareMatrix(Container&&);
+//     - norm() const;
+//     - adjointInPlace();
+//     - adjoint() const.
+// Definitions (hmeigens):
+//     - operator*(const SquareMatrix&, const SquareMatrix&).
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
 

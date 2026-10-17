@@ -1,5 +1,10 @@
 /// @file
 /// @brief Parser for complex numbers from text.
+// Class (hmeigens::ParseError):
+//     - ParseError(std::string_view);
+//     - ParseError(std::string_view, std::string_view).
+// Declarations (hmeigens):
+//     - parseComplex(std::string_view).
 #ifndef HMEIGENS_COMPLEX_PARSE_HPP
 #define HMEIGENS_COMPLEX_PARSE_HPP
 

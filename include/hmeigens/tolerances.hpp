@@ -1,5 +1,12 @@
 /// @file
 /// @brief Tolerances enforced by the tests of the library.
+// Declarations:
+//     - HMEIGENS_HYPOT_ULPS.
+// Declarations (hmeigens):
+//     - parseTolerance;
+//     - normTolerance(std::size_t).
+// Definitions (hmeigens):
+//     - normTolerance(std::size_t).
 #ifndef HMEIGENS_TOLERANCES_HPP
 #define HMEIGENS_TOLERANCES_HPP
 

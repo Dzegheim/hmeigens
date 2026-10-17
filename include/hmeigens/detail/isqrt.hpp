@@ -1,4 +1,8 @@
 // File for the integer square root function.
+// Declarations (hmeigens::detail):
+//     - isqrt(std::size_t).
+// Definitions (hmeigens::detail):
+//     - isqrt(std::size_t).
 #ifndef HMEIGENS_DETAIL_ISQRT_HPP
 #define HMEIGENS_DETAIL_ISQRT_HPP
 

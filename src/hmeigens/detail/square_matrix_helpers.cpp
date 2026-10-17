@@ -1,10 +1,10 @@
 // Source file for all non-template functions in square_matrix_helpers.hpp.
-// Contents:
-// - hmeigens::detail::validateSize(std::size_t);
-// - hmeigens::detail::validateSize(std::intmax_t);
-// - hmeigens::detail::validateSize(std::uintmax_t);
-// - hmeigens::detail::sizeFromBodyLength(std::size_t);
-// - hmeigens::detail::checkSizeMatch(std::size_t, std::size_t, std::string_view).
+// Definitions (hmeigens::detail):
+//     - validateSize(std::size_t);
+//     - validateSize(std::intmax_t);
+//     - validateSize(std::uintmax_t);
+//     - sizeFromBodyLength(std::size_t);
+//     - checkSizeMatch(std::size_t, std::size_t, std::string_view).
 #include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
