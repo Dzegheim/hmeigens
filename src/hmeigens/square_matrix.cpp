@@ -87,3 +87,46 @@ hmeigens::SquareMatrix hmeigens::SquareMatrix::adjoint() const {
     adj.adjointInPlace();
     return adj;
 }
+
+// Matrix multiplication.
+// Fully documented in .hpp.
+//
+// The base algorithm would be, given P=L*R:
+// P(i,j)=sum_k L(i,k)R(k,j),
+// where i, j, k run in the range [0, size[.
+// After benchmarking two design choices emerged.
+// (1) benchmarks/matrix_multiplication_bench.cpp shows that the approach implemented below is the best performing of the three considered ones. That file contains a brief explanation of each.
+// The approach chosen here is the one that allows for vectorization and cache access optimization.
+// (2) benchmarks/complex_multiplication_bench.cpp shows that an explicitly written complex multiplication is faster than the standard operator* from <complex>.
+// This is because the standard version may perform safety checks on the finiteness of numbers. Those checks are not needed here, as the finiteness of the matrix norm (and therefore of all of its elements) is a prerequisite this code will enforce in the eigenvalue search. Those checks, though not required, may happen, and slow the calculations down even if here they're not needed.
+hmeigens::SquareMatrix hmeigens::operator* (const hmeigens::SquareMatrix& leftHand, const hmeigens::SquareMatrix& rightHand) {
+    // Store the size for readability.
+    const std::size_t size = leftHand.size();
+    // Construct a zero-filled matrix after checking the sizes match.
+    // If they don't, the helper throws std::invalid_argument.
+    hmeigens::SquareMatrix product{
+        hmeigens::detail::checkSizeMatch(
+            size,
+            rightHand.size(),
+            "matrix multiplication"
+        )
+    };
+    for (std::size_t i = 0; i < size; ++i) {
+        for (std::size_t k = 0; k < size; ++k) {
+            // Store the value of the left-hand matrix.
+            // Two accesses per value of k, instead of 2*size ones if done inside the inner loop.
+            const auto lTempRe = leftHand(i,k).real();
+            const auto lTempIm = leftHand(i,k).imag();
+            for (std::size_t j = 0; j < size; ++j) {
+                // Store the values to access only two times rather than four.
+                const auto rTempRe = rightHand(k,j).real();
+                const auto rTempIm = rightHand(k,j).imag();
+                product(i,j)+=hmeigens::Complex{
+                    lTempRe*rTempRe-lTempIm*rTempIm,
+                    lTempRe*rTempIm+lTempIm*rTempRe
+                };
+            }
+        }
+    }
+    return product;
+}

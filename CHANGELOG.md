@@ -31,9 +31,13 @@ Version 0.2.0 is recorded from git history.
     - `type_traits` test to check for the explicitness of the constructors;
     - `hmeigens::CanBeSize` and the size parameter constructor correctly allow intended sizes and refuse undesirable ones;
     - `hmeigens::SquareMatrix::identity` constructs a valid identity matrix for valid sizes, and throws for invalid ones;
-    - `hmeigens::SquareMatrix::norm()` returns the expected values and satisfies the axioms to be considered a norm. Some test cases are as of now planned, and get skipped: submultiplicativity, trace identity, invariance under unitary similarity transformations. These will be implemented once the missing members are added to the class;
+    - `hmeigens::SquareMatrix::norm()` returns the expected values, satisfies the axioms to be considered a norm, is submultiplicative, and is invariant under unitary similarity transformations. One last test case is as of now planned, and gets skipped: trace identity. This will be implemented once the missing member is added to the class;
     - `hmeigens::SquareMatrix::adjointInPlace()` provides a reference to the matrix it was called on, with the expected updated value, and is involutory;
     - `hmeigens::SquareMatrix::adjoint()` provides the expected matrix and does not alter the original matrix.
+- **Tests for `hmeigens::operator*`.** Specifically:
+    - it provides the expected values;
+    - the identity is its neutral element;
+    - it throws as expected.
 - **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
 - **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
 - **Several `hmeigens::SquareMatrix` class features.** Specifically:
@@ -43,6 +47,7 @@ Version 0.2.0 is recorded from git history.
     - a static `identity` member function that takes a size as parameter and builds the corresponding identity matrix;
     - a `norm()` member that computes the Frobenius norm of a matrix;
     - two member functions `adjoint()` and `adjointInPlace()` that compute the transpose complex-conjugate of a given matrix, the first returning a copy, the second working directly on the original matrix and returning a reference to it.
+- **Matrix multiplication `hmeigens::operator*`.** It throws `std::invalid_argument` for mismatching sizes. All elements of matrices passed to it must be finite.
 - **A new macro `HMEIGENS_MAKE_SCALAR`.** It appends an `f` suffix to numeric literals when building with `-DHMEIGENS_SCALAR_FLOAT` and leaves the value unchanged otherwise. This is to avoid implicit value conversions of literals throughout the code.
 - **Tests for `scalar.hpp`.** Specifically:
     - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);

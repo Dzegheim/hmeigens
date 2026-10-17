@@ -8,7 +8,8 @@
 //      - hmeigens::SquareMatrix::identity;
 //      - hmeigens::SquareMatrix::norm;
 //      - hmeigens::SquareMatrix::adjointInPlace;
-//      - hmeigens::SquareMatrix::adjoint.
+//      - hmeigens::SquareMatrix::adjoint;
+//      - hmeigens::operator*.
 #include "hmeigens/tolerances.hpp"
 #include "hmeigens/square_matrix.hpp"
 
@@ -779,7 +780,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     checkRealULPs(
         hmeigens::SquareMatrix{
             {std::numeric_limits<hmeigens::Scalar>::max(), HMS(0.),
-             HMS(0.),                                        HMS(0.)}
+             HMS(0.),                                      HMS(0.)}
         }.norm(),
         std::numeric_limits<hmeigens::Scalar>::max(),
         // In Catch2 Infinity is 1 ULP more than FLT_MAX/DBL_MAX, so this relation must be exact to check it doesn't overflow.
@@ -790,7 +791,7 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     checkRealULPs(
         hmeigens::SquareMatrix{
             {std::numeric_limits<hmeigens::Scalar>::min(), HMS(0.),
-             HMS(0.),                                        HMS(0.)}
+             HMS(0.),                                      HMS(0.)}
         }.norm(),
         std::numeric_limits<hmeigens::Scalar>::min(),
         0
@@ -855,23 +856,56 @@ TEST_CASE("Square matrix test: the Frobenius norm behaves like a norm.", "[squar
 
 TEST_CASE("Square matrix test: the Frobenius norm is submultiplicative.", "[square_matrix][SquareMatrix][norm]") {
     // GIVEN two matrices A, B
-    // WHEN  the equality norm(A*B)<=norm(A)*norm(B) is tested for
+    // WHEN  the inequality norm(A*B)<=norm(A)*norm(B) is tested for
     // THEN  it holds
-    SKIP("The member hmeigens::SquareMatrix::operator* is not implemented yet.");
+    const hmeigens::SquareMatrix left{
+        {HMS(2.), HMS(-1.),
+         HMS(1.), HMS(3.)}
+    };
+    const hmeigens::SquareMatrix right{
+        {HMS(1.),             HMS(2.),
+         {HMS(3.), HMS(-1.)}, HMS(4.)}
+    };
+    // Tolerance here is meaningless as the values are very far apart.
+    CHECK((left*right).norm() <= left.norm() * right.norm());
 }
 
 TEST_CASE("Square matrix test: the Frobenius norm satisfies the trace identity.", "[square_matrix][SquareMatrix][norm]") {
     // GIVEN a matrix M and its adjoint M_h
-    // WHEN  the equality norm(M) =  sqrt(trace(M_h * M)) is tested for
+    // WHEN  the equality norm(M) = sqrt(trace(M_h * M)) is tested for
     // THEN  it holds
-    SKIP("The members hmeigens::SquareMatrix::operator* and hmeigens::SquareMatrix::trace are not implemented yet.");
+    SKIP("The member hmeigens::SquareMatrix::trace is not implemented yet.");
 }
 
 TEST_CASE("Square matrix test: the Frobenius norm is invariant under unitary similarity transformations.", "[square_matrix][SquareMatrix][norm]") {
     // GIVEN a matrix M, a unitary matrix U, and its adjoint U_h
     // WHEN  the equality norm(M) = norm(U*M*U_h) is tested for
     // THEN  it holds
-    SKIP("The member hmeigens::SquareMatrix::operator* is not implemented yet.");
+    //
+    // On tolerance: this test is performed with exactly representable values, so that the multiplication adds no roundings. This means that all norms must match the values discussed in hmeigens::normTolerance in tolerances.hpp.
+    // Since two norms are compared against one another, the tolerance can simply be obtained as 2*hmeigens::normTolerance(2).
+    hmeigens::SquareMatrix unitary{
+        {{HMS(.5), HMS(.5)}, {HMS(.5), HMS(-.5)},
+         {HMS(.5), HMS(-.5)}, {HMS(.5), HMS(.5)}}
+    };
+    hmeigens::SquareMatrix unitaryAdj = unitary.adjoint();
+    // The matrix has norm 5.
+    hmeigens::SquareMatrix testMatrix{
+        {{HMS(2.), HMS(1.)}, {HMS(1.), HMS(-2.)},
+         {HMS(-2.), HMS(1.)}, {HMS(3.), HMS(1.)}}
+    };
+    // Verify that the unitary matrix is actually unitary. This must be exactly true.
+    checkAllElementsVersus(
+        unitary*unitaryAdj,
+        {HMS(1.), HMS(0.),
+         HMS(0.), HMS(1.)},
+        0
+    );
+    checkRealULPs(
+        (unitary*testMatrix*unitaryAdj).norm(),
+        testMatrix.norm(),
+        2*hmeigens::normTolerance(2)
+    );
 }
 
 /* --------------------------------------------------------------- */
@@ -882,12 +916,12 @@ TEST_CASE("Square matrix test: the in-place adjoint is correct.", "[square_matri
     // GIVEN a matrix
     // WHEN  its adjoint is computed in-place
     // THEN  it is modified as expected
-    hmeigens::SquareMatrix testMatrix {
+    hmeigens::SquareMatrix testMatrix{
         {{HMS(1.), HMS(-1.)}, {HMS(3.5), HMS(0.)}, {HMS(0.), HMS(0.5)},
          {HMS(-1.), HMS(2.)}, {HMS(-3.), HMS(3.)}, {HMS(1.23), HMS(1.44)},
          {HMS(2.), HMS(-8.)}, {HMS(0.), HMS(.125)}, {HMS(0.), HMS(0.)}}
     };
-    hmeigens::SquareMatrix::Container testConj {
+    hmeigens::SquareMatrix::Container testConj{
         {HMS(1.), HMS(1.)}, {HMS(-1.), HMS(-2.)}, {HMS(2.), HMS(8.)},
         {HMS(3.5), HMS(0.)}, {HMS(-3.), HMS(-3.)}, {HMS(0.), HMS(-.125)},
         {HMS(0.), HMS(-.5)}, {HMS(1.23), HMS(-1.44)}, {HMS(0.), HMS(0.)}
@@ -911,12 +945,12 @@ TEST_CASE("Square matrix test: the in-place adjoint is involutory.", "[square_ma
     // GIVEN a matrix
     // WHEN  its adjoint is computed in-place twice
     // THEN  it is unchanged
-    hmeigens::SquareMatrix::Container testBody {
+    hmeigens::SquareMatrix::Container testBody{
         {HMS(1.), HMS(-1.)}, {HMS(3.5), HMS(0.)}, {HMS(0.), HMS(0.5)},
         {HMS(-1.), HMS(2.)}, {HMS(-3.), HMS(3.)}, {HMS(1.23), HMS(1.44)},
         {HMS(2.), HMS(-8.)}, {HMS(0.), HMS(.125)}, {HMS(0.), HMS(0.)}
     };
-    hmeigens::SquareMatrix testMatrix {
+    hmeigens::SquareMatrix testMatrix{
         // Needs a copy of testBody, as the constructor moves it.
         hmeigens::SquareMatrix::Container{testBody}
     };
@@ -941,16 +975,16 @@ TEST_CASE("Square matrix test: the adjoint operation gives the correct value and
     // GIVEN a matrix
     // WHEN  its adjoint is computed
     // THEN  the adjoint has the expected value and the original matrix is untouched
-    hmeigens::SquareMatrix::Container testBody {
+    hmeigens::SquareMatrix::Container testBody{
         {HMS(1.), HMS(-1.)}, {HMS(3.5), HMS(0.)}, {HMS(0.), HMS(0.5)},
         {HMS(-1.), HMS(2.)}, {HMS(-3.), HMS(3.)}, {HMS(1.23), HMS(1.44)},
         {HMS(2.), HMS(-8.)}, {HMS(0.), HMS(.125)}, {HMS(0.), HMS(0.)}
     };
-    hmeigens::SquareMatrix testMatrix {
+    hmeigens::SquareMatrix testMatrix{
         // Needs a copy of testBody, as the constructor moves it.
         hmeigens::SquareMatrix::Container{testBody}
     };
-    hmeigens::SquareMatrix::Container testConj {
+    hmeigens::SquareMatrix::Container testConj{
         {HMS(1.), HMS(1.)}, {HMS(-1.), HMS(-2.)}, {HMS(2.), HMS(8.)},
         {HMS(3.5), HMS(0.)}, {HMS(-3.), HMS(-3.)}, {HMS(0.), HMS(-.125)},
         {HMS(0.), HMS(-.5)}, {HMS(1.23), HMS(-1.44)}, {HMS(0.), HMS(0.)}
@@ -963,6 +997,88 @@ TEST_CASE("Square matrix test: the adjoint operation gives the correct value and
     // Tolerance is 0 ULPs as no algebra is performed on the numbers.
     // (Changing a sign does not round the number.)
     checkAllElementsVersus(testMatrixConj, testConj, 0);
+}
+
+/* --------------------------------------------------------------- */
+/* --------------------- hmeigens::operator* --------------------- */
+/* --------------------------------------------------------------- */
+//
+TEST_CASE("Square matrix test: the matrix product is correct.", "[square_matrix][SquareMatrix][operator*]") {
+    // GIVEN two matrices
+    // WHEN  their product is computed via hmeigens::operator*
+    // THEN  the product is correct
+    //
+    // The tolerance here is 0 ULPs as all chosen elements are exactly representable in both double and float.
+    //
+    // 1x1 matrices.
+    const hmeigens::SquareMatrix testL1{{{HMS(1.), HMS(-2.)}}};
+    const hmeigens::SquareMatrix testR1{{{HMS(-3.), HMS(4.5)}}};
+    const hmeigens::SquareMatrix::Container testP1{{HMS(6.), HMS(10.5)}};
+    checkAllElementsVersus(testL1*testR1, testP1, 0);
+    // 2x2 matrices.
+    const hmeigens::SquareMatrix testL2{
+        {{HMS(2.5), HMS(1.)}, {HMS(-1.), HMS(-1.)},
+         {HMS(1.), HMS(0.)},  {HMS(0.), HMS(3.)}}
+    };
+    const hmeigens::SquareMatrix testR2{
+        {{HMS(0.), HMS(.5)},  {HMS(-2.), HMS(0.)},
+         {HMS(3.), HMS(-6.)}, {HMS(2.5), HMS(4.25)}}
+    };
+    const hmeigens::SquareMatrix::Container testP2{
+        {HMS(-9.5), HMS(4.25)}, {HMS(-3.25), HMS(-8.75)},
+        {HMS(18.), HMS(9.5)},   {HMS(-14.75), HMS(7.5)}
+    };
+    checkAllElementsVersus(testL2*testR2, testP2, 0);
+    // 3x3 matrices.
+    const hmeigens::SquareMatrix testL3{
+        {{HMS(2.), HMS(1.5)},  {HMS(-3.5), HMS(2.)}, {HMS(.5), HMS(-.25)},
+         {HMS(-1.), HMS(4.)},  {HMS(.375), HMS(1.)}, {HMS(5.), HMS(-2.)},
+         {HMS(-.5), HMS(.75)}, {HMS(2.), HMS(-3.)},  {HMS(1.), HMS(.5)}}
+    };
+    const hmeigens::SquareMatrix testR3{
+        {{HMS(-2.), HMS(3.)},  {HMS(.25), HMS(-.5)},  {HMS(4.), HMS(1.)},
+         {HMS(3.), HMS(-1.)},  {HMS(-.375), HMS(2.)}, {HMS(.5), HMS(.75)},
+         {HMS(-4.), HMS(-2.)}, {HMS(.875), HMS(1.)},  {HMS(2.), HMS(-.25)}}
+    };
+    const hmeigens::SquareMatrix::Container testP3{
+        {HMS(-19.5), HMS(12.5)},      {HMS(-.75), HMS(-8.09375)},  {HMS(4.1875), HMS(5.75)},
+        {HMS(-31.875), HMS(-10.375)}, {HMS(5.984375), HMS(5.125)}, {HMS(.9375), HMS(10.53125)},
+        {HMS(-1.25), HMS(-18.)},      {HMS(5.875), HMS(7.)},       {HMS(2.625), HMS(3.25)}
+    };
+    checkAllElementsVersus(testL3*testR3, testP3, 0);
+}
+
+TEST_CASE("Square matrix test: the identity is the neutral element of the matrix product.", "[square_matrix][SquareMatrix][operator*]") {
+    // GIVEN a matrix
+    // WHEN  it is multiplied by the identity on either side
+    // THEN  the product is equal to the matrix
+    //
+    // The tolerance here is 0 ULPs as all chosen elements are exactly representable in both double and float.
+    const hmeigens::SquareMatrix::Container testBody{
+        {HMS(2.), HMS(1.5)},  {HMS(-3.5), HMS(2.)}, {HMS(.5), HMS(-.25)},
+        {HMS(-1.), HMS(4.)},  {HMS(.375), HMS(1.)}, {HMS(5.), HMS(-2.)},
+        {HMS(-.5), HMS(.75)}, {HMS(2.), HMS(-3.)},  {HMS(1.), HMS(.5)}
+    };
+    // Needs a copy of testBody, as the constructor moves it.
+    const hmeigens::SquareMatrix testMatrix{hmeigens::SquareMatrix::Container{testBody}};
+    const hmeigens::SquareMatrix id = hmeigens::SquareMatrix::identity(3);
+    checkAllElementsVersus(testMatrix*id, testBody, 0);
+    checkAllElementsVersus(id*testMatrix, testBody, 0);
+}
+
+TEST_CASE("Square matrix test: matrix product with different sizes is correctly reported as impossible.", "[square_matrix][SquareMatrix][operator*]") {
+    // GIVEN two matrices of different sizes
+    // WHEN  hmeigens::operator* attempts to multiply them
+    // THEN  the correct exception type is thrown, with the operation name in the message
+    const hmeigens::SquareMatrix testL{3};
+    const hmeigens::SquareMatrix testR{4};
+    CHECK_THROWS_MATCHES(
+        testL*testR,
+        std::invalid_argument,
+        Catch::Matchers::MessageMatches(
+            Catch::Matchers::ContainsSubstring("matrix multiplication")
+        )
+    );
 }
 
 #undef HMS

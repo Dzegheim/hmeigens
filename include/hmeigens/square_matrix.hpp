@@ -283,6 +283,24 @@ namespace hmeigens {
     // These two assertions verify that the operation above behaved properly.
     static_assert(maxMatrixSize <= maxSquarableSize, "The variable hmeigens::maxMatrixSize cannot overflow when squared.");
     static_assert(maxMatrixSize * maxMatrixSize <= SquareMatrix::Container{}.max_size(), "The variable hmeigens::maxMatrixSize squared must represent a valid number of elements for hmeigens::SquareMatrix::Container.");
+
+    /// @brief Matrix multiplication between two square matrices.
+    ///
+    /// Given two size @f(n@f) matrices @f(L@f), @f(R@f), their product @f(P=LR@f) has elements
+    /// @f[
+    /// P_{ij}=\sum_{k=1}^{n}L_{ik}R_{kj}.
+    /// @f]
+    /// @param leftHand The left-hand side of the multiplication.
+    /// @param rightHand The right-hand side of the multiplication.
+    /// @return The standard matrix multiplication `leftHand*rightHand`.
+    /// @throws std::invalid_argument if the two matrices are of different sizes.
+    /// @throws std::bad_alloc if the memory could not be allocated on the machine.
+    /// @pre The elements of @f(L@f) and @f(R@f) must be finite.
+    /// @note For details on the implementation also see the following files:
+    /// - benchmarks/complex_multiplication_bench.cpp;
+    /// - benchmarks/matrix_multiplication_bench.cpp.
+    [[nodiscard]] SquareMatrix operator*(const SquareMatrix& leftHand, const SquareMatrix& rightHand);
+
 }
 
 /* ----------------------------- */
