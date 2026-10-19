@@ -6,8 +6,33 @@ Versions before 0.3.0 were not tagged.
 
 Version 0.2.0 is recorded from git history.
 
-## [Unreleased]
+## [0.6.0] - 2026-10-19
 ### Added
+- **A proper [README.md](README.md).**
+- **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
+- **New CMake presets.** The `benchmark` preset builds the benchmarks only. The `release-nt` preset builds the codebase without the tests. All presets are in `double` by default, and have a matching `float` version with the `-f` suffix (e.g. `release-f`).
+- **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
+- **Several `hmeigens::SquareMatrix` class features.** Specifically:
+    - a new constructor that takes as parameter a body containing numbers (row-major), creating a matrix with the corresponding contents;
+    - both read and write accessor `operator()` (does NOT check that the indexes are safe in release mode, and checks and behaves like `at()` in debug mode when `NDEBUG` is not defined);
+    - both read and write safe accessor `at()` (checks the indexes and throws `std::out_of_range` if out of bounds);
+    - a static `identity` member function that takes a size as parameter and builds the corresponding identity matrix;
+    - a `norm()` member that computes the Frobenius norm of a matrix;
+    - two member functions `adjoint()` and `adjointInPlace()` that compute the transpose complex-conjugate of a given matrix, the first returning a copy, the second working directly on the original matrix and returning a reference to it.
+- **Matrix multiplication `hmeigens::operator*`.** It throws `std::invalid_argument` for mismatching sizes. All elements of matrices passed to it must be finite.
+- **A new macro `HMEIGENS_MAKE_SCALAR`.** It appends an `f` suffix to numeric literals when building with `-DHMEIGENS_SCALAR=float` and leaves the value unchanged otherwise. This is to avoid implicit value conversions of literals throughout the code.
+- **Tests for `scalar.hpp`.** Specifically:
+    - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);
+    - `HMEIGENS_MAKE_SCALAR` produces a value that the compiler interprets as the expected type, and the value it produces matches the expected one exactly.
+- **An integer square root function `hmeigens::detail::isqrt()`.** With tests.
+- **A new constant `hmeigens::maxSquarableSize`.** It represents the maximum value squarable without wrapping `std::size_t`.
+- **A concept `hmeigens::CanBeSize` that holds a list of types allowed to be interpreted as sizes.** The accepted native types are `short int`, `int`, `long int`, `long long int`, and their `unsigned` versions. Standard-defined types, such as `std::size_t`, work as long as the compiler maps them to one of the eight supported native types. All the accepted types also allow for `const` qualification (or even `volatile` if you're feeling spicy).
+- **A new file `tolerances.hpp`.** It holds parameters that are used in testing and that the tests enforce.
+- **Tolerance for norm tests.** The new function `hmeigens::normTolerance` and the CMake cache variable `HMEIGENS_HYPOT_ULPS` allow for testing the norm of a matrix with variable tolerance due to implementation-defined limitations.
+- **A new file `comparison_helpers.hpp` in `tests/`.** It houses helpers that multiple tests use to compare values.
+- **Benchmarks.** They can be built and run via `HMEIGENS_BUILD_BENCHMARKS`. Specifically:
+    - `complex_multiplication_bench.cpp` compares the standard `operator*` from `<complex>` against an explicitly written complex multiplication;
+    - `matrix_multiplication_bench.cpp` compares three different ways of implementing matrix multiplication, all `O(n^3)`: classic definition, rearranged inner loop, transposition and parallel walking (see the file for details on each).
 - **Tests for `hmeigens::parseComplex`.** Specifically:
     - values that underflow `hmeigens::Scalar`, as previous testing for out-of-range only would test for overflow;
     - specific tests for `hmeigens::ParseError`.
@@ -38,29 +63,6 @@ Version 0.2.0 is recorded from git history.
     - it provides the expected values;
     - the identity is its neutral element;
     - it throws as expected.
-- **Documentation is now on GitHub Pages!** Find it [here](https://dzegheim.github.io/hmeigens/). Automatically updated via Workflow.
-- **New `CMAKE_EXPORT_COMPILE_COMMANDS` flag in `CMakePresets.json`.** Without it clangd was finding fake problems in the editor, as it could not find files.
-- **Several `hmeigens::SquareMatrix` class features.** Specifically:
-    - a new constructor that takes as parameter a body containing numbers (row-major), creating a matrix with the corresponding contents;
-    - both read and write accessor `operator()` (does NOT check that the indexes are safe in release mode, and checks and behaves like `at()` in debug mode when `NDEBUG` is not defined);
-    - both read and write safe accessor `at()` (checks the indexes and throws `std::out_of_range` if out of bounds);
-    - a static `identity` member function that takes a size as parameter and builds the corresponding identity matrix;
-    - a `norm()` member that computes the Frobenius norm of a matrix;
-    - two member functions `adjoint()` and `adjointInPlace()` that compute the transpose complex-conjugate of a given matrix, the first returning a copy, the second working directly on the original matrix and returning a reference to it.
-- **Matrix multiplication `hmeigens::operator*`.** It throws `std::invalid_argument` for mismatching sizes. All elements of matrices passed to it must be finite.
-- **A new macro `HMEIGENS_MAKE_SCALAR`.** It appends an `f` suffix to numeric literals when building with `-DHMEIGENS_SCALAR=float` and leaves the value unchanged otherwise. This is to avoid implicit value conversions of literals throughout the code.
-- **Tests for `scalar.hpp`.** Specifically:
-    - `hmeigens::scalarType`, which names the scalar type, matches the type of `hmeigens::Scalar` (seems tautological, it's not);
-    - `HMEIGENS_MAKE_SCALAR` produces a value that the compiler interprets as the expected type, and the value it produces matches the expected one exactly.
-- **An integer square root function `hmeigens::detail::isqrt()`.** With tests.
-- **A new constant `hmeigens::maxSquarableSize`.** It represents the maximum value squarable without wrapping `std::size_t`.
-- **A concept `hmeigens::CanBeSize` that holds a list of types allowed to be interpreted as sizes.** The accepted native types are `short int`, `int`, `long int`, `long long int`, and their `unsigned` versions. Standard-defined types, such as `std::size_t`, work as long as the compiler maps them to one of the eight supported native types. All the accepted types also allow for `const` qualification (or even `volatile` if you're feeling spicy).
-- **A new file `tolerances.hpp`.** It holds parameters that are used in testing and that the tests enforce.
-- **Tolerance for norm tests.** The new function `hmeigens::normTolerance` and the CMake cache variable `HMEIGENS_HYPOT_ULPS` allow for testing the norm of a matrix with variable tolerance due to implementation-defined limitations.
-- **A new file `comparison_helpers.hpp` in `tests/`.** It houses helpers that multiple tests use to compare values.
-- **Benchmarks.** They can be built and run via `HMEIGENS_BUILD_BENCHMARKS`. Specifically:
-    - `complex_multiplication_bench.cpp` compares the standard `operator*` from `<complex>` against an explicitly written complex multiplication;
-    - `matrix_multiplication_bench.cpp` compares three different ways of implementing matrix multiplication, all `O(n^3)`: classic definition, rearranged inner loop, transposition and parallel walking (see the file for details on each).
 
 ### Changed
 - **`hmeigens::SquareMatrix` construction now reports out-of-memory errors as `std::bad_alloc`.** An `std::bad_alloc` exception was previously caught and rethrown as an `std::runtime_error` with the original nested in it. Callers catching `std::runtime_error` must now catch `std::bad_alloc` instead. The constructor does not handle any exception now.
@@ -71,6 +73,7 @@ Version 0.2.0 is recorded from git history.
 - **Constructors taking floating-points or integers that are not in `hmeigens::CanBeSize` are now deleted.**
 - **The `hmeigens::parseTolerance` constant was moved to the new file `tolerances.hpp` and now measures ULPs.** Before it was in `constants.hpp` and was an `hmeigens::Scalar`. It is now a `std::uint64_t` that measures `1` ULP.
 - **The Catch2 dependency was moved from the tests only to the top-level `CMakeLists.txt`.** The benchmarks share the dependency, so this makes it possible to enforce the same one uniformly across the whole project.
+- **The coverage build now also instruments the tests.** Previously inlines, templates, and constexprs would not be correctly reported in coverage, because they are instantiated locally in each file.
 
 ### Fixed
 - **Control characters in input text no longer break error messages.** Before a `\0` or `\n` would not be escaped and, when properly rejected by the parser, would be printed literally in the diagnostics messages, breaking them. Printable control characters are rendered as `\n` or `\t`, unprintable ones as three digit octals. Non-ASCII text is still handled like before, so that someone passing an emoji or another special character will still see it in the output.
