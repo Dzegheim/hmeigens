@@ -35,3 +35,8 @@ if(NOT HMEIGENS_HYPOT_ULPS STREQUAL "")
     # Private to prevent carrying over flags.
     target_compile_definitions(${PROJECT_NAME_LOWER}_tests PRIVATE HMEIGENS_HYPOT_ULPS=${HMEIGENS_HYPOT_ULPS})
 endif()
+
+# Add coverage instrumentation to tests.
+if(HMEIGENS_COVERAGE)
+    target_compile_options(${PROJECT_NAME_LOWER}_tests PRIVATE --coverage -O0)
+endif()
