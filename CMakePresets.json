@@ -9,8 +9,17 @@
     {
       "name": "base",
       "hidden": true,
+      "description": "Base shared settings.",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "float",
+      "hidden": true,
+      "description": "Selects float as the scalar type.",
+      "cacheVariables": {
+        "HMEIGENS_SCALAR": "float"
+      }
     },
     {
       "name": "release",
@@ -23,6 +32,27 @@
       }
     },
     {
+      "name": "release-f",
+      "inherits": ["release", "float"],
+      "displayName": "Release (float)",
+      "description": "Release build, float scalar."
+    },
+    {
+      "name": "release-nt",
+      "inherits": "release",
+      "displayName": "Release (no tests)",
+      "description": "Release build, does not build tests.",
+      "cacheVariables": {
+        "HMEIGENS_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "release-nt-f",
+      "inherits": ["release-nt", "float"],
+      "displayName": "Release (no tests float)",
+      "description": "Release build, float scalar, does not build tests."
+    },
+    {
       "name": "debug",
       "inherits": "base",
       "displayName": "Debug",
@@ -30,6 +60,12 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
+    },
+    {
+      "name": "debug-f",
+      "inherits": ["debug", "float"],
+      "displayName": "Debug (float)",
+      "description": "Debug build, float scalar."
     },
     {
       "name": "coverage",
@@ -41,6 +77,12 @@
       }
     },
     {
+      "name": "coverage-f",
+      "inherits": ["coverage", "float"],
+      "displayName": "Coverage (float)",
+      "description": "Debug build with gcov coverage, float scalar."
+    },
+    {
       "name": "benchmark",
       "inherits": "release",
       "displayName": "Benchmark",
@@ -49,29 +91,33 @@
         "HMEIGENS_BUILD_TESTS": "OFF",
         "HMEIGENS_BUILD_BENCHMARKS": "ON"
       }
+    },
+    {
+      "name": "benchmark-f",
+      "inherits": ["benchmark", "float"],
+      "displayName": "Benchmark (float)",
+      "description": "Release build of the benchmarks only, float scalar."
     }
   ],
   "buildPresets": [
     { "name": "release", "configurePreset": "release" },
+    { "name": "release-f", "configurePreset": "release-f" },
+    { "name": "release-nt", "configurePreset": "release-nt" },
+    { "name": "release-nt-f", "configurePreset": "release-nt-f" },
     { "name": "debug", "configurePreset": "debug" },
+    { "name": "debug-f", "configurePreset": "debug-f" },
     { "name": "coverage", "configurePreset": "coverage" },
-    { "name": "benchmark", "configurePreset": "benchmark" }
+    { "name": "coverage-f", "configurePreset": "coverage-f" },
+    { "name": "benchmark", "configurePreset": "benchmark" },
+    { "name": "benchmark-f", "configurePreset": "benchmark-f" }
   ],
   "testPresets": [
-    {
-      "name": "release",
-      "configurePreset": "release",
-      "output": { "outputOnFailure": true }
-    },
-    {
-      "name": "debug",
-      "configurePreset": "debug",
-      "output": { "outputOnFailure": true }
-    },
-    {
-      "name": "coverage",
-      "configurePreset": "coverage",
-      "output": { "outputOnFailure": true }
-    }
+    { "name": "test-base", "hidden": true, "output": { "outputOnFailure": true } },
+    { "name": "release", "inherits": "test-base", "configurePreset": "release" },
+    { "name": "release-f", "inherits": "test-base", "configurePreset": "release-f" },
+    { "name": "debug", "inherits": "test-base", "configurePreset": "debug" },
+    { "name": "debug-f", "inherits": "test-base", "configurePreset": "debug-f" },
+    { "name": "coverage", "inherits": "test-base", "configurePreset": "coverage" },
+    { "name": "coverage-f", "inherits": "test-base", "configurePreset": "coverage-f" }
   ]
 }
