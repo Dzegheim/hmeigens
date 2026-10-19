@@ -95,7 +95,7 @@ TEST_CASE("Square matrix helpers test: a valid unsigned size is accepted.", "[sq
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the size is reported as valid
     //
-    // These values directly reach for hmgeigens::detail::validateSize(std::uintmax_t) if it exists, and for the std::size_t overload if not.
+    // These values directly reach for hmeigens::detail::validateSize(std::uintmax_t) if it exists, and for the std::size_t overload if not.
     // They may be redundant, but never strictly need to be skipped.
     // Here the max size can be tested for, as it must always fit within this type.
     CHECK(hmeigens::detail::validateSize(std::uintmax_t{1}) == 1);
@@ -147,7 +147,7 @@ TEST_CASE ("Square matrix helpers test: integer values that don't fit std::size_
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the correct exception is thrown, with a message containing the reason and the invalid size
     #if SIZE_MAX == UINTMAX_MAX
-    SKIP("In the current build settings std::size_t coincides with std::intmax_t.");
+    SKIP("In the current build settings std::size_t coincides with std::uintmax_t.");
     #endif
     // The minimum value that may satisfy the condition.
     checkInvalidSize<std::length_error>(
