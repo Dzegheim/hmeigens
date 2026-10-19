@@ -33,6 +33,7 @@ namespace hmeigens {
 
     /// @brief Converts text into a corresponding complex number.
     ///
+    /// @anchor parser_formats
     /// Accepted forms:
     ///
     /// | Form      | Example        |  (Real, Imaginary)   |

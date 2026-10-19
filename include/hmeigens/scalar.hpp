@@ -40,6 +40,7 @@ namespace hmeigens {
     #else
     /// @brief Alias for the floating-point type used throughout the project.
     ///
+    /// @anchor scalar_types
     /// Selected via CMake `-DHMEIGENS_SCALAR=float|double`.
     /// Due to algorithm precision reasons the default is set to `double` rather than `float`.
     /// The reference notes for this project (G. Servizi, *Autovalori*, 2017) show residual errors of the order `1e-8`.

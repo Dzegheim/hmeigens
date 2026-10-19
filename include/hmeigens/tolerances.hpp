@@ -16,6 +16,7 @@
 #ifndef HMEIGENS_HYPOT_ULPS
 /// @brief ULP multiplier for the norm tests. Default value is 2. Can be set at configure time with `-DHMEIGENS_HYPOT_ULPS=<n>`.
 ///
+/// @anchor hypot_ulps
 /// Default is `2` because of measurements [published](https://homepages.loria.fr/PZimmermann/papers/glibc242.pdf) by Gladman, Innocente, Mather, Zimmermann in August 2025.
 /// The comparison of `std::hypot` gives a maximum measured error of `1.57` ULPs for single precision and `1.89` ULPs for double precision. A value of `2` is enough to account for these values, which are however not maximum theoretical errors, but only measured.
 /// @note If the variable is set via CMake, its value persists as long as it is cached. To return it to its default value either override it again to `2`, undefine it with `-UHMEIGENS_HYPOT_ULPS`, or simply delete the build directory.
