@@ -115,7 +115,8 @@ cd ./build/benchmark/benchmarks/
 # It is also possible to change the number of samples, e.g. 200.
 ./hmeigens_benchmarks "[matrix_mult]" --benchmark-samples 200
 # Run a hidden case.
-# It is not recommended to use a large number of samples here. These executions are long and hidden for a reason.
+# It is not recommended to use a large number of samples here.
+# These executions are long and hidden for a reason.
 ./hmeigens_benchmarks "[matrix_mult_xl]" --benchmark-samples 20
 ```
 
