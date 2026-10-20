@@ -1,32 +1,45 @@
+# Short YAML workflow that builds the GitHub Pages documentation automatically on every push to main.
 name: Documentation
-
+# Run on push to main.
 on:
   push:
     branches: [main]
-
+# Configure permissions.
 permissions:
+  # Needed to read the repo.
   contents: read
+  # Needed to write to Pages.
   pages: write
+  # Needed to verify the source of the deployment.
   id-token: write
-
+# Build and deploy the documentation.
 jobs:
   build-and-deploy:
+    # Any machine would be fine.
+    # Here Ubuntu is a safe choice. If this is changed, the commands below need to change as well.
     runs-on: ubuntu-latest
+    # Target the Pages to deploy to.
     environment:
       name: github-pages
+      # This gets the URL from the "deployment" step below.
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Download the repo.
       - uses: actions/checkout@v4
-
+      # Get Doxygen.
       - name: Install Doxygen
         run: sudo apt-get update && sudo apt-get install -y doxygen
-
+      # Generate the documentation.
       - name: Generate
         run: doxygen Doxyfile
-
+      # Send it to Pages.
+      # Configure Pages.
       - uses: actions/configure-pages@v5
+      # Package and upload the documentation.
       - uses: actions/upload-pages-artifact@v3
         with:
+          # Set the path to where Doxygen wrote.
           path: doxygen/html
+      # The deployment proper.
       - id: deployment
         uses: actions/deploy-pages@v4
