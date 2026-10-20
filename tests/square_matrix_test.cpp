@@ -690,15 +690,15 @@ TEST_CASE("Square matrix test: the identity matrix has the correct form.", "[squ
     // The 0 ULP tolerance comes from the fact that copying or referencing an element of a matrix must not alter it. Since no arithmetic is performed, it must not be rounded or altered.
     checkAllElementsVersus(
         hmeigens::SquareMatrix::identity(1),
-        hmeigens::SquareMatrix::Container{{{HMS(1.), HMS(0.)}}},
+        hmeigens::SquareMatrix::Container{{HMS(1.), HMS(0.)}},
         0
     );
     checkAllElementsVersus(
         hmeigens::SquareMatrix::identity(3),
         hmeigens::SquareMatrix::Container{
-            {{HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
+            {HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
              {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)},
-             {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}}
+             {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}
         },
         0
     );
