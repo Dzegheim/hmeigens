@@ -445,10 +445,10 @@ hmeigens::SquareMatrix hmeigens::SquareMatrix::identity(Size size) {
     // The value of size could be signed or a different unsigned type.
     // The loop must be checked against id.size().
     for (std::size_t row = 0; row < id.size(); ++row) {
-        id(row, row) = {{
+        id(row, row) = {
             HMEIGENS_MAKE_SCALAR(1.),
             HMEIGENS_MAKE_SCALAR(0.)
-        }};
+        };
     }
     return id;
 }
