@@ -1,0 +1,99 @@
+# YAML workflow that builds the codebase and runs the tests on several linux distros and versions to verify system compatibility.
+name: CI-Linux
+# Run on push to main.
+on:
+  push:
+    branches: [main]
+    # Ignore files that do not affect the behaviour of the code.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'Doxyfile'
+      - 'LICENSE'
+  # Add a button to the Actions tab.
+  workflow_dispatch:
+jobs:
+  # GitHub's default Linux OS is Ubuntu.
+  # This tests several versions.
+  ubuntu:
+    # Combine every OS-compiler pair with every preset.
+    # Lists are below.
+    name: ${{ matrix.cfg.os }} ${{ matrix.cfg.compiler }} ${{ matrix.preset }}
+    runs-on: ${{ matrix.cfg.os }}
+    # Set up for the jobs.
+    strategy:
+      # Continue to another job on failure.
+      fail-fast: false
+      # Set up the configurations to be run.
+      matrix:
+        cfg:
+          # Modern versions of Ubuntu with various compilers.
+          # Includes one -arm version as well.
+          - { os: ubuntu-24.04, compiler: g++-13 }
+          - { os: ubuntu-24.04, compiler: g++-14 }
+          - { os: ubuntu-24.04, compiler: clang++-17 }
+          - { os: ubuntu-24.04, compiler: clang++-18 }
+          - { os: ubuntu-26.04, compiler: g++-15 }
+          - { os: ubuntu-26.04, compiler: clang++-22 }
+          - { os: ubuntu-26.04-arm, compiler: g++-15 }
+        # The four meaningful presets.
+        preset: [release, debug, release-f, debug-f]
+    # Pick a compiler from the list.
+    env:
+      CXX: ${{ matrix.cfg.compiler }}
+    steps:
+      # Download the repo.
+      - uses: actions/checkout@v4
+      # Get information on the used tools to check in case of problems.
+      - name: Tool versions
+        run: |
+          $CXX --version
+          cmake --version
+          ninja --version
+      # Configuration step.
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+      # Compilation step.
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+      # Testing step.
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }}
+  # Linux distros that are not Ubuntu.
+  # GitHub needs to run them in containers.
+  linux-other-distros:
+    name: ${{ matrix.distro.name }} ${{ matrix.preset }}
+    runs-on: ubuntu-24.04
+    container: ${{ matrix.distro.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test some widespread and/or useful distros.
+        # They all need to be set up properly with install.
+        distro:
+          # Debian is common enough to warrant testing.
+          - { name: 'debian:trixie', install: 'apt-get update && apt-get install -y g++ cmake ninja-build git' }
+          # Fedora tends to be on top of the game with GCC versions.
+          # It is also widespread enough.
+          - { name: 'fedora:44', install: 'dnf install -y gcc-c++ cmake ninja-build git' }
+          # Alpine is useful because it has a different C library.
+          # It has samurai instead of ninja. Not funny.
+          - { name: 'alpine:3.24', install: 'apk add g++ cmake samurai git' }
+        # Just two are enough. One release vs one debug and one double vs one float.
+        preset: [release, debug-f]
+    steps:
+      # Install what is needed.
+      # Information on the used tools is here, so no need to print it later.
+      - name: Install tools
+        run: ${{ matrix.distro.install }}
+      # Download the repo.
+      - uses: actions/checkout@v4
+      # Configuration step.
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+      # Compilation step.
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+      # Testing step.
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }}
