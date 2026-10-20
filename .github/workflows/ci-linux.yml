@@ -1,4 +1,4 @@
-# YAML workflow that builds the codebase and runs the tests on several linux distros and versions to verify system compatibility.
+# YAML workflow that builds the codebase and runs the tests on several Linux distros and versions to verify system compatibility.
 name: CI-Linux
 # Run on push to main.
 on:
@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.cfg.os }}
     # Set up for the jobs.
     strategy:
-      # Continue to another job on failure.
+      # Prevent a single job failure from killing the entire run.
       fail-fast: false
       # Set up the configurations to be run.
       matrix:
@@ -65,8 +65,11 @@ jobs:
     name: ${{ matrix.distro.name }} ${{ matrix.preset }}
     runs-on: ubuntu-24.04
     container: ${{ matrix.distro.name }}
+    # Set up for the jobs.
     strategy:
+      # Prevent a single job failure from killing the entire run.
       fail-fast: false
+      # Set up the configurations to be run.
       matrix:
         # Test some widespread and/or useful distros.
         # They all need to be set up properly with install.
@@ -88,6 +91,50 @@ jobs:
         run: ${{ matrix.distro.install }}
       # Download the repo.
       - uses: actions/checkout@v4
+      # Configuration step.
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+      # Compilation step.
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+      # Testing step.
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }}
+  # Ubuntu 32-bit build.
+  ubuntu-32bit:
+    # One per preset.
+    name: ubuntu-24.04 g++-14 -m32 ${{ matrix.preset }}
+    # One Ubuntu version is enough.
+    runs-on: ubuntu-24.04
+    # Set up for the jobs.
+    strategy:
+      # Prevent a single job failure from killing the entire run.
+      fail-fast: false
+      # Set up the configurations to be run.
+      matrix:
+        # All four presets are needed.
+        # In this environment float and double do not behave the same.
+        # Neither do debug and release.
+        preset: [release, debug, release-f, debug-f]
+    env:
+      # Choose a compiler.
+      CXX: g++-14
+      # The 32-bit flag.
+      CXXFLAGS: -m32
+    steps:
+      # These are needed for linking.
+      - name: Install 32-bit libraries
+        run: sudo apt-get update && sudo apt-get install -y g++-14-multilib
+      # Download the repo.
+      - uses: actions/checkout@v4
+      # Get information on the used tools to check in case of problems.
+      - name: Tool versions
+        # The last line prints the relevant macros of the compiler to verify they are indeed the 32-bit ones.
+        run: |
+          $CXX --version
+          cmake --version
+          ninja --version
+          $CXX $CXXFLAGS -x c++ -dM -E - < /dev/null | grep -E '__i386__|__SIZEOF_POINTER__|__FLT_EVAL_METHOD__'
       # Configuration step.
       - name: Configure
         run: cmake --preset ${{ matrix.preset }}
