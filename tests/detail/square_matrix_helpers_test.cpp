@@ -230,6 +230,7 @@ TEST_CASE("Square matrix helpers test: matching sizes are accepted and the size 
     // The two cases below check that the function accepts two inputs that are invalid as sizes. If validation is ever added to the helper, these will fail. They're here because in that case tests for bad inputs would be needed.
     CHECK(hmeigens::detail::checkSizeMatch(0, 0, "") == 0);
     // Note that a negative value here wraps as the parameters are std::size_t.
+    // Some compilers warn about this implicit conversion. The test is deliberate, as this is the most likely form in which it could be encountered.
     CHECK(hmeigens::detail::checkSizeMatch(-1, -1, "") == std::size_t(-1));
 }
 
