@@ -30,10 +30,13 @@ jobs:
       matrix:
         # Modern versions of macOS with various compilers.
         # Includes one -intel version as well.
+        # On macos-15 only g++-15 passes.
+        # The pair { os: macos-15, compiler: clang++ } fails.
+        # On this cfg AppleClang 17.0.0.17000013's libc++ lacks:
+        # - std::from_chars for floating-point types.
         cfg:
-          - { os: macos-15, compiler: clang++ }
           - { os: macos-26, compiler: clang++ }
-          - { os: macos-15-intel, compiler: clang++ }
+          - { os: macos-26-intel, compiler: clang++ }
           - { os: macos-15, compiler: g++-15 }
         # The four meaningful presets.
         preset: [release, debug, release-f, debug-f]
