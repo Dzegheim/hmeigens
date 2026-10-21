@@ -19,7 +19,7 @@ bool hmeigens::detail::isDisplayable(unsigned char toCheck) {
 std::string hmeigens::detail::escape(std::string_view toEscape) {
     std::string escaped;
     escaped.reserve(toEscape.size());
-    for (const unsigned char c : toEscape) {
+    for (const auto c : toEscape) {
         // This cast makes the conversion to unsigned explicit, so that the compiler does not complain.
         const auto character = static_cast<unsigned char>(c);
         // Backslash and quotes are escaped or the rendering could be ambiguous.
