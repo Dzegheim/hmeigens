@@ -148,7 +148,7 @@ TEST_CASE ("Square matrix helpers test: integer values that don't fit std::size_
     // THEN  the correct exception is thrown, with a message containing the reason and the invalid size
     #if SIZE_MAX == UINTMAX_MAX
     SKIP("In the current build settings std::size_t coincides with std::uintmax_t.");
-    #endif
+    #else
     // The minimum value that may satisfy the condition.
     checkInvalidSize<std::length_error>(
         std::uintmax_t{std::numeric_limits<std::size_t>::max()}+1,
@@ -159,6 +159,7 @@ TEST_CASE ("Square matrix helpers test: integer values that don't fit std::size_
         std::numeric_limits<std::uintmax_t>::max(),
         std::format("A {0}x{0} matrix cannot be created.\n---> Number of elements is too large to be represented by std::size_t. The maximum value that can be represented by the type is {1}.", std::numeric_limits<std::uintmax_t>::max(), std::numeric_limits<std::size_t>::max())
     );
+    #endif
 }
 
 /* ------------------------------------------------ */

@@ -638,7 +638,7 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
     // In release mode this test makes no sense, and must be skipped, as the operators do not perform any checks.
     #ifdef NDEBUG
     SKIP("The overloads of hmeigens::SquareMatrix::operator() perform no out-of-range checks in release mode.");
-    #endif
+    #else
     // Yes, the code in this CASE is a duplication of the hmeigens::SquareMatrix::at CASE. This is deliberate.
     // This is because Catch2, if a test is skipped even for a single SECTION, reports it entirely as skipped.
     // The choice made here is that, in this specific instance, code duplication is more acceptable than a less clear test result.
@@ -676,6 +676,7 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
             );
         }
     }
+    #endif
 }
 
 /* --------------------------------------------------------------- */
