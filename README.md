@@ -6,7 +6,7 @@ The solver will be based on the Francis QR step.
 ## Documentation
 Documentation for HMEigenS can be found in two places:
 - all public interfaces are documented with Doxygen [here](https://dzegheim.github.io/hmeigens);
-- all .cpp files, all .hpp in `include/hmeigens/detail/` all files in `tests/` and all files in `benchmarks/` have extensive documentation, so if someone wishes to review the code it shouldn't be a madness-inducing experience.
+- all .cpp files, all .hpp in `include/hmeigens/detail/`, all files in `tests/` and all files in `benchmarks/` have extensive documentation, so if someone wishes to review the code it shouldn't be a madness-inducing experience.
 
 ## Status
 Current version: 0.6.0.
@@ -68,7 +68,10 @@ while tests can be run, if built, using `ctest` as
 ```bash
 ctest --preset release # Name of the built preset.
 ```
-Some tests are platform dependent, as they can only be performed on 32-bit architectures (or any other in which `std::size_t` has fewer digits than `std::uintmax_t`). Some tests are build dependent, as they can only be performed in debug mode. Some tests are not stubs for not yet implemented features, so they are skipped.
+Note that:
+- some tests are platform dependent, as they can only be performed on 32-bit architectures (or any other in which `std::size_t` has fewer digits than `std::uintmax_t`);
+- some tests are build dependent, as they can only be performed in debug mode;
+- some tests are stubs for not yet implemented features, so they are skipped.
 
 ### Without presets
 Should presets not be used, it is also possible to run CMake without them. These are all the available options:
@@ -132,10 +135,44 @@ cmake --build --preset coverage
 ctest --preset coverage
 ```
 Coverage files can be found in `./build/coverage/CMakeFiles/hmeigens_core.dir/` and from there by following the structure of the repository, so by default in `src/hmeigens` and `src/hmeigens/detail`.
+
 Note that coverage is additive, so if the `.gcda` files are already present and the tests are run again, the amount of times each line was run will not reset but increase from where it was already. Simply delete them to reset the count.
 
 ## Platforms
-Coming soon.
+[![CI-Windows](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-windows.yml/badge.svg)](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-windows.yml)
+[![CI-Linux](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-linux.yml)
+[![CI-macOS](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-macos.yml)
+
+In addition to the setup already listed in *Requirements*, the codebase is built, run, and tested on all the systems listed in the [workflow files](.github/workflows/).
+
+The four main presets (`release`, `debug`, `release-f`, `debug-f`) are run on each major family of OSs. The table below lists the tested combinations. For more details check the files. OSs with a * below only run `release` and `debug-f`.
+
+| **Operating System** | **Architecture(s)** | **Compiler(s)** | **Notes** |
+|---|---|---|---|
+| **Ubuntu** | | | |
+| Ubuntu 24.04 | x86-64 | GCC 13, 14; Clang 17, 18 | |
+| Ubuntu 24.04 | x86 (`-m32`) | GCC 14 | Build is 32-bit. |
+| Ubuntu 26.04 | x86-64 | GCC 15; Clang 22 | |
+| Ubuntu 26.04 | ARM64 | GCC 15 | |
+| **Other Linux** | | | |
+| Debian 13* | x86-64 | GCC 14 | Container, not native. |
+| Fedora 44* | x86-64 | GCC 16 | Container, not native. |
+| Alpine 3.24* | x86-64 | GCC 15 | Container, not native. Uses `musl` C library. |
+| **Windows Server** | | | |
+| Windows Server 2022 | x64, x86 | MSVC (VS 2022) | The x86 build is 32-bit. |
+| Windows Server 2025 | x64, x86 | MSVC (VS 2026) | The x86 build is 32-bit. |
+| Windows Server 2025 | x64 | clang-cl (default) | Default preinstalled clang-cl version. |
+| Windows Server 2025, MSYS2 UCRT64 | x64 | GCC `latest` | Due to MSYS2, GCC is `latest`. |
+| Windows Server 2025, MSYS2 CLANG64 | x64 | Clang `latest` | Uses `libc++`. Due to MSYS2, Clang is `latest`. |
+| Windows Server 2025, MSYS2 MINGW32 | x86 | GCC `latest` | Due to MSYS2, GCC is `latest`. Build is 32-bit. |
+| **Windows 11** | | | |
+| Windows 11 | ARM64 | MSVC (VS 2026) |  |
+| **macOS** | | | |
+| macOS 15 | ARM64 | GCC 15 | |
+| macOS 26 | ARM64 | Apple Clang (default) | Default preinstalled Apple Clang version. |
+| macOS 26 | x86-64 | Apple Clang (default) | Default preinstalled Apple Clang version. |
+
+Note that the major version is fixed where possible or convenient. Minor versions may vary between runs.
 
 ## A Personal Note
 This code is developed as a project for a university exam. It is also an excuse for picking back up C++ and catch up on some more modern programming concepts (such as `<concepts>`, if you excuse the joke).
