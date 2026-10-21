@@ -27,7 +27,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       # Download the repo.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Get Doxygen.
       - name: Install Doxygen
         run: sudo apt-get update && sudo apt-get install -y doxygen

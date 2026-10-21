@@ -53,7 +53,7 @@ jobs:
       CXX: ${{ matrix.cfg.compiler }}
     steps:
       # Download the repo.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Third-party action: sets up MSVC dev environment.
       # Basically it allows for the compiler and libraries to be found by CMake.
       - uses: ilammy/msvc-dev-cmd@v1
@@ -105,7 +105,7 @@ jobs:
         shell: msys2 {0}
     steps:
       # Download the repo.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Install the needed tools.
       - uses: msys2/setup-msys2@v2
         with:

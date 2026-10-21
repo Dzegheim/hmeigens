@@ -46,7 +46,7 @@ jobs:
       CXX: ${{ matrix.cfg.compiler }}
     steps:
       # Download the repo.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Get information on the used tools to check in case of problems.
       - name: Tool versions
         run: |
@@ -93,7 +93,7 @@ jobs:
       - name: Install tools
         run: ${{ matrix.distro.install }}
       # Download the repo.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Configuration step.
       - name: Configure
         run: cmake --preset ${{ matrix.preset }}
@@ -129,7 +129,7 @@ jobs:
       - name: Install 32-bit libraries
         run: sudo apt-get update && sudo apt-get install -y g++-14-multilib
       # Download the repo.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Get information on the used tools to check in case of problems.
       - name: Tool versions
         # The last line prints the relevant macros of the compiler to verify they are indeed the 32-bit ones.
