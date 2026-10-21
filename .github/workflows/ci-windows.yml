@@ -1,0 +1,129 @@
+# YAML workflow that builds the codebase and runs the tests on several Windows versions to verify system compatibility.
+name: CI-Windows
+# Run on push to main.
+on:
+  push:
+    branches: [main]
+    # Ignore files that do not affect the behaviour of the code.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'Doxyfile'
+      - 'LICENSE'
+  # Add a button to the Actions tab.
+  workflow_dispatch:
+jobs:
+  # Windows' default compiler is MSVC.
+  # This tests several versions.
+  windows-msvc:
+    # Combine the OS, compiler, and architecture with each preset.
+    # Lists are below.
+    name: ${{ matrix.cfg.os }} ${{ matrix.cfg.compiler }} ${{ matrix.cfg.arch }} ${{ matrix.preset }}
+    runs-on: ${{ matrix.cfg.os }}
+    # Set up for the jobs.
+    strategy:
+      # Prevent a single job failure from killing the entire run.
+      fail-fast: false
+      # Set up the configurations to be run.
+      matrix:
+        # Modern versions of Windows.
+        # Test various architectures and compilers.
+        # Includes -arm versions as well.
+        cfg:
+          # These have Visual Studio 2022.
+          - { os: windows-2022, arch: x64, compiler: cl }
+          - { os: windows-2025, arch: x64, compiler: cl }
+          - { os: windows-2025, arch: x86, compiler: cl }
+          - { os: windows-11-arm, arch: arm64, compiler: cl }
+          # These have Visual Studio 2026.
+          - { os: windows-2025-vs2026, arch: x64, compiler: cl }
+          - { os: windows-2025-vs2026, arch: x86, compiler: cl }
+          - { os: windows-11-vs2026-arm, arch: arm64, compiler: cl }
+          # This uses Clang.
+          - { os: windows-2025, arch: x64, compiler: clang-cl }
+        # The four meaningful presets.
+        preset: [release, debug, release-f, debug-f]
+    # Compiler.
+    # On Windows cl is not on PATH, so it needs to be set up.
+    # This is done below with ilammy/msvc-dev-cmd@v1.
+    env:
+      CXX: ${{ matrix.cfg.compiler }}
+    steps:
+      # Download the repo.
+      - uses: actions/checkout@v4
+      # Third-party action: sets up MSVC dev environment.
+      # Basically it allows for the compiler and libraries to be found by CMake.
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.cfg.arch }}
+      # Get information on the used tools to check in case of problems.
+      - name: Tool versions
+        run: |
+          where.exe $env:CXX
+          cmake --version
+          ninja --version
+      # Configuration step.
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+      # Compilation step.
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+      # Testing step.
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }}
+  # This project was tested on the machine it was developed on with MinGW-w64 11.0.1 with GCC 15.2.0.
+  # The job tests the code versus the latest MinGW on another machine, using both Clang and GCC.
+  windows-mingw:
+    # Combine the MSYS2 environment with each preset.
+    name: windows-2025 ${{ matrix.cfg.msys }} ${{ matrix.preset }}
+    runs-on: windows-2025
+    # Set up for the jobs.
+    strategy:
+      # Prevent a single job failure from killing the entire run.
+      fail-fast: false
+      # Set up the configurations to be run.
+      matrix:
+        # Here MSYS2 is used to install MinGW.
+        # This gets the "current" version of MinGW.
+        cfg:
+          # For 64-bit GCC.
+          - { msys: UCRT64,  pre: mingw-w64-ucrt-x86_64, pkg: gcc, compiler: g++ }
+          # For 64-bit Clang.
+          - { msys: CLANG64, pre: mingw-w64-clang-x86_64, pkg: clang, compiler: clang++ }
+          # For 32-bit GCC.
+          - { msys: MINGW32, pre: mingw-w64-i686, pkg: gcc, compiler: g++ }
+        preset: [release, debug, release-f, debug-f]
+    # Compiler.
+    env:
+      CXX: ${{ matrix.cfg.compiler }}
+    # Set up the shell.
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      # Download the repo.
+      - uses: actions/checkout@v4
+      # Install the needed tools.
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.cfg.msys }}
+          update: true
+          install: >-
+            ${{ matrix.cfg.pre }}-${{ matrix.cfg.pkg }}
+            ${{ matrix.cfg.pre }}-cmake
+            ${{ matrix.cfg.pre }}-ninja
+      # Get information on the used tools to check in case of problems.
+      - name: Tool versions
+        run: |
+          $CXX --version
+          cmake --version
+          ninja --version
+      # Configuration step.
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+      # Compilation step.
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+      # Testing step.
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }}
