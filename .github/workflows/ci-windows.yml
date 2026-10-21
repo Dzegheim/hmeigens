@@ -35,9 +35,7 @@ jobs:
         cfg:
           # These have Visual Studio 2022.
           - { os: windows-2022, arch: x64, compiler: cl }
-          - { os: windows-2025, arch: x64, compiler: cl }
-          - { os: windows-2025, arch: x86, compiler: cl }
-          - { os: windows-11-arm, arch: arm64, compiler: cl }
+          - { os: windows-2022, arch: x86, compiler: cl }
           # These have Visual Studio 2026.
           - { os: windows-2025-vs2026, arch: x64, compiler: cl }
           - { os: windows-2025-vs2026, arch: x86, compiler: cl }
