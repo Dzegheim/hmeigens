@@ -55,11 +55,11 @@ endif()
 add_library(${PROJECT_NAME_LOWER}_flags INTERFACE)
 
 # Flags for warnings.
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+if(MSVC)
+    target_compile_options(${PROJECT_NAME_LOWER}_flags INTERFACE /W4 /permissive-)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${PROJECT_NAME_LOWER}_flags INTERFACE
         -Wall -Wextra -Wpedantic -Wconversion -Wshadow)
-elseif(MSVC)
-    target_compile_options(${PROJECT_NAME_LOWER}_flags INTERFACE /W4 /permissive-)
 endif()
 
 # Link compiler runtime statically.
