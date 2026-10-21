@@ -4,6 +4,8 @@ name: Documentation
 on:
   push:
     branches: [main]
+    # Add a button to the Actions tab.
+  workflow_dispatch:
 # Configure permissions.
 permissions:
   # Needed to read the repo.
