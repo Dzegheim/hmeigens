@@ -1,0 +1,60 @@
+# YAML workflow that builds the codebase and runs the tests on several macOS versions and architectures to verify system compatibility.
+name: CI-macOS
+# Run on push to main.
+on:
+  push:
+    branches: [main]
+    # Ignore files that do not affect the behaviour of the code.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'Doxyfile'
+      - 'LICENSE'
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/ci-windows.yml'
+      - '.github/workflows/ci-linux.yml'
+  # Add a button to the Actions tab.
+  workflow_dispatch:
+jobs:
+  # This tests various versions of macOS with Clang and GCC.
+  macos:
+    # Combine every OS-compiler pair with every preset.
+    # Lists are below.
+    name: ${{ matrix.cfg.os }} ${{ matrix.cfg.compiler }} ${{ matrix.preset }}
+    runs-on: ${{ matrix.cfg.os }}
+    # Set up for the jobs.
+    strategy:
+      # Prevent a single job failure from killing the entire run.
+      fail-fast: false
+      # Set up the configurations to be run.
+      matrix:
+        # Modern versions of macOS with various compilers.
+        # Includes one -intel version as well.
+        cfg:
+          - { os: macos-15, compiler: clang++ }
+          - { os: macos-26, compiler: clang++ }
+          - { os: macos-15-intel, compiler: clang++ }
+          - { os: macos-15, compiler: g++-15 }
+        # The four meaningful presets.
+        preset: [release, debug, release-f, debug-f]
+    # Pick a compiler from the list.
+    env:
+      CXX: ${{ matrix.cfg.compiler }}
+    steps:
+      # Download the repo.
+      - uses: actions/checkout@v7
+      # Get information on the used tools to check in case of problems.
+      - name: Tool versions
+        run: |
+          $CXX --version
+          cmake --version
+          ninja --version
+      # Configuration step.
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+      # Compilation step.
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
+      # Testing step.
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }}
