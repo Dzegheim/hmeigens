@@ -10,6 +10,8 @@ on:
       - 'docs/**'
       - 'Doxyfile'
       - 'LICENSE'
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/ci-windows.yml'
   # Add a button to the Actions tab.
   workflow_dispatch:
 jobs:
