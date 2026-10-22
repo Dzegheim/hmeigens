@@ -27,6 +27,7 @@
 
 #include <complex>
 #include <string>
+#include <limits>       // For std::numeric_limits
 
 namespace hmeigens {
 
@@ -53,6 +54,11 @@ namespace hmeigens {
     /// Useful for letting users know at runtime the floating-point type used to build the project.
     inline const std::string scalarType = "double";
     #endif
+
+    // Several parts of this codebase use NaN, infinity, subnormal values, or assume ULP behaviour that must satisfy this standard.
+    // The testing library (Catch2) also enforces this check, though at runtime.
+    // It is also the 21st century, and it has been for some time now, so please update to something that supports it. (:
+    static_assert(std::numeric_limits<Scalar>::is_iec559, "This project needs floating-point numbers to be IEC 559/IEEE 754 compliant.");
 
     /// @brief Alias for complex numbers with the chosen `hmeigens::Scalar` value type.
     using Complex = std::complex<Scalar>;
