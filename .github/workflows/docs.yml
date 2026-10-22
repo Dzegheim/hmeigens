@@ -1,10 +1,22 @@
-# Short YAML workflow that builds the GitHub Pages documentation automatically on every push to main.
+# Short YAML workflow that builds the GitHub Pages documentation automatically on every push to main that affects the sources.
 name: Documentation
+# Prevent multiple documentation workflows from running at the same time.
+concurrency:
+  group: pages
+  cancel-in-progress: false
 # Run on push to main.
 on:
   push:
     branches: [main]
-    # Add a button to the Actions tab.
+    # Only rebuild the documentation if the actual sources change.
+    paths:
+      - 'include/**'
+      - '!include/hmeigens/detail/**'
+      - 'docs/**'
+      - 'CHANGELOG.md'
+      - 'Doxyfile'
+      - '.github/workflows/docs.yml'
+  # Add a button to the Actions tab.
   workflow_dispatch:
 # Configure permissions.
 permissions:
