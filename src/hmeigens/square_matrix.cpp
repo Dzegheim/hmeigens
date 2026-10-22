@@ -1,4 +1,4 @@
-// Source file for all non-template functions in square_matrix.hpp.
+// Source file for all non-template and non-inline functions in square_matrix.hpp.
 // Definitions (hmeigens::SquareMatrix):
 //     - SquareMatrix(Container&&);
 //     - norm() const;
