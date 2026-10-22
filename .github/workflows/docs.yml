@@ -48,12 +48,12 @@ jobs:
         run: doxygen Doxyfile
       # Send it to Pages.
       # Configure Pages.
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       # Package and upload the documentation.
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           # Set the path to where Doxygen wrote.
           path: doxygen/html
       # The deployment proper.
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
