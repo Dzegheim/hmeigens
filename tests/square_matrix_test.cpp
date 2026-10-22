@@ -740,16 +740,40 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     // THEN  the value returned is the expected one
     //
     // Null matrix: the norm must be exactly 0.
-    checkRealULPs(hmeigens::SquareMatrix{1}.norm(), HMS(0.), 0);
-    checkRealULPs(hmeigens::SquareMatrix{100}.norm(), HMS(0.), 0);
+    checkRealULPs(
+        hmeigens::SquareMatrix{1}.norm(),
+        HMS(0.),
+        0
+    );
+    checkRealULPs(
+        hmeigens::SquareMatrix{100}.norm(),
+        HMS(0.),
+        0
+    );
     // Identity: the norm must be sqrt(size).
     // Note that std::sqrt() is REQUIRED to be precise by the (IEEE) standard. See https://en.cppreference.com/cpp/numeric/math/sqrt.
-    checkRealULPs(hmeigens::SquareMatrix::identity(1).norm(), HMS(1.), hmeigens::normTolerance(1));
-    checkRealULPs(hmeigens::SquareMatrix::identity(3).norm(), std::sqrt(HMS(3.)), hmeigens::normTolerance(3));
-    checkRealULPs(hmeigens::SquareMatrix::identity(10).norm(), std::sqrt(HMS(10.)), hmeigens::normTolerance(10));
+    checkRealULPs(
+        hmeigens::SquareMatrix::identity(1).norm(),
+        HMS(1.),
+        hmeigens::normTolerance(1)
+    );
+    checkRealULPs(
+        hmeigens::SquareMatrix::identity(3).norm(),
+        std::sqrt(HMS(3.)),
+        hmeigens::normTolerance(3)
+    );
+    checkRealULPs(
+        hmeigens::SquareMatrix::identity(10).norm(),
+        std::sqrt(HMS(10.)),
+        hmeigens::normTolerance(10)
+    );
     // Arbitrary matrices.
     // The following norms have been computed by hand and then double checked on WolframAlpha.
-    checkRealULPs(hmeigens::SquareMatrix{{HMS(4.)}}.norm(), HMS(4.), hmeigens::normTolerance(1));
+    checkRealULPs(
+        hmeigens::SquareMatrix{{HMS(4.)}}.norm(),
+        HMS(4.),
+        hmeigens::normTolerance(1)
+    );
     checkRealULPs(
         hmeigens::SquareMatrix{
             {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)}, {HMS(3.), HMS(3.)},
@@ -777,13 +801,17 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
         hmeigens::normTolerance(2)
     );
     // Matrices whose elements squared over/underflow. The norm is still a valid number in range. Using std::hypot guarantees the result cannot overflow in the middle of calculations.
+    //
+    // Names for readability.
+    const hmeigens::Scalar max = std::numeric_limits<hmeigens::Scalar>::max();
+    const hmeigens::Scalar min = std::numeric_limits<hmeigens::Scalar>::min();
     // Value whose square always overflows.
     checkRealULPs(
         hmeigens::SquareMatrix{
-            {std::numeric_limits<hmeigens::Scalar>::max(), HMS(0.),
-             HMS(0.),                                      HMS(0.)}
+            {max    , HMS(0.),
+             HMS(0.), HMS(0.)}
         }.norm(),
-        std::numeric_limits<hmeigens::Scalar>::max(),
+        max,
         // In Catch2 Infinity is 1 ULP more than FLT_MAX/DBL_MAX, so this relation must be exact to check it doesn't overflow.
         // Since only 1 element of the matrix is nonzero, std::hypot must be exact, since per IEEE it behaves like std::fabs, which is exact.
         0
@@ -791,17 +819,17 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
     // Value whose square always underflows.
     checkRealULPs(
         hmeigens::SquareMatrix{
-            {std::numeric_limits<hmeigens::Scalar>::min(), HMS(0.),
-             HMS(0.),                                      HMS(0.)}
+            {min    , HMS(0.),
+             HMS(0.), HMS(0.)}
         }.norm(),
-        std::numeric_limits<hmeigens::Scalar>::min(),
+        min,
         0
     );
     // Overflow is inf.
     CHECK(
         std::isinf(hmeigens::SquareMatrix{
-            {std::numeric_limits<hmeigens::Scalar>::max(), HMS(0.),
-             std::numeric_limits<hmeigens::Scalar>::max(), HMS(0.)}
+            {max, HMS(0.),
+             max, HMS(0.)}
         }.norm())
     );
 }
