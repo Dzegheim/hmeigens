@@ -84,7 +84,7 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
         HMS(0.);
         // If there is a sign, it is used.
         // If there is no sign, it is a '+'.
-        const hmeigens::Scalar imagSign = (match[2].matched && *match[2].first == '-') ? HMS(-1.) : HMS(1.);
+        const hmeigens::Scalar imagSign = (match[2].matched and *match[2].first == '-') ? HMS(-1.) : HMS(1.);
         // If there is a magnitude, it is used.
         // If there is no magnitude, it is 1.0.
         const hmeigens::Scalar imagMagnitude = match[3].matched

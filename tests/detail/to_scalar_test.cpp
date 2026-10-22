@@ -53,7 +53,7 @@ static void checkRejects(std::string_view testString, std::string_view expectedT
         hmeigens::ParseError,
         Catch::Matchers::MessageMatches(
             Catch::Matchers::ContainsSubstring(std::string{expectedText})
-            &&
+            and
             Catch::Matchers::ContainsSubstring(std::string{contextText})
         )
     );

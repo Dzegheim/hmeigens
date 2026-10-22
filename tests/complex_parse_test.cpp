@@ -59,7 +59,7 @@ static void checkRejects(std::string_view testString, std::string_view alsoConta
         hmeigens::ParseError,
         Catch::Matchers::MessageMatches(
             Catch::Matchers::ContainsSubstring(std::string{alsoContains})
-            &&
+            and
             Catch::Matchers::ContainsSubstring(escaped)
         )
     );

@@ -19,7 +19,7 @@ hmeigens::Scalar hmeigens::detail::toScalar(std::string_view toConvert, std::str
     const std::string_view originalToConvert = toConvert;
     // Check that toConvert is not empty, and that the first character is a '+'.
     // If it is a '+', drop it.
-    if (!toConvert.empty() && toConvert.front() == '+') {
+    if (not toConvert.empty() and toConvert.front() == '+') {
         toConvert.remove_prefix(1);
     }
     // Get the start and end of toConvert.
@@ -31,7 +31,7 @@ hmeigens::Scalar hmeigens::detail::toScalar(std::string_view toConvert, std::str
     // The value is untouched in case of errors.
     const auto [ptr, ec] = std::from_chars(first, last, value);
     // The value was read correctly only if ptr is last, and if ec is default.
-    if (ec != std::errc{} || ptr != last) {
+    if (ec != std::errc{} or ptr != last) {
         // If there is an error, throw with the offending text.
         // The input is already checked by hmeigens::parseComplex, so a std::errc::invalid_argument should never happen.
         // What can happen here is std::errc::result_out_of_range if the passed value does not fit in the chosen hmeigens::Scalar type.

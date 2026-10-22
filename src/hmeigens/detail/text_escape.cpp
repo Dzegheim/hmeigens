@@ -13,7 +13,7 @@
 // According to https://en.cppreference.com/cpp/locale/isprint it needs a std::ctype.
 bool hmeigens::detail::isDisplayable(unsigned char toCheck) {
     // The first non-ASCII is 0x80 (128 decimal, 0200 octal).
-    return toCheck >= 0x80 || std::isprint(static_cast<char>(toCheck), std::locale::classic());
+    return toCheck >= 0x80 or std::isprint(static_cast<char>(toCheck), std::locale::classic());
 }
 
 std::string hmeigens::detail::escape(std::string_view toEscape) {
