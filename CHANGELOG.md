@@ -6,6 +6,18 @@ Versions before 0.3.0 were not tagged.
 
 Version 0.2.0 is recorded from git history.
 
+## [Unreleased]
+### Added
+- **CI workflows.** One for each major OS family: Linux, Windows, macOS. The [README's *Platforms* section](README.md#platforms) has all the information on supported platforms.
+- **A new file pair `predicates.hpp`/`.cpp`.** It is meant to host functions that verify whether a matrix satisfies certain properties. It contains:
+    - `hmeigens::isFinite`, which checks that a given matrix is finite in both the real and imaginary parts for all its elements.
+- **The codebase now enforces the IEC 559 standard at compile time.** This is likely unnecessary, but better safe than sorry.
+- **New tests.** Specifically:
+    - `hmeigens::isFinite` thoroughly tested.
+
+### Fixed
+- **The project now compiles with Clang.** Some cases of double braces were resolved by Clang as ambiguous. This was found out during the CI workflow jobs. All instances were fixed.
+
 ## [0.6.0] - 2026-10-19
 ### Added
 - **A proper [README.md](README.md).**

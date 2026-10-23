@@ -72,6 +72,7 @@ endif()
 set(HMEIGENS_SOURCES
     complex_parse.cpp
     square_matrix.cpp
+    predicates.cpp
     detail/text_escape.cpp
     detail/to_scalar.cpp
     detail/square_matrix_helpers.cpp

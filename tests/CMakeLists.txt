@@ -12,6 +12,7 @@ set(HMEIGENS_TEST_SOURCES
     detail/square_matrix_helpers_test.cpp
     scalar_test.cpp
     detail/isqrt_test.cpp
+    predicates_test.cpp
     )
 
 add_executable(${PROJECT_NAME_LOWER}_tests ${HMEIGENS_TEST_SOURCES})
