@@ -1,7 +1,9 @@
 // Source file for all functions in predicates.hpp.
 // Definitions (hmeigens):
-//     - isFinite().
+//     - isFinite();
+//     - getTolerance().
 #include "hmeigens/predicates.hpp"
+#include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
 
 #include <cmath>         // For std::isfinite
@@ -25,4 +27,17 @@ bool hmeigens::isFinite(const hmeigens::SquareMatrix& matrix) {
         }
     }
     return true;
+}
+
+// Computes the tolerance.
+// Fully documented in .hpp.
+// See documentation for reasoning on the chosen operands.
+hmeigens::Scalar hmeigens::getTolerance(const hmeigens::SquareMatrix& matrix) {
+    // Get the squared size as an hmeigens::Scalar.
+    const hmeigens::Scalar sizeSquared = static_cast<hmeigens::Scalar>(matrix.size()*matrix.size());
+    return // For each element of the formula:
+        hmeigens::epsilon*    // \varepsilon;
+        hmeigens::toleranceK* // k;
+        sizeSquared*          // n^2;
+        matrix.norm();        // ||M||.
 }

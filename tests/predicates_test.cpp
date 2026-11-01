@@ -2,13 +2,18 @@
 // Sections:
 // - constants;
 // - test cases:
-//     - hmeigens::isFinite.
+//     - hmeigens::isFinite;
+//     - hmeigens::getTolerance.
 
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/predicates.hpp"
+#include "hmeigens/tolerances.hpp"
+
+#include "comparison_helpers.hpp"
 
 #include <limits>        // For std::numeric_limits
+#include <cmath>         // For std::sqrt
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -24,6 +29,9 @@ constexpr hmeigens::Scalar lowest = std::numeric_limits<hmeigens::Scalar>::lowes
 
 // Local brief alias for the conversion macro to improve legibility.
 #define HMS HMEIGENS_MAKE_SCALAR
+
+// Readability of tests.
+using hmeigens::test::checkRealULPs;
 
 /* ------------------------------------------------ */
 /* ------------------ Test cases ------------------ */
@@ -95,6 +103,51 @@ TEST_CASE("Predicates test: a matrix with non-finite elements is correctly repor
     };
     CHECK_FALSE(hmeigens::isFinite(nan1));
     CHECK_FALSE(hmeigens::isFinite(nan2));
+}
+
+/* ------------------------------------------------ */
+/* ------------ hmeigens::getTolerance ------------ */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Predicates test: tolerance is computed as expected.", "[predicates][getTolerance]") {
+    // GIVEN a matrix
+    // WHEN  hmeigens::getTolerance computes its tolerance
+    // THEN  it returns the expected value within its own tolerance
+    //
+    // Null matrix.
+    checkRealULPs(
+        hmeigens::getTolerance(hmeigens::SquareMatrix{
+            {{HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
+             {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
+             {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}}
+        }),
+        HMS(0.),
+        // Tolerance is 0, as this needs to be exact no matter the size.
+        0
+    );
+    // Matrix with size that is a power of 2, and the only non-zero element that is a power of 2.
+    checkRealULPs(
+        hmeigens::getTolerance(hmeigens::SquareMatrix{
+            {{HMS(2.), HMS(0.)}, {HMS(0.), HMS(0.)},
+             {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}}
+        }),
+        // Here size^2*norm = 4.*2. = 8.
+        hmeigens::epsilon*hmeigens::toleranceK*HMS(8.),
+        // Tolerance here needs no extra, as the multiplications all include a power of 2.
+        hmeigens::toleranceTolerance(2)
+    );
+    // Generic 3x3 matrix.
+    checkRealULPs(
+        hmeigens::getTolerance(hmeigens::SquareMatrix{
+            {{HMS(1.), HMS(0.)}, {HMS(0.), HMS(2.)}, {HMS(0.), HMS(3.)},
+             {HMS(4.), HMS(4.)}, {HMS(5.), HMS(.5)}, {HMS(-6.), HMS(-6.)},
+             {HMS(7.), HMS(0.)}, {HMS(0.), HMS(8.)}, {HMS(-9.), HMS(0.)}}
+        }),
+        // Here size^2 = 9 and norm = sqrt(337.25).
+        hmeigens::epsilon*hmeigens::toleranceK*HMS(9.)*std::sqrt(HMS(337.25)),
+        // Tolerance here needs extra = 3, from 2 multiplications and 1 use of std::sqrt.
+        hmeigens::toleranceTolerance(3, 3)
+    );
 }
 
 #undef HMS
