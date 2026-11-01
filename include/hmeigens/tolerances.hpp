@@ -4,9 +4,11 @@
 //     - HMEIGENS_HYPOT_ULPS.
 // Declarations (hmeigens):
 //     - parseTolerance;
-//     - normTolerance(std::size_t).
+//     - normTolerance(std::size_t);
+//     - toleranceTolerance(std::size_t, std::uint64_t).
 // Definitions (hmeigens):
-//     - normTolerance(std::size_t).
+//     - normTolerance(std::size_t);
+//     - toleranceTolerance(std::size_t, std::uint64_t).
 #ifndef HMEIGENS_TOLERANCES_HPP
 #define HMEIGENS_TOLERANCES_HPP
 
@@ -58,7 +60,19 @@ namespace hmeigens {
     /// @warning The function performs no overflow check itself. It assumes the given `size` always comes from a matrix, and that its square can be multiplied by `2*HMEIGENS_HYPOT_ULPS`.
     /// @sa HMEIGENS_HYPOT_ULPS
     /// @sa hmeigens::SquareMatrix::norm()
-    inline constexpr std::uint64_t normTolerance(std::size_t size);
+    [[nodiscard]] inline constexpr std::uint64_t normTolerance(std::size_t size);
+
+    /// @brief Returns the tolerance for the computation of the tolerance by `hmeigens::getTolerance()`.
+    ///
+    /// Testing the tolerance requires some degree of tolerance, since it performs several operations and each part of both the function and the tests introduces roundings. In particular:
+    /// - (function) computing the norm introduces `normTolerance` ULPs already, but this number needs to be doubled because this error is relative, and thus could change its value in ULPs by changing the mantissa/significand of the floating-point value being computed, so `2*normTolerance()` ULPs;
+    /// - (function) multiplying is correctly rounded (IEEE 754), therefore each multiplication rounds by at most half a ULP, but here there are three multiplications (actually four, but multiplying by `hmeigens::epsilon` does not round as it changes only the exponent), and finally this amount needs to be doubled by the same mantissa reasoning as before, so `3` ULPs;
+    /// - (tests) performing operations on the reference value for testing may round it, but the number of ULPs due to this is variable, so the `extra` parameter, defaulted to `0`, covers this.
+    /// @param size The size of the matrix whose tolerance is being computed.
+    /// @param extra The extra number of ULPs that need to be added to the tolerance due to operations being performed on the reference testing value.
+    /// @return A `std::uint64_t` that is `2*normTolerance(size)+3+extra`.
+    [[nodiscard]] inline constexpr std::uint64_t toleranceTolerance(std::size_t size, std::uint64_t extra = 0);
+
 }
 
 /* ----------------------------- */
@@ -70,6 +84,11 @@ inline constexpr std::uint64_t hmeigens::normTolerance(std::size_t size) {
     // Squaring size is always safe if it comes from a matrix.
     // For all realistic cases, multiplying a squared size by 2*HMEIGENS_HYPOT_ULPS will never overflow.
     return HMEIGENS_HYPOT_ULPS*2*size*size;
+}
+
+// See the declaration for all relevant information.
+inline constexpr std::uint64_t hmeigens::toleranceTolerance(std::size_t size, std::uint64_t extra) {
+    return 2*hmeigens::normTolerance(size)+3+extra;
 }
 
 #endif
