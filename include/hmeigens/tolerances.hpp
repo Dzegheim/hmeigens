@@ -66,11 +66,12 @@ namespace hmeigens {
     ///
     /// Testing the tolerance requires some degree of tolerance, since it performs several operations and each part of both the function and the tests introduces roundings. In particular:
     /// - (function) computing the norm introduces `normTolerance` ULPs already, but this number needs to be doubled because this error is relative, and thus could change its value in ULPs by changing the mantissa/significand of the floating-point value being computed, so `2*normTolerance()` ULPs;
-    /// - (function) multiplying is correctly rounded (IEEE 754), therefore each multiplication rounds by at most half a ULP, but here there are three multiplications (actually four, but multiplying by `hmeigens::epsilon` does not round as it changes only the exponent), and finally this amount needs to be doubled by the same mantissa reasoning as before, so `3` ULPs;
+    /// - (function) multiplying is correctly rounded (IEEE 754), therefore each multiplication rounds by at most half a ULP, but here there are two multiplications (actually three, but multiplying by `hmeigens::epsilon` does not round as it changes only the exponent), and finally this amount needs to be doubled by the same mantissa reasoning as before, so `2` ULPs;
     /// - (tests) performing operations on the reference value for testing may round it, but the number of ULPs due to this is variable, so the `extra` parameter, defaulted to `0`, covers this.
     /// @param size The size of the matrix whose tolerance is being computed.
     /// @param extra The extra number of ULPs that need to be added to the tolerance due to operations being performed on the reference testing value.
-    /// @return A `std::uint64_t` that is `2*normTolerance(size)+3+extra`.
+    /// @warning If `hmeigens::Scalar` is `float`, and `size` is greater than `4096`, then callers need to pass at least `extra = 1`, due to the square of the size no longer being exactly representable within `float`, thus being rounded.
+    /// @return A `std::uint64_t` that is `2*(normTolerance(size)+1)+extra`.
     [[nodiscard]] inline constexpr std::uint64_t toleranceTolerance(std::size_t size, std::uint64_t extra = 0);
 
 }
@@ -88,7 +89,7 @@ inline constexpr std::uint64_t hmeigens::normTolerance(std::size_t size) {
 
 // See the declaration for all relevant information.
 inline constexpr std::uint64_t hmeigens::toleranceTolerance(std::size_t size, std::uint64_t extra) {
-    return 2*hmeigens::normTolerance(size)+3+extra;
+    return 2*hmeigens::normTolerance(size)+2+extra;
 }
 
 #endif

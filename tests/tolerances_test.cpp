@@ -33,12 +33,12 @@ TEST_CASE("Tolerances test: toleranceTolerance gives the expected values.", "[to
     //
     // Default argument.
     // Minimum meaningful input.
-    STATIC_REQUIRE(hmeigens::toleranceTolerance(1) == 4*HMEIGENS_HYPOT_ULPS+3);
+    STATIC_REQUIRE(hmeigens::toleranceTolerance(1) == 4*HMEIGENS_HYPOT_ULPS+2);
     // Meaningful input.
-    STATIC_REQUIRE(hmeigens::toleranceTolerance(5) == 100*HMEIGENS_HYPOT_ULPS+3);
+    STATIC_REQUIRE(hmeigens::toleranceTolerance(5) == 100*HMEIGENS_HYPOT_ULPS+2);
     // Non-default argument. Same inputs.
     // Same as the default version with an addition.
     STATIC_REQUIRE(hmeigens::toleranceTolerance(1, 2) == hmeigens::toleranceTolerance(1)+2);
     // Explicitly computed value.
-    STATIC_REQUIRE(hmeigens::toleranceTolerance(5, 20) == 100*HMEIGENS_HYPOT_ULPS+23);
+    STATIC_REQUIRE(hmeigens::toleranceTolerance(5, 20) == 100*HMEIGENS_HYPOT_ULPS+22);
 }
