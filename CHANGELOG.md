@@ -13,7 +13,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::isFinite`, which checks that a given matrix is finite in both the real and imaginary parts for all its elements.
 - **The codebase now enforces the IEC 559 standard at compile time.** This is likely unnecessary, but better safe than sorry.
 - **New tests.** Specifically:
-    - `hmeigens::isFinite` thoroughly tested.
+    - `hmeigens::isFinite` thoroughly tested;
+    - `hmeigens::normTolerance` returns the expected values.
 
 ### Fixed
 - **The project now compiles with Clang.** Some cases of double braces were resolved by Clang as ambiguous. This was found out during the CI workflow jobs. All instances were fixed.

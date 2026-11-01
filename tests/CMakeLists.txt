@@ -13,6 +13,7 @@ set(HMEIGENS_TEST_SOURCES
     scalar_test.cpp
     detail/isqrt_test.cpp
     predicates_test.cpp
+    tolerances_test.cpp
     )
 
 add_executable(${PROJECT_NAME_LOWER}_tests ${HMEIGENS_TEST_SOURCES})
