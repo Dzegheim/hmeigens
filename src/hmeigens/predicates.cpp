@@ -1,13 +1,15 @@
 // Source file for all functions in predicates.hpp.
 // Definitions (hmeigens):
-//     - isFinite();
-//     - getTolerance().
+//     - isFinite(const SquareMatrix&);
+//     - getTolerance(const SquareMatrix&);
+//     - isUpperHessenberg(const SquareMatrix&, const Scalar).
 #include "hmeigens/predicates.hpp"
 #include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
 
 #include <cmath>         // For std::isfinite
 #include <cstddef>       // For std::size_t
+#include <complex>       // For std::abs
 
 // Checks that all elements are finite.
 // Fully documented in .hpp.
@@ -40,4 +42,23 @@ hmeigens::Scalar hmeigens::getTolerance(const hmeigens::SquareMatrix& matrix) {
         hmeigens::toleranceK* // k;
         sizeSquared*          // n^2;
         matrix.norm();        // ||M||.
+}
+
+// Checks whether a matrix is in upper Hessenberg form.
+// Fully documented in .hpp.
+bool hmeigens::isUpperHessenberg(const hmeigens::SquareMatrix& matrix, const hmeigens::Scalar tolerance) {
+    // Readability.
+    const std::size_t size = matrix.size();
+    // Check that all sub-subdiagonal elements are 0. within the tolerance.
+    // The outer loop can start at 2 as this condition does not affect the first two rows.
+    // This also means that 1x1 and 2x2 matrices return true trivially without any checks.
+    for (std::size_t i = 2; i < size; ++i) {
+        // Pass through all sub-subdiagonal elements.
+        for (std::size_t j = 0; j < i-1; ++j) {
+            if (std::abs(matrix(i,j)) > tolerance) {
+                return false;
+            }
+        }
+    }
+    return true;
 }

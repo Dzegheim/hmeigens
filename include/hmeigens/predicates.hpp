@@ -1,8 +1,9 @@
 /// @file
 /// @brief A collection of functions that verify the properties of a given matrix.
 // Declarations (hmeigens):
-//     - isFinite();
-//     - getTolerance().
+//     - isFinite(const SquareMatrix&);
+//     - getTolerance(const SquareMatrix&);
+//     - isUpperHessenberg(const SquareMatrix&, const Scalar).
 #ifndef HMEIGENS_PREDICATES_HPP
 #define HMEIGENS_PREDICATES_HPP
 
@@ -12,7 +13,7 @@
 
 namespace hmeigens {
 
-    /// @brief Checks that all elements of the matrix satisfy `std::isfinite()` for both their real and imaginary parts.
+    /// @brief Checks whether all elements of the matrix satisfy `std::isfinite()` for both their real and imaginary parts.
     /// @param matrix The matrix to be checked.
     /// @return `true` if all elements of the matrix are finite, `false` otherwise.
     [[nodiscard]] bool isFinite(const SquareMatrix& matrix);
@@ -38,6 +39,28 @@ namespace hmeigens {
     /// @sa hmeigens::toleranceK
     /// @sa HMEIGENS_TOLERANCE_K
     [[nodiscard]] Scalar getTolerance(const SquareMatrix& matrix);
+
+    /// @brief Checks whether a matrix is in upper Hessenberg form within a given tolerance.
+    ///
+    /// A matrix is upper Hessenberg when it is in the form
+    /// \f[
+    /// M =
+    /// \begin{pmatrix}
+    ///    m_{1,1} & m_{1,2} & m_{1,3} & \cdots    & m_{1,n}
+    /// \\ m_{2,1} & m_{2,2} & m_{2,3} & \cdots    & m_{2,n}
+    /// \\ 0       & m_{3,2} & m_{3,3} & \cdots    & m_{3,n}
+    /// \\ \vdots  & \ddots  & \ddots  & \ddots    & \vdots
+    /// \\ 0       & \cdots  & 0       & m_{n,n-1} & m_{n,n}
+    /// \end{pmatrix}\ ,
+    /// \f]
+    /// i.e. it is *almost* upper triangular.
+    /// This function compares all sub-subdiagonal elements' moduli with the given tolerance, to determine whether or not they are `0.`.
+    /// @param matrix The matrix to be checked.
+    /// @param tolerance The number above which the modulus of an element is not considered to be `0.`.
+    /// @return `true` if the matrix is in upper Hessenberg form within `tolerance`, `false` otherwise.
+    /// @pre `matrix` must be finite as per `hmeigens::isFinite()`.
+    /// @pre `tolerance` must be finite as per `std::isfinite()`. It must also be non-negative, as the function performs no checks on it. Giving a negative value will result in a meaningless trivially `false` result (except for `1x1` and `2x2` matrices, for which the function always returns `true`).
+    [[nodiscard]] bool isUpperHessenberg(const SquareMatrix& matrix, const Scalar tolerance);
 }
 
 #endif
