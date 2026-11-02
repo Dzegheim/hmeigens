@@ -7,6 +7,7 @@
 #include "hmeigens/predicates.hpp"
 #include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
+#include "hmeigens/scalar.hpp"
 
 #include <cmath>         // For std::isfinite
 #include <cstddef>       // For std::size_t
@@ -53,10 +54,10 @@ bool hmeigens::isUpperHessenberg(const hmeigens::SquareMatrix& matrix, const hme
     // Checks that all sub-subdiagonal elements are 0. within the tolerance.
     // The outer loop can start at 2 as this condition does not affect the first two rows.
     // This also means that 1x1 and 2x2 matrices return true trivially without any checks.
-    for (std::size_t i = 2; i < size; ++i) {
+    for (std::size_t row = 2; row < size; ++row) {
         // Pass through all sub-subdiagonal elements.
-        for (std::size_t j = 0; j < i-1; ++j) {
-            if (std::abs(matrix(i,j)) > tolerance) {
+        for (std::size_t col = 0; col < row-1; ++col) {
+            if (std::abs(matrix(row, col)) > tolerance) {
                 return false;
             }
         }
@@ -71,9 +72,9 @@ bool hmeigens::isUpperTriangular(const hmeigens::SquareMatrix& matrix, const hme
     const std::size_t size = matrix.size();
     // Checks that all elements below the diagonal are 0. within the tolerance.
     // Subdiagonal elements are manually checked, then hmeigens::isUpperHessenberg verifies the rest.
-    // Here i can start at 1 as the first row does not affect the check.
-    for (std::size_t i = 1; i < size; ++i) {
-        if (std::abs(matrix(i,i-1)) > tolerance) {
+    // Here row can start at 1 as the first row does not affect the check.
+    for (std::size_t row = 1; row < size; ++row) {
+        if (std::abs(matrix(row, row-1)) > tolerance) {
             return false;
         }
     }
