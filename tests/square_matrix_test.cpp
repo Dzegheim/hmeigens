@@ -698,8 +698,8 @@ TEST_CASE("Square matrix test: the identity matrix has the correct form.", "[squ
         hmeigens::SquareMatrix::identity(3),
         hmeigens::SquareMatrix::Container{
             {HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
-             {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)},
-             {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}
+            {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)},
+            {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}
         },
         0
     );
