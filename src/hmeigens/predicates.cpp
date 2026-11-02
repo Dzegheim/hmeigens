@@ -2,7 +2,8 @@
 // Definitions (hmeigens):
 //     - isFinite(const SquareMatrix&);
 //     - getTolerance(const SquareMatrix&);
-//     - isUpperHessenberg(const SquareMatrix&, const Scalar).
+//     - isUpperHessenberg(const SquareMatrix&, const Scalar);
+//     - isUpperTriangular(const SquareMatrix&, const Scalar).
 #include "hmeigens/predicates.hpp"
 #include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
@@ -49,7 +50,7 @@ hmeigens::Scalar hmeigens::getTolerance(const hmeigens::SquareMatrix& matrix) {
 bool hmeigens::isUpperHessenberg(const hmeigens::SquareMatrix& matrix, const hmeigens::Scalar tolerance) {
     // Readability.
     const std::size_t size = matrix.size();
-    // Check that all sub-subdiagonal elements are 0. within the tolerance.
+    // Checks that all sub-subdiagonal elements are 0. within the tolerance.
     // The outer loop can start at 2 as this condition does not affect the first two rows.
     // This also means that 1x1 and 2x2 matrices return true trivially without any checks.
     for (std::size_t i = 2; i < size; ++i) {
@@ -61,4 +62,20 @@ bool hmeigens::isUpperHessenberg(const hmeigens::SquareMatrix& matrix, const hme
         }
     }
     return true;
+}
+
+// Checks whether a matrix is in upper triangular form.
+// Fully documented in .hpp.
+bool hmeigens::isUpperTriangular(const hmeigens::SquareMatrix& matrix, const hmeigens::Scalar tolerance) {
+    // Readability.
+    const std::size_t size = matrix.size();
+    // Checks that all elements below the diagonal are 0. within the tolerance.
+    // Subdiagonal elements are manually checked, then hmeigens::isUpperHessenberg verifies the rest.
+    // Here i can start at 1 as the first row does not affect the check.
+    for (std::size_t i = 1; i < size; ++i) {
+        if (std::abs(matrix(i,i-1)) > tolerance) {
+            return false;
+        }
+    }
+    return hmeigens::isUpperHessenberg(matrix, tolerance);
 }

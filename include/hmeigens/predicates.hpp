@@ -3,7 +3,8 @@
 // Declarations (hmeigens):
 //     - isFinite(const SquareMatrix&);
 //     - getTolerance(const SquareMatrix&);
-//     - isUpperHessenberg(const SquareMatrix&, const Scalar).
+//     - isUpperHessenberg(const SquareMatrix&, const Scalar);
+//     - isUpperTriangular(const SquareMatrix&, const Scalar).
 #ifndef HMEIGENS_PREDICATES_HPP
 #define HMEIGENS_PREDICATES_HPP
 
@@ -60,7 +61,28 @@ namespace hmeigens {
     /// @return `true` if the matrix is in upper Hessenberg form within `tolerance`, `false` otherwise.
     /// @pre `matrix` must be finite as per `hmeigens::isFinite()`.
     /// @pre `tolerance` must be finite as per `std::isfinite()`. It must also be non-negative, as the function performs no checks on it. Giving a negative value will result in a meaningless trivially `false` result (except for `1x1` and `2x2` matrices, for which the function always returns `true`).
+    /// @sa hmeigens::isUpperTriangular
     [[nodiscard]] bool isUpperHessenberg(const SquareMatrix& matrix, const Scalar tolerance);
+
+    /// @brief Checks whether a matrix is in upper triangular form within a given tolerance.
+    ///
+    /// A matrix is upper triangular when it is in the form
+    /// \f[
+    /// M = \begin{pmatrix}
+    ///    m_{1,1} & m_{1,2} & \cdots  & m_{1,n}
+    /// \\ 0       & m_{2,2} & \cdots  & m_{2,n}
+    /// \\ \vdots  & \ddots  & \ddots  & \vdots
+    /// \\ 0       & \cdots  & 0       & m_{n,n}
+    /// \end{pmatrix}\ .
+    /// \f]
+    /// This function compares the moduli of all elements below the diagonal with the given tolerance, to determine whether or not they are `0.`.
+    /// @param matrix The matrix to be checked.
+    /// @param tolerance The number above which the modulus of an element is not considered to be `0.`.
+    /// @return `true` if the matrix is in upper triangular form within `tolerance`, `false` otherwise.
+    /// @pre `matrix` must be finite as per `hmeigens::isFinite()`.
+    /// @pre `tolerance` must be finite as per `std::isfinite()`. It must also be non-negative, as the function performs no checks on it. Giving a negative value will result in a meaningless trivially `false` result (except for `1x1` matrices, for which the function always returns `true`).
+    /// @sa hmeigens::isUpperHessenberg
+    [[nodiscard]] bool isUpperTriangular(const SquareMatrix& matrix, const Scalar tolerance);
 }
 
 #endif

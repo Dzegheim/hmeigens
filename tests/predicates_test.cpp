@@ -4,7 +4,8 @@
 // - test cases:
 //     - hmeigens::isFinite;
 //     - hmeigens::getTolerance;
-//     - hmeigens::isUpperHessenberg.
+//     - hmeigens::isUpperHessenberg;
+//     - hmeigens::isUpperTriangular.
 
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/square_matrix.hpp"
@@ -271,6 +272,113 @@ TEST_CASE("Predicates test: a non-upper Hessenberg matrix is correctly identifie
     testMatrix3(3,1) = testMatrix3(0,0); // Value of (1.; 0.).
     testMatrix3(4,0) = testMatrix3(1,0); // Value of (0.; 0.).
     CHECK_FALSE(hmeigens::isUpperHessenberg(testMatrix3, tolerance3));
+}
+
+/* ------------------------------------------------ */
+/* ---------- hmeigens::isUpperTriangular --------- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Predicates test: an upper triangular matrix is correctly identified.", "[predicates][isUpperTriangular]") {
+    // GIVEN a matrix in upper triangular form
+    // WHEN  hmeigens::isUpperTriangular checks it
+    // THEN  it returns true
+    //
+    // Trivially triangular matrices.
+    // Null matrix.
+    CHECK(
+        hmeigens::isUpperTriangular(hmeigens::SquareMatrix{
+            {{HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
+             {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
+             {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}}
+        },
+        // Tolerance is 0., as this needs to be exact no matter the size.
+        HMS(0.)
+    ));
+    // For 1x1 matrices the implementation does not perform any checks, so even with large elements and a 0. tolerance the check must pass.
+    CHECK(
+        hmeigens::isUpperTriangular(hmeigens::SquareMatrix{
+            {{HMS(1.2345), HMS(67.89)}}
+        },
+        HMS(0.)
+    ));
+    // Non-trivially triangular matrices.
+    // An exact 0. in the required spot.
+    const hmeigens::SquareMatrix testMatrix1{
+        {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)},
+         {HMS(0.), HMS(0.)}, {HMS(4.), HMS(4.)}}
+    };
+    CHECK(hmeigens::isUpperTriangular(
+        testMatrix1,
+        hmeigens::getTolerance(testMatrix1)
+    ));
+    // Exactly the tolerance in the required spot.
+    const hmeigens::SquareMatrix testMatrix2{
+        {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)},
+         {HMS(3.), HMS(3.)}, {HMS(4.), HMS(4.)}}
+    };
+    // This check verifies that a number exactly equal to the tolerance counts as 0., no matter how large its modulus is.
+    // In this specific case it is larger than that of most other elements of the matrix itself.
+    CHECK(hmeigens::isUpperTriangular(
+        testMatrix2,
+        std::abs(testMatrix2(1,0))
+    ));
+    // A larger matrix with "small enough to be zero" values in the required spots.
+    const hmeigens::SquareMatrix testMatrix3{
+        {{HMS(1.), HMS(1.)},    {HMS(2.), HMS(2.)},       {HMS(3.), HMS(3.)},
+         {HMS(1e-20), HMS(0.)}, {HMS(5.), HMS(5.)},       {HMS(6.), HMS(6.)},
+         {HMS(0.), HMS(1e-20)}, {HMS(1e-20), HMS(1e-20)}, {HMS(9.), HMS(9.)}}
+    };
+    CHECK(hmeigens::isUpperTriangular(
+        testMatrix3,
+        hmeigens::getTolerance(testMatrix3)
+    ));
+}
+
+TEST_CASE("Predicates test: a non-upper triangular matrix is correctly identified.", "[predicates][isUpperTriangular]") {
+    // GIVEN a matrix not in upper triangular form
+    // WHEN  hmeigens::isUpperTriangular checks it
+    // THEN  it returns false
+    //
+    // Clearly not triangular (with the appropriate tolerance).
+    const hmeigens::SquareMatrix testMatrix1{
+        {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)},
+         {HMS(3.), HMS(3.)}, {HMS(4.), HMS(4.)}}
+    };
+    CHECK_FALSE(hmeigens::isUpperTriangular(
+        testMatrix1,
+        hmeigens::getTolerance(testMatrix1)
+    ));
+    // An element that is just above the tolerance.
+    CHECK_FALSE(hmeigens::isUpperTriangular(
+        testMatrix1,
+        // Tolerance is the number that is 1 ULP smaller than the element in the required position.
+        std::nextafter(std::abs(testMatrix1(1,0)), HMS(0.))
+    ));
+    // An element which is small relative to the others, but still above the tolerance.
+    const hmeigens::SquareMatrix testMatrix2{
+        {{HMS(1.), HMS(1.)},       {HMS(2.), HMS(2.)},
+         {HMS(3.e-4), HMS(3.e-4)}, {HMS(4.), HMS(4.)}}
+    };
+    CHECK_FALSE(hmeigens::isUpperTriangular(
+        testMatrix2,
+        hmeigens::getTolerance(testMatrix2)
+    ));
+    // A 4x4 matrix with "bad" elements in different places each time.
+    // This verifies that the position of the "bad" element does not matter.
+    hmeigens::SquareMatrix testMatrix3 = hmeigens::SquareMatrix::identity(4);
+    // Position (1,0).
+    testMatrix3(1,0) = testMatrix3(0,0); // Value of (1.; 0.).
+    // Tolerance does not change as the "bad" value always has the same modulus.
+    const hmeigens::Scalar tolerance3 = hmeigens::getTolerance(testMatrix3);
+    CHECK_FALSE(hmeigens::isUpperTriangular(testMatrix3, tolerance3));
+    // Position (3,0).
+    testMatrix3(3,0) = testMatrix3(0,0); // Value of (1.; 0.).
+    testMatrix3(1,0) = testMatrix3(0,1); // Value of (0.; 0.).
+    CHECK_FALSE(hmeigens::isUpperTriangular(testMatrix3, tolerance3));
+    // Position (3,2).
+    testMatrix3(3,2) = testMatrix3(0,0); // Value of (1.; 0.).
+    testMatrix3(3,0) = testMatrix3(0,1); // Value of (0.; 0.).
+    CHECK_FALSE(hmeigens::isUpperTriangular(testMatrix3, tolerance3));
 }
 
 #undef HMS
