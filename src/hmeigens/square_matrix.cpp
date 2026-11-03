@@ -8,10 +8,10 @@
 //     - operator*(const SquareMatrix&, const SquareMatrix&).
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
+#include "hmeigens/detail/algebra_helpers.hpp"
 
 #include <utility>     // For std::move
 #include <cstddef>     // For std::size_t
-#include <cmath>       // For std::hypot
 #include <complex>     // For std::conj
 
 // Constructor of the hmeigens::SquareMatrix class.
@@ -28,40 +28,10 @@ hmeigens::SquareMatrix::SquareMatrix(hmeigens::SquareMatrix::Container&& body) :
 // Frobenius norm of a matrix.
 // Fully documented in .hpp.
 //
-// There exists an approach that runs over the matrix element by element and computes it as
-//     hmeigens::Scalar norm = hmeigens::Scalar{0.};
-//     for(auto z : body_) {
-//         norm += std::norm(z);
-//     }
-//     return std::sqrt(norm);
-// but if the sum of squares or even a single std::norm is too large, the entire norm results in inf, even if the square root would be small enough to fit into the result. Damn floating-points.
-// An equivalent form is to use std::hypot. It can be proven by induction that the two forms are algebraically equivalent.
-// ---- Statement ----
-// Let x_1,...,x_n be real numbers.
-// Let f_0 = 0, f_k = sqrt(x_k^2 + f_(k-1)^2).
-// [i.e. in the code the equivalent of calling std::hypot(std::hypot(z.real(), z.imag()), norm).]
-// Then for all k in 1,...,n f_k=sqrt(sum_(i=1)^k x_i^2).
-// ---- Proof ----
-// Case 1 given 0:
-// f_1 = sqrt(x_1^2 + f_0^2) = sqrt(x_1^2 + 0) = sqrt(x_1^2).
-//
-// Case k given k-1:
-// f_k = sqrt(x_k^2 + f_(k-1)^2).
-// Given f_(k-1) = sqrt(sum_(i=1)^(k-1) x_i^2), since x_i^2 >= 0, then
-// f_(k-1)^2 = sqrt(sum_(i=1)^(k-1) x_i^2)^2 = sum_(i=1)^(k-1) x_i^2, and thus:
-// f_k = sqrt(x_k^2 + sum_(i=1)^(k-1) x_i^2) = sqrt(sum_(i=1)^(k) x_i^2).
-// ---- Q.E.D. ----
-// This call of std::hypot is equivalent to the definition of the Frobenius norm.
-// Of course std::hypot is slower, but this implementation cannot explode to infinity in the middle of the computation.
-// The norm needs to be computed only once in the triangularization process, so it being slower does not really matter.
+// The Frobenius norm is equivalent to the 2-norm of a vector holding all the elements of the matrix.
 hmeigens::Scalar hmeigens::SquareMatrix::norm() const {
-    // Initialize the norm to 0.
-    hmeigens::Scalar norm = HMEIGENS_MAKE_SCALAR(0.);
     // The body_ is just an hmeigens::SquareMatrix::Container. The order of the elements here does not matter.
-    for(const auto& z : body_) {
-        norm = std::hypot(std::hypot(z.real(), z.imag()), norm);
-    }
-    return norm;
+    return hmeigens::detail::twoNorm(body_);
 }
 
 // In-place adjoint of the matrix.

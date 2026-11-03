@@ -14,6 +14,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::getTolerance`, which computes the tolerance above which an element cannot safely be considered `0.` with respect to the matrix at hand;
     - `hmeigens::isUpperHessenberg`, which checks whether a given matrix is in [upper Hessenberg](https://en.wikipedia.org/wiki/Hessenberg_matrix#Upper_Hessenberg_matrix) form within a given tolerance;
     - `hmeigens::isUpperTriangular`, which checks whether a given matrix is in [upper triangular](https://en.wikipedia.org/wiki/Triangular_matrix#Description) form within a given tolerance.
+- **A new file pair `algebra_helpers.hpp`/`.cpp` in `detail/`.** It is meant to host functions that perform algebraic operations on groups of complex numbers. It contains:
+    - `hmeigens::detail::twoNorm`, which computes the `2`-norm of a vector of complex numbers.
 - **The codebase now enforces the IEC 559 standard at compile time.** This is likely unnecessary, but better safe than sorry.
 - **New `hmeigens::toleranceTolerance` helper in `tolerances.hpp`.**
 - **New pair of constants `HMEIGENS_TOLERANCE_K` and `hmeigens::toleranceK`.** The first is a temporary value that needs to be computed in benchmarking when the codebase is done, and will later be a configurable value via CMake. The second is just a cast of the other to `hmeigens::Scalar`. See documentation for details on what they represent.
@@ -22,7 +24,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::normTolerance` and `hmeigens::toleranceTolerance` return the expected values;
     - `hmeigens::getTolerance` thoroughly tested;
     - `hmeigens::isUpperHessenberg` thoroughly tested;
-    - `hmeigens::isUpperTriangular` thoroughly tested.
+    - `hmeigens::isUpperTriangular` thoroughly tested;
+    - `hmeigens::detail::twoNorm` thoroughly tested, though most of its tests are done via `hmeigens::SquareMatrix::norm`.
 
 ### Fixed
 - **The project now compiles with Clang.** Some cases of double braces were resolved by Clang as ambiguous. This was found out during the CI workflow jobs. All instances were fixed.
