@@ -16,7 +16,7 @@
 #include <cstdint>  // For std::uint64_t
 
 #ifndef HMEIGENS_HYPOT_ULPS
-/// @brief ULP multiplier for the norm tests. Default value is 2. Can be set at configure time with `-DHMEIGENS_HYPOT_ULPS=<n>`.
+/// @brief ULP multiplier for the norm tests. Default value is `2`. Can be set at configure time with `-DHMEIGENS_HYPOT_ULPS=<n>`.
 ///
 /// @anchor hypot_ulps
 /// Default is `2` because of measurements [published](https://homepages.loria.fr/PZimmermann/papers/glibc242.pdf) by Gladman, Innocente, Mather, Zimmermann in August 2025.
@@ -46,12 +46,13 @@ namespace hmeigens {
 
     /// @brief Returns the tolerance for the computation of the norm by `hmeigens::SquareMatrix::norm()`.
     ///
-    /// Implementations *usually* guarantee that the error is less than 1 ULP.
+    /// Implementations *usually* guarantee that the error is less than `1` ULP.
     /// [Source](https://en.cppreference.com/cpp/numeric/math/hypot):
     /// > Implementations usually guarantee precision of less than 1 ulp (Unit in the Last Place — Unit of Least Precision): [GNU](https://sourceware.org/git/?p=glibc.git;a=blob_plain;f=sysdeps/ieee754/dbl-64/e_hypot.c), [BSD](https://svnweb.freebsd.org/base/head/lib/msun/src/e_hypot.c).
+    ///
     /// Each element passes through two calls to `std::hypot`, one for the norm and one for the modulus of the complex number.
-    /// Given that a matrix of size `n` has `n*n` elements and assuming a (*usual*) deviation of `2` ULPs per element (one per call of `std::hypot`), the tolerance obtained if all errors go in the same direction is twice the number of elements in ULPs.
-    /// Since the standard leaves the accuracy to the implementation, this is taken as a baseline that can then be increased with the parameter `HMEIGENS_HYPOT_ULPS`, whose default value is 2.
+    /// Given that a matrix of size \f(n\f) has \f(n^2\f) elements and assuming a (*usual*) deviation of `2` ULPs per element (one per call of `std::hypot`), the tolerance obtained if all errors go in the same direction is twice the number of elements in ULPs.
+    /// Since the standard leaves the accuracy to the implementation, this is taken as a baseline that can then be increased with the parameter `HMEIGENS_HYPOT_ULPS`, whose default value is `2`.
     /// The actual tolerance enforced by the tests is therefore, by default, \f(4n^2\f). The value is however modifiable at configure time, because that upper bound is not a standard requirement, and some implementations may break it.
     /// See the documentation of `HMEIGENS_HYPOT_ULPS` for details on how its default was chosen and how it can be changed.
     /// @param size The size of the matrix whose norm is being computed.
@@ -65,7 +66,7 @@ namespace hmeigens {
     /// @brief Returns the tolerance for the computation of the tolerance by `hmeigens::getTolerance()`.
     ///
     /// Testing the tolerance requires some degree of tolerance, since it performs several operations and each part of both the function and the tests introduces roundings. In particular:
-    /// - (function) computing the norm introduces `normTolerance` ULPs already, but this number needs to be doubled because this error is relative, and thus could change its value in ULPs by changing the mantissa/significand of the floating-point value being computed, so `2*normTolerance()` ULPs;
+    /// - (function) computing the norm introduces `normTolerance()` ULPs already, but this number needs to be doubled because this error is relative, and thus could change its value in ULPs by changing the mantissa/significand of the floating-point value being computed, so `2*normTolerance()` ULPs;
     /// - (function) multiplying is correctly rounded (IEEE 754), therefore each multiplication rounds by at most half a ULP, but here there are two multiplications (actually three, but multiplying by `hmeigens::epsilon` does not round as it changes only the exponent), and finally this amount needs to be doubled by the same mantissa reasoning as before, so `2` ULPs;
     /// - (tests) performing operations on the reference value for testing may round it, but the number of ULPs due to this is variable, so the `extra` parameter, defaulted to `0`, covers this.
     /// @param size The size of the matrix whose tolerance is being computed.

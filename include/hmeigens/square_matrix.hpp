@@ -82,12 +82,14 @@ namespace hmeigens {
     /// @brief Square matrix with complex elements.
     ///
     /// The size is fixed at construction and cannot be changed.
-    /// The elements are stored in row-major order, so `hmeigens::SquareMatrix::Container` `{1,2,3,4,5,6,7,8,9}` represents the matrix
-    /// ```
-    /// | 1   2   3 |
-    /// | 4   5   6 |
-    /// | 7   8   9 |
-    /// ```
+    /// The elements are stored in row-major order, so `hmeigens::SquareMatrix::Container` `{1., 2., 3., 4., 5., 6., 7., 8., 9.}` represents the matrix
+    /// \f[
+    /// \begin{pmatrix}
+    ///    1 & 2 & 3
+    /// \\ 4 & 5 & 6 
+    /// \\ 7 & 8 & 9
+    /// \end{pmatrix}
+    /// \f]
     /// with a size of `3`.
     /// @note The size of a matrix is a **positive** number. A size `0` matrix **cannot** be constructed.
     class SquareMatrix {
@@ -111,7 +113,7 @@ namespace hmeigens {
         /// @brief Constructor for a zero-filled `size * size` matrix.
         ///
         /// The size of the matrix is validated at creation, and cannot be altered afterwards. A matrix cannot have a size:
-        /// - <=0 (meaningless);
+        /// - `<=0` (meaningless);
         /// - so large that `size * size` cannot be represented;
         /// - so large that it cannot be stored on the machine.
         ///
@@ -123,7 +125,7 @@ namespace hmeigens {
         ///
         /// int main() {
         ///     // A 1x1 zero-filled matrix.
-        ///     // Note that this is different from SquareMatrix A{{1}}, as that is a 1x1 matrix with (1,0) as its only element.
+        ///     // Note that this is different from SquareMatrix A{{1}}, as that is a 1x1 matrix with (1.; 0.) as its only element.
         ///     SquareMatrix A{1};
         ///     // A 3x3 zero-filled matrix.
         ///     SquareMatrix B{3};
@@ -141,7 +143,7 @@ namespace hmeigens {
         /// @brief Constructor for a matrix with an already known `body`.
         ///
         /// The size of the matrix is validated at creation, and cannot be altered afterwards. A matrix cannot be built from a `body` that:
-        /// - is empty, as it would have `.size()` 0 (meaningless);
+        /// - is empty, as it would have `.size()` `0` (meaningless);
         /// - has a number of elements that is not a perfect square, as it cannot be interpreted as a square matrix.
         ///
         /// Example:
@@ -154,12 +156,12 @@ namespace hmeigens {
         /// using hmeigens::SquareMatrix;
         ///
         /// int main() {
-        ///     // A 1x1 matrix with (4.2, 6.7) as its only element.
+        ///     // A 1x1 matrix with (4.2; 6.7) as its only element.
         ///     SquareMatrix A{{{HMS(4.2), HMS(6.7)}}};
-        ///     // A 1x1 matrix with (1,0) as its only element.
+        ///     // A 1x1 matrix with (1.; 0.) as its only element.
         ///     // Note that this is different from SquareMatrix B{1}, as that is a 1x1 zero-filled matrix.
-        ///     SquareMatrix B{{1}};
-        ///     // A 3x3 matrix whose members are, in order, the pairs (1,1) to (9,9).
+        ///     SquareMatrix B{{1.}};
+        ///     // A 3x3 matrix whose members are, in order, the pairs (1.; 1.) to (9.; 9.).
         ///     SquareMatrix C {
         ///         {{HMS(1.), HMS(1.)}, {HMS(2.), HMS(2.)}, {HMS(3.), HMS(3.)},
         ///          {HMS(4.), HMS(4.)}, {HMS(5.), HMS(5.)}, {HMS(6.), HMS(6.)},
@@ -267,11 +269,11 @@ namespace hmeigens {
 
         /// @brief Frobenius norm of the matrix.
         ///
-        /// The Frobenius norm of a size @f(n@f) square matrix @f(M@f) with elements @f(m_{ij}@f) is defined as
-        /// @f[
-        /// \left\|M\right\|_F=\sqrt{\sum_{i=1}^{n}\sum_{j=1}^{n}\left|m_{ij}\right|^2}\ ,
-        /// @f]
-        /// where @f(\left|m_{ij}\right|^2@f) is the squared modulus of the element.
+        /// The Frobenius norm of a size \f(n\f) square matrix \f(\mathbf{M}\f) with elements \f(m_{ij}\f) is defined as
+        /// \f[
+        /// \left\|\mathbf{M}\right\|_F=\sqrt{\sum_{i=1}^{n}\sum_{j=1}^{n}\left|m_{ij}\right|^2}\ ,
+        /// \f]
+        /// where \f(\left|m_{ij}\right|^2\f) is the squared modulus of the element.
         /// The Frobenius norm is used in this project because it is invariant under unitary operations.
         /// @return The Frobenius norm of the matrix as an `hmeigens::Scalar`.
         [[nodiscard]] Scalar norm() const;
@@ -319,19 +321,20 @@ namespace hmeigens {
 
     /// @brief Matrix multiplication between two square matrices.
     ///
-    /// Given two size @f(n@f) matrices @f(L@f), @f(R@f), their product @f(P=LR@f) has elements
-    /// @f[
-    /// P_{ij}=\sum_{k=1}^{n}L_{ik}R_{kj}.
-    /// @f]
+    /// Given two size \f(n\f) matrices \f(\mathbf{L}\f), \f(\mathbf{R}\f), their product \f(\mathbf{P}=\mathbf{L}\mathbf{R}\f) has elements
+    /// \f[
+    /// p_{ij}=\sum_{k=1}^{n}l_{ik}r_{kj}\ ,
+    /// \f]
+    /// where \f(p\f), \f(l\f), and \f(r\f) are the elements of the correspondingly named matrix.
     /// @param leftHand The left-hand side of the multiplication.
     /// @param rightHand The right-hand side of the multiplication.
     /// @return The standard matrix multiplication `leftHand*rightHand`.
     /// @throws std::invalid_argument if the two matrices are of different sizes.
     /// @throws std::bad_alloc if the memory could not be allocated on the machine.
-    /// @pre The elements of @f(L@f) and @f(R@f) must be finite.
+    /// @pre The elements of \f(\mathbf{L}\f) and \f(\mathbf{R}\f) must be finite.
     /// @note For details on the implementation also see the following files:
-    /// - benchmarks/complex_multiplication_bench.cpp;
-    /// - benchmarks/matrix_multiplication_bench.cpp.
+    /// - `benchmarks/complex_multiplication_bench.cpp`;
+    /// - `benchmarks/matrix_multiplication_bench.cpp`.
     [[nodiscard]] SquareMatrix operator*(const SquareMatrix& leftHand, const SquareMatrix& rightHand);
 
 }

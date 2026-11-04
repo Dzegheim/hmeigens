@@ -21,7 +21,7 @@
 /// The current value of `1.` is temporary, and it is meant to be measured by the benchmarks, but this cannot be done until the solver is completed.
 /// This entry will contain information on the benchmarks, when available.
 /// See `hmeigens::getTolerance` for an extensive discussion on the shape of the tolerance. This constant engulfs the elements from the theory that are not tied to the matrix:
-/// - the `2` factor between \f(\varepsilon\f) and \f(\mathbf{u}\f);
+/// - the \(2\) factor between \f(\varepsilon\f) and \f(u\f);
 /// - the \f(c\f) *small constant*.
 /// @warning This is a temporary value pending benchmarking.
 /// @sa hmeigens::toleranceK
@@ -31,7 +31,7 @@
 
 namespace hmeigens {
 
-    /// @brief The difference between `1.0` and the next `hmeigens::Scalar`.
+    /// @brief The difference between `1.` and the next `hmeigens::Scalar`.
     ///
     /// [Values](https://en.cppreference.com/cpp/types/climits):
     /// - `1.19209e-07` for `float`;

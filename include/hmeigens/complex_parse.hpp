@@ -36,13 +36,13 @@ namespace hmeigens {
     /// @anchor parser_formats
     /// Accepted forms:
     ///
-    /// | Form      | Example        |  (Real, Imaginary)   |
-    /// | :-------: | :------------: | :------------------: |
-    /// |   `a`     |      `1.2`     |       (1.2,0)        |
-    /// |  `a+bi`   |     `1-2i`     |       (1,-2)         |
-    /// |   `bi`    |     `-3.i`     |       (0,-3)         |
-    /// |   `i`     |      `+i`      |       (0,1)          |
-    /// |  `a,b`    |     `1,-2.3`   |       (1,-2.3)       |
+    /// |    Form    |    Example     |  (Real, Imaginary)   |
+    /// | :--------: | :------------: | :------------------: |
+    /// | \f(a\f)    |     `1.2`      |    \f((1.2, 0)\f)    |
+    /// | \f(a+bi\f) |    `1-2i`      |    \f((1, -2)\f)     |
+    /// | \f(bi\f)   |    `-3.i`      |    \f((0, -3)\f)     |
+    /// | \f(i\f)    |     `+i`       |    \f((0, 1)\f)      |
+    /// | \f(a,b\f)  |    `1,-2.3`    |    \f((1, -2.3)\f)   |
     ///
     /// In addition:
     /// - numbers may start or end with a `.`: `2.` is perfectly valid;
