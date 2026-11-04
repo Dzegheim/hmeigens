@@ -1,6 +1,7 @@
 // Source file for all functions in algebra_helpers.hpp.
 // Definitions (hmeigens::detail):
-//     - twoNorm(std::span<const Complex>).
+//     - twoNorm(std::span<const Complex>);
+//     - complexUnitVector(Complex).
 #include "hmeigens/detail/algebra_helpers.hpp"
 #include "hmeigens/scalar.hpp"
 
@@ -47,4 +48,19 @@ hmeigens::Scalar hmeigens::detail::twoNorm(std::span<const hmeigens::Complex> ve
         norm = std::hypot(std::hypot(z.real(), z.imag()), norm);
     }
     return norm;
+}
+
+// Computes the unit length vector in the direction of input, unless the input is (0.; 0.), in which case it returns (1.; 0.).
+// Fully documented in .hpp.
+hmeigens::Complex hmeigens::detail::complexUnitVector(hmeigens::Complex input) {
+    // The only complex number that does not have a defined phase is exactly (0.; 0.), so here == is required.
+    return input == hmeigens::Complex{} ?
+        // Return (1.; 0.) if the input is (0.; 0.).
+        hmeigens::Complex{
+            HMEIGENS_MAKE_SCALAR(1.),
+            HMEIGENS_MAKE_SCALAR(0.)
+        } :
+        // Build the unit vector otherwise.
+        // Note that using std::arg would not be useful here, as inputs with large differences in absolute value between components, i.e. close to one of the two axes, lose too much information.
+        input/std::hypot(input.real(), input.imag());
 }

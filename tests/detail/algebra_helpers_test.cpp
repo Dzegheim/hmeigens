@@ -1,7 +1,9 @@
 // Test file for algebra_helpers.hpp/.cpp.
 // Sections:
+// - constants;
 // - test cases:
-//      - hmeigens::detail::twoNorm.
+//      - hmeigens::detail::twoNorm;
+//      - hmeigens::detail::complexUnitVector.
 #include "hmeigens/detail/algebra_helpers.hpp"
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/tolerances.hpp"
@@ -11,11 +13,25 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <cstdint>       // For std::uint64_t
+#include <cmath>         // For std::sqrt, std::hypot
+
 // Local brief alias for the conversion macro to improve legibility.
 #define HMS HMEIGENS_MAKE_SCALAR
 
 // Readability of tests.
 using hmeigens::test::checkRealULPs;
+using hmeigens::test::checkComplexULPs;
+
+/* --------------------------------------------- */
+/* ----------------- Constants ----------------- */
+/* --------------------------------------------- */
+//
+// Tolerance for the hmeigens::detail::complexUnitVector function.
+// The function uses std::hypot, so it will have at least HMEIGENS_HYPOT_ULPS of tolerance. The division is another half ULP, as it is correctly rounded.
+// Since the error is relative, they must all be doubled, as per the discussion in tolerances.hpp.
+// This is kept local, and out of tolerances.hpp, as it is a simple computation and belongs to hmeigens::detail, which is not documented via Doxygen.
+constexpr std::uint64_t CUVTol = 2*HMEIGENS_HYPOT_ULPS+1;
 
 /* ------------------------------------------------ */
 /* ------------------ Test cases ------------------ */
@@ -67,5 +83,62 @@ TEST_CASE("2-norm test: containers whose length isn't a perfect square.", "[alge
         hmeigens::normTolerance(2)
     );
 }
+
+
+/* ------------------------------------------------ */
+/* ------ hmeigens::detail::complexUnitVector ----- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Complex unit vector test: the direction is correct.", "[algebra_helpers][detail][complexUnitVector]") {
+    // GIVEN a complex number
+    // WHEN  its associated complex unit vector is computed
+    // THEN  it is the expected vector with the correct length
+    //
+    // Special case: (0.; 0.).
+    checkComplexULPs(
+        hmeigens::detail::complexUnitVector({HMS(0.), HMS(0.)}),
+        {HMS(1.), HMS(0.)},
+        // It must return exactly 1., so no tolerance allowed.
+        0
+    );
+    // Notable directions.
+    // Real, positive.
+    checkComplexULPs(
+        hmeigens::detail::complexUnitVector({HMS(6.7), HMS(0.)}),
+        {HMS(1.), HMS(0.)},
+        CUVTol
+    );
+    // Real, negative.
+    checkComplexULPs(
+        hmeigens::detail::complexUnitVector({HMS(-4.2), HMS(0.)}),
+        {HMS(-1.), HMS(0.)},
+        CUVTol
+    );
+    // Imaginary, positive.
+    checkComplexULPs(
+        hmeigens::detail::complexUnitVector({HMS(0.), HMS(1000.)}),
+        {HMS(0.), HMS(1.)},
+        CUVTol
+    );
+    // Imaginary, negative.
+    checkComplexULPs(
+        hmeigens::detail::complexUnitVector({HMS(0.), HMS(-3.141592653)}),
+        {HMS(0.), HMS(-1.)},
+        CUVTol
+    );
+    // Generic input.
+    const hmeigens::Complex z{HMS(12.), HMS(-6.)};
+    const hmeigens::Complex zCUV = hmeigens::detail::complexUnitVector(z);
+    // The expected value is (2/sqrt(5); -1/sqrt(5)).
+    // This check already verifies the vector is unitary, as the norm of the expected value is 1: sqrt(4/5+1/5) = 1.
+    checkComplexULPs(
+        zCUV,
+        hmeigens::Complex{HMS(2.)/std::sqrt(HMS(5.)), HMS(-1.)/std::sqrt(HMS(5.))},
+        // Tolerance is CUVTol+2, with 1 ULP being from the std::sqrt function, and 1 from the division, as both are correctly rounded.
+        CUVTol+2
+    );
+}
+
+
 
 #undef HMS
