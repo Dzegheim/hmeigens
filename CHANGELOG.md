@@ -17,6 +17,9 @@ Version 0.2.0 is recorded from git history.
 - **A new file pair `algebra_helpers.hpp`/`.cpp` in `detail/`.** It is meant to host functions that perform algebraic operations on groups of complex numbers. It contains:
     - `hmeigens::detail::twoNorm`, which computes the `2`-norm of a vector of complex numbers;
     - `hmeigens::detail::complexUnitVector`, which computes a unit vector in the same direction as the input (except for `(0.; 0.)`, for which it returns `1.`).
+- **A new file `eigenvalues_solver.hpp`.** It is meant to host the functions of the main solver. It contains:
+    - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenbergInPlace`, **not implemented yet**, that houses the documentation for the Householder reflection part of the code;
+    - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenberg`, same as above.
 - **The codebase now enforces the IEC 559 standard at compile time.** This is likely unnecessary, but better safe than sorry.
 - **New `hmeigens::toleranceTolerance` helper in `tolerances.hpp`.**
 - **New pair of constants `HMEIGENS_TOLERANCE_K` and `hmeigens::toleranceK`.** The first is a temporary value that needs to be computed in benchmarking when the codebase is done, and will later be a configurable value via CMake. The second is just a cast of the other to `hmeigens::Scalar`. See documentation for details on what they represent.
