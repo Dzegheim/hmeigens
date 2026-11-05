@@ -1,7 +1,9 @@
 // Header-only collection of functions used by the tests to compare floating-point values.
 // Contents:
 // - hmeigens::test::checkRealULPs;
-// - hmeigens::test::checkComplexULPs.
+// - hmeigens::test::checkComplexULPs;
+// - hmeigens::test::checkRealAbs;
+// - hmeigens::test::checkComplexAbs.
 #ifndef HMEIGENS_TEST_COMPARISON_HELPERS_HPP
 #define HMEIGENS_TEST_COMPARISON_HELPERS_HPP
 
@@ -14,7 +16,7 @@
 
 namespace hmeigens::test {
 
-    // This helper checks that two real numbers are within the expected tolerance of one another.
+    // This helper checks that two real numbers are within the expected tolerance of one another in ULPs.
     inline void checkRealULPs(
         // The value to be checked.
         const Scalar toCheck,
@@ -24,7 +26,7 @@ namespace hmeigens::test {
         const std::uint64_t toleranceULPs
     );
     
-    // This helper checks that both the real and the imaginary part of two complex numbers are within the expected tolerance of one another.
+    // This helper checks that both the real and the imaginary part of two complex numbers are within the expected tolerance of one another in ULPs.
     inline void checkComplexULPs(
         // The value to be checked.
         const Complex toCheck,
@@ -32,6 +34,25 @@ namespace hmeigens::test {
         const Complex expected,
         // How many ULPs can each part (re, im) be apart.
         const std::uint64_t toleranceULPs);
+
+    // This helper checks that two real numbers are within the expected tolerance of one another in absolute value.
+    inline void checkRealAbs(
+        // The value to be checked.
+        const Scalar toCheck,
+        // The expected value.
+        const Scalar expected,
+        // How much they can be apart.
+        const Scalar tolerance
+    );
+    
+    // This helper checks that both the real and the imaginary part of two complex numbers are within the expected tolerance of one another in absolute value.
+    inline void checkComplexAbs(
+        // The value to be checked.
+        const Complex toCheck,
+        // The expected value.
+        const Complex expected,
+        // How much can each part (re, im) be apart.
+        const Scalar tolerance);
 }
 
 /* ----------------------------- */
@@ -55,6 +76,26 @@ inline void hmeigens::test::checkComplexULPs(const hmeigens::Complex toCheck, co
     hmeigens::test::checkRealULPs(toCheck.real(), expected.real(), toleranceULPs);
     // Imaginary part check.
     hmeigens::test::checkRealULPs(toCheck.imag(), expected.imag(), toleranceULPs);
+    return;
+}
+
+// See the declaration for all relevant information.
+inline void hmeigens::test::checkRealAbs(const hmeigens::Scalar toCheck, const hmeigens::Scalar expected, const hmeigens::Scalar tolerance) {
+    CAPTURE(toCheck, expected, tolerance);
+    CHECK_THAT(
+        toCheck,
+        Catch::Matchers::WithinAbs(expected, tolerance)
+    );
+    return;
+}
+
+// See the declaration for all relevant information.
+inline void hmeigens::test::checkComplexAbs(const hmeigens::Complex toCheck, const hmeigens::Complex expected, const hmeigens::Scalar tolerance) {
+    CAPTURE(toCheck, expected, tolerance);
+    // Real part check.
+    hmeigens::test::checkRealAbs(toCheck.real(), expected.real(), tolerance);
+    // Imaginary part check.
+    hmeigens::test::checkRealAbs(toCheck.imag(), expected.imag(), tolerance);
     return;
 }
 
