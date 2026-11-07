@@ -23,7 +23,7 @@ hmeigens::Complex hmeigens::detail::makeHouseholderInPlace(std::span<hmeigens::C
     // Now vector holds v/||v||.
     // Compute the unit complex number associated with the first element of vector.
     // The computed value is -phi.
-    // here phi having opposite phase to vector[0] is extremely important. See section 5.1.3 Computing the Householder Vector of Matrix Computations (Golub & Van Loan, 4th edition, 2013), about the severe cancellation issue.
+    // Here phi having opposite phase to vector[0] is extremely important. See section 5.1.3 Computing the Householder Vector of Matrix Computations (Golub & Van Loan, 4th edition, 2013), about the severe cancellation issue.
     // This is needed to compute u/||v||.
     const auto minusPhi = hmeigens::detail::complexUnitVector(vector[0]);
     // Finish the computation of u/||v||.
