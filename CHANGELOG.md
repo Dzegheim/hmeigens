@@ -17,6 +17,8 @@ Version 0.2.0 is recorded from git history.
 - **A new file pair `algebra_helpers.hpp`/`.cpp` in `detail/`.** It is meant to host functions that perform algebraic operations on groups of complex numbers. It contains:
     - `hmeigens::detail::twoNorm`, which computes the `2`-norm of a vector of complex numbers;
     - `hmeigens::detail::complexUnitVector`, which computes a unit vector in the same direction as the input (except for `(0.; 0.)`, for which it returns `1.`).
+- **A new file pair `householder.hpp`/`.cpp` in `detail/`.** It is meant to host the functions that perform the Householder reflections to transform a matrix into upper Hessenberg form. It contains:
+    - `hmeigens::detail::makeHouseholderInPlace`, which takes all the elements below the diagonal in a column and transforms the container holding them into the unit Householder vector, then returns the element to be put into the subdiagonal position in the matrix.
 - **A new file `eigenvalues_solver.hpp`.** It is meant to host the functions of the main solver. It contains:
     - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenbergInPlace`, **not implemented yet**, that houses the documentation for the Householder reflection part of the code;
     - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenberg`, same as above.
@@ -30,7 +32,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::isUpperHessenberg` thoroughly tested;
     - `hmeigens::isUpperTriangular` thoroughly tested;
     - `hmeigens::detail::twoNorm` thoroughly tested, though most of its tests are done via `hmeigens::SquareMatrix::norm`;
-    - `hmeigens::detail::complexUnitVector` thoroughly tested.
+    - `hmeigens::detail::complexUnitVector` thoroughly tested;
+    - `hmeigens::detail::makeHouseholderInPlace` thoroughly tested.
 
 ### Fixed
 - **The project now compiles with Clang.** Some cases of double braces were resolved by Clang as ambiguous. This was found out during the CI workflow jobs. All instances were fixed.

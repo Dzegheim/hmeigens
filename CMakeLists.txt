@@ -77,6 +77,7 @@ set(HMEIGENS_SOURCES
     detail/to_scalar.cpp
     detail/square_matrix_helpers.cpp
     detail/algebra_helpers.cpp
+    detail/householder.cpp
 )
 list(TRANSFORM HMEIGENS_SOURCES PREPEND src/hmeigens/)
 

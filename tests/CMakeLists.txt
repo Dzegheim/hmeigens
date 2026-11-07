@@ -15,6 +15,7 @@ set(HMEIGENS_TEST_SOURCES
     predicates_test.cpp
     tolerances_test.cpp
     detail/algebra_helpers_test.cpp
+    detail/householder_test.cpp
     )
 
 add_executable(${PROJECT_NAME_LOWER}_tests ${HMEIGENS_TEST_SOURCES})
