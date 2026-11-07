@@ -5,7 +5,6 @@
 //     - validateSize(std::uintmax_t);
 //     - sizeFromBodyLength(std::size_t);
 //     - checkSizeMatch(std::size_t, std::size_t, std::string_view).
-#include "hmeigens/constants.hpp"
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/detail/square_matrix_helpers.hpp"
 #include "hmeigens/detail/isqrt.hpp"
@@ -14,11 +13,10 @@
 #include <stdexcept>     // For std::invalid_argument, std::length_error
 #include <cstddef>       // For std::size_t
 #include <cstdint>       // For std::intmax_t, std::uintmax_t, SIZE_MAX, UINTMAX_MAX
-#include <utility>       // For std::cmp_greater
-#include <algorithm>     // For std::min
 
 #if SIZE_MAX < UINTMAX_MAX
-// If this does not hold the only function using it doesn't exist.
+// If this does not hold, the only function using them doesn't exist.
+#include <utility>       // For std::cmp_greater
 #include <limits>        // For std::numeric_limits<>::max()
 #endif
 

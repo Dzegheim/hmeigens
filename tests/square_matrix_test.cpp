@@ -1020,7 +1020,7 @@ TEST_CASE("Square matrix test: the adjoint operation gives the correct value and
     };
     // Perform the adjoint computation.
     auto testMatrixConj = testMatrix.adjoint();
-    // original matrix is untouched.
+    // Original matrix is untouched.
     checkAllElementsVersus(testMatrix, testBody, 0);
     // Adjoint is computed correctly.
     // Tolerance is 0 ULPs as no algebra is performed on the numbers.

@@ -6,7 +6,7 @@
 #include "hmeigens/constants.hpp"
 
 #include <cstddef>  // For std::size_t
-#include <limits>
+#include <limits>   // For std::numeric_limits
 
 #include <catch2/catch_test_macros.hpp>
 

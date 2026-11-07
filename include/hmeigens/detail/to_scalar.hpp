@@ -1,4 +1,4 @@
-// File for function used to convert strings into floating-point numbers.
+// File for the function used to convert strings into floating-point numbers.
 // Declarations (hmeigens::detail):
 //     - toScalar(std::string_view, std::string_view).
 #ifndef HMEIGENS_DETAIL_TOSCALAR_HPP

@@ -6,8 +6,7 @@
 
 #include "benchmark_helpers.hpp"
 
-#include <cstddef>       // for std::size_t
-#include <complex>
+#include <cstddef>       // For std::size_t
 #include <random>
 #include <string>
 

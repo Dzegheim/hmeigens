@@ -11,6 +11,7 @@
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/predicates.hpp"
 #include "hmeigens/tolerances.hpp"
+#include "hmeigens/constants.hpp"
 
 #include "comparison_helpers.hpp"
 

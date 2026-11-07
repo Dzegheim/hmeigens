@@ -27,7 +27,7 @@ namespace hmeigens {
         /// @brief Two-argument constructor: parsed text **can** be read into a complex number, but something about it failed, specified by the second argument.
         ///
         /// @param input The offending text that was not successfully parsed.
-        /// @param errorMessage An additional text supplied to provide additional information on the type of failure the parser experienced.
+        /// @param errorMessage An additional text string supplied to provide information on the type of failure the parser experienced.
         explicit ParseError(std::string_view input, std::string_view errorMessage);
     };
 

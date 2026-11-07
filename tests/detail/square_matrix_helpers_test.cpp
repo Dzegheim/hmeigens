@@ -68,7 +68,7 @@ TEST_CASE("Square matrix helpers test: a valid std::size_t is accepted.", "[squa
     // THEN  the size is reported as valid
     //
     // If the size is valid, the function returns the size, so it is enough to just check against the input.
-    // These values directly reach for hmgeigens::detail::validateSize(std::size_t).
+    // These values directly reach for hmeigens::detail::validateSize(std::size_t).
     // Minimum valid size.
     CHECK(hmeigens::detail::validateSize(std::size_t{1}) == 1);
     // Largest possible value.
@@ -80,7 +80,7 @@ TEST_CASE("Square matrix helpers test: a valid signed size is accepted.", "[squa
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the size is reported as valid
     //
-    // These values directly reach for hmgeigens::detail::validateSize(std::intmax_t).
+    // These values directly reach for hmeigens::detail::validateSize(std::intmax_t).
     // The maximum size cannot be tested by these overloads, as the largest std::size_t may exceed the largest signed integer.
     CHECK(hmeigens::detail::validateSize(std::intmax_t{1}) == 1);
     CHECK(hmeigens::detail::validateSize(std::intmax_t{bigEnoughNumber}) == bigEnoughNumber);
@@ -102,7 +102,7 @@ TEST_CASE("Square matrix helpers test: a valid unsigned size is accepted.", "[sq
     CHECK(hmeigens::detail::validateSize(std::uintmax_t{hmeigens::maxMatrixSize}) == hmeigens::maxMatrixSize);
     // These values reach the template overload in any reasonable system.
     // If an unsigned short int is uintmax_t then the template is the least of the concerns.
-    // Here the max matrix size may not fit in the type, so back to bigEnoguhNumber it is.
+    // Here the max matrix size may not fit in the type, so back to bigEnoughNumber it is.
     CHECK(hmeigens::detail::validateSize(static_cast<unsigned short int>(1)) == 1);
     CHECK(hmeigens::detail::validateSize(static_cast<unsigned short int>(bigEnoughNumber)) == bigEnoughNumber);
 }

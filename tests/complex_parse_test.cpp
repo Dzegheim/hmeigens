@@ -63,6 +63,7 @@ static void checkRejects(std::string_view testString, std::string_view alsoConta
             Catch::Matchers::ContainsSubstring(escaped)
         )
     );
+    return;
 }
 
 /* ------------------------------------------------ */

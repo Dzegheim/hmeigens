@@ -26,7 +26,7 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
     // (?:\d+(?:\.\d*)?|\.\d+)  123 OR 123.45 OR .45 OR 123.
     // (?:[eE][\+\-]?\d+)?      Optional exponent
     static const std::string unsignedNumber {R"((?:\d+(?:\.\d*)?|\.\d+)(?:[eE][\+\-]?\d+)?)"};
-    // String for the sign of a number
+    // String for the sign of a number.
     static const std::string sign {R"([\+\-])"};
     // String for an (optionally) signed number.
     // This is just to avoid repeating sign + "?" + unsignedNumber many times below.
@@ -79,17 +79,19 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
     if (std::regex_match(first, last, match, algebraicForm)) {
         // If a real part is matched, it is used.
         // If not matched, it is null.
-        const hmeigens::Scalar realPart = match[1].matched ?
-        hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input) :
-        HMS(0.);
+        const hmeigens::Scalar realPart =
+            match[1].matched ?
+            hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input) :
+            HMS(0.);
         // If there is a sign, it is used.
         // If there is no sign, it is a '+'.
         const hmeigens::Scalar imagSign = (match[2].matched and *match[2].first == '-') ? HMS(-1.) : HMS(1.);
         // If there is a magnitude, it is used.
         // If there is no magnitude, it is 1.0.
-        const hmeigens::Scalar imagMagnitude = match[3].matched
-        ? hmeigens::detail::toScalar(std::string_view{match[3].first, match[3].second}, input) :
-        HMS(1.);
+        const hmeigens::Scalar imagMagnitude =
+            match[3].matched ?
+            hmeigens::detail::toScalar(std::string_view{match[3].first, match[3].second}, input) :
+            HMS(1.);
         return hmeigens::Complex{realPart, imagSign * imagMagnitude};
     }
     // If nothing matches an exception is thrown.

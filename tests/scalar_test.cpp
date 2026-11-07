@@ -5,7 +5,7 @@
 //      - HMEIGENS_MAKE_SCALAR.
 #include "hmeigens/scalar.hpp"
 
-#include <type_traits>
+#include <type_traits>  // For std::is_same_v
 
 #include <catch2/catch_test_macros.hpp>
 

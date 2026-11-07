@@ -10,7 +10,6 @@
 
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/scalar.hpp"
-#include "hmeigens/constants.hpp"
 
 namespace hmeigens {
 

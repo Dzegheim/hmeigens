@@ -11,7 +11,7 @@
 
 #include "hmeigens/scalar.hpp"
 
-#include <limits>
+#include <limits>   // For std::numeric_limits
 #include <cstddef>  // For std::size_t
 
 #ifndef HMEIGENS_TOLERANCE_K

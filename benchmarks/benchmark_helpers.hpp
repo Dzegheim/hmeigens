@@ -8,7 +8,7 @@
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/square_matrix.hpp"
 
-#include <cstddef>       // for std::size_t
+#include <cstddef>       // For std::size_t
 #include <random>
 
 #include <catch2/catch_test_macros.hpp>

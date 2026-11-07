@@ -31,7 +31,7 @@
 //     - <CanBeSize, CanBeSize> operator()(Row, Col);
 //     - <CanBeSize, CanBeSize> at(Row, Col) const;
 //     - <CanBeSize, CanBeSize> at(Row, Col);
-//     - <CanBeSize, CanBeSize> checkIndex(Row, Col);
+//     - <CanBeSize, CanBeSize> checkIndex(Row, Col) const;
 //     - static <CanBeSize> identity(Size).
 #ifndef HMEIGENS_SQUARE_MATRIX_HPP
 #define HMEIGENS_SQUARE_MATRIX_HPP
@@ -312,7 +312,7 @@ namespace hmeigens {
     inline constexpr std::size_t maxMatrixSize = std::min(
         maxSquarableSize,
         detail::isqrt(
-            hmeigens::SquareMatrix::Container{}.max_size()
+            SquareMatrix::Container{}.max_size()
         )
     );
     // These two assertions verify that the operation above behaved properly.
@@ -422,7 +422,7 @@ hmeigens::Complex& hmeigens::SquareMatrix::at(Row row, Col col) {
 }
 
 // Verifies that an index is within the matrix, throws if not.
-// For non-negative values checking for just the expression row * size_ + col < body_.size() could result in wrong indexation being accepted.
+// For non-negative values checking for just the expression row * size_ + col < body_.size() could result in wrong indexing being accepted.
 // Something like (0,8) for a 3x3 matrix would give the element in position (2,2), which is not what was asked, as what was asked makes no sense.
 // Not that anyone writing this code would make that mistake and write a comment about it...
 // Fully documented at the declaration.
