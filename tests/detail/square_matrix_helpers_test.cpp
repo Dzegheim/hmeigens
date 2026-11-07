@@ -76,7 +76,7 @@ TEST_CASE("Square matrix helpers test: a valid std::size_t is accepted.", "[squa
 }
 
 TEST_CASE("Square matrix helpers test: a valid signed size is accepted.", "[square_matrix_helpers][detail][validateSize]") {
-    // GIVEN a valid unsigned size for a matrix
+    // GIVEN a valid signed size for a matrix
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the size is reported as valid
     //
@@ -85,13 +85,13 @@ TEST_CASE("Square matrix helpers test: a valid signed size is accepted.", "[squa
     CHECK(hmeigens::detail::validateSize(std::intmax_t{1}) == 1);
     CHECK(hmeigens::detail::validateSize(std::intmax_t{bigEnoughNumber}) == bigEnoughNumber);
     // These values reach the template overload in any reasonable system.
-    // If an unsigned short int is intmax_t then the template is the least of the concerns.
+    // If a short int is intmax_t then the template is the least of the concerns.
     CHECK(hmeigens::detail::validateSize(static_cast<short int>(1)) == 1);
     CHECK(hmeigens::detail::validateSize(static_cast<short int>(bigEnoughNumber)) == bigEnoughNumber);
 }
 
 TEST_CASE("Square matrix helpers test: a valid unsigned size is accepted.", "[square_matrix_helpers][detail][validateSize]") {
-    // GIVEN a valid signed size for a matrix
+    // GIVEN a valid unsigned size for a matrix
     // WHEN  hmeigens::detail::validateSize attempts to validate it
     // THEN  the size is reported as valid
     //
@@ -101,7 +101,7 @@ TEST_CASE("Square matrix helpers test: a valid unsigned size is accepted.", "[sq
     CHECK(hmeigens::detail::validateSize(std::uintmax_t{1}) == 1);
     CHECK(hmeigens::detail::validateSize(std::uintmax_t{hmeigens::maxMatrixSize}) == hmeigens::maxMatrixSize);
     // These values reach the template overload in any reasonable system.
-    // If a short int is uintmax_t then the template is the least of the concerns.
+    // If an unsigned short int is uintmax_t then the template is the least of the concerns.
     // Here the max matrix size may not fit in the type, so back to bigEnoguhNumber it is.
     CHECK(hmeigens::detail::validateSize(static_cast<unsigned short int>(1)) == 1);
     CHECK(hmeigens::detail::validateSize(static_cast<unsigned short int>(bigEnoughNumber)) == bigEnoughNumber);
