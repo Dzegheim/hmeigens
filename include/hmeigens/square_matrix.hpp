@@ -19,7 +19,7 @@
 //     - adjointInPlace();
 //     - adjoint() const;
 //     - getIndex(std::size_t, std::size_t) const;
-//     - <CanBeSize, CanBeSize> checkIndex(Row, Col).
+//     - <CanBeSize, CanBeSize> checkIndex(Row, Col) const.
 // Declarations (hmeigens):
 //     - maxMatrixSize;
 //     - operator*(const SquareMatrix&, const SquareMatrix&).
