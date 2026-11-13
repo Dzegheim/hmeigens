@@ -8,7 +8,7 @@ Version 0.2.0 is recorded from git history.
 
 ## [Unreleased]
 ### Added
-- **CI workflows.** One for each major OS family: Linux, Windows, macOS. The [README's *Platforms* section](README.md#platforms) has all the information on supported platforms.
+- **CI workflows.** One for each major OS family: Linux, Windows, macOS. The README's *[Platforms](README.md#platforms)* section has all the information on supported platforms.
 - **A new file pair `predicates.hpp`/`.cpp`.** It is meant to host functions that verify whether a matrix satisfies certain properties. It contains:
     - `hmeigens::isFinite`, which checks whether a given matrix is finite in both the real and imaginary parts for all its elements;
     - `hmeigens::getTolerance`, which computes the tolerance above which an element cannot safely be considered `0.` with respect to the matrix at hand;

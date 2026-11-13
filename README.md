@@ -143,7 +143,7 @@ Note that coverage is additive, so if the `.gcda` files are already present and 
 [![CI-Linux](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-linux.yml)
 [![CI-macOS](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/Dzegheim/hmeigens/actions/workflows/ci-macos.yml)
 
-In addition to the setup already listed in *Requirements*, the codebase is built, run, and tested on all the systems listed in the [workflow files](.github/workflows/).
+In addition to the setup already listed in *Requirements*, the codebase is built, run, and tested on all the systems listed in the workflow files.
 
 The four main presets (`release`, `debug`, `release-f`, `debug-f`) are run on each major family of OSs. The table below lists the tested combinations. For more details check the files. OSs with a * below only run `release` and `debug-f`.
 
