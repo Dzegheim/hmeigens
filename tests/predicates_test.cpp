@@ -21,21 +21,18 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+// Readability of tests.
+using hmeigens::test::checkRealULPs;
+#define HMS HMEIGENS_MAKE_SCALAR
+
 /* --------------------------------------------- */
 /* ----------------- Constants ----------------- */
 /* --------------------------------------------- */
 //
-// For readability of tests.
 constexpr hmeigens::Scalar NaN = std::numeric_limits<hmeigens::Scalar>::quiet_NaN();
 constexpr hmeigens::Scalar Inf = std::numeric_limits<hmeigens::Scalar>::infinity();
 constexpr hmeigens::Scalar max = std::numeric_limits<hmeigens::Scalar>::max();
 constexpr hmeigens::Scalar lowest = std::numeric_limits<hmeigens::Scalar>::lowest();
-
-// Local brief alias for the conversion macro to improve legibility.
-#define HMS HMEIGENS_MAKE_SCALAR
-
-// Readability of tests.
-using hmeigens::test::checkRealULPs;
 
 /* ------------------------------------------------ */
 /* ------------------ Test cases ------------------ */

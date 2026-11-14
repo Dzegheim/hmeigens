@@ -12,12 +12,10 @@
 namespace hmeigens::detail {
 
     // This function checks if a character is printable in the way that matters to this code.
+    // Characters below 128 are displayable if they are printable as per std::isprint. Characters 128 and above are not ASCII and therefore always displayable.
     // The locale used is the std::locale::classic(), as it is the only one that will be used inside the code, so that the same input produces the same output independently of the user's locale settings.
-    // From 128 onward there is no need to check here, those are not ASCII.
     // Should anyone ever input a non-ASCII character, like an emoji (why would they?), escaping its components would display it as a mumbojumbo of octals, and the user would have a hard time reading the error message.
-    // The chars before 128 are checked by std::isprint.
     // The parameter is unsigned char because char can be signed or unsigned depending on the compiler, so performing these types of checks on it is dangerous.
-    // The argument must be a char, passing an unsigned one compiles and links but throws std::bad_cast at runtime.
     [[nodiscard]] bool isDisplayable(unsigned char toCheck);
 
     // This function renders arbitrary input as text that is safe to put in a message by escaping problematic characters.

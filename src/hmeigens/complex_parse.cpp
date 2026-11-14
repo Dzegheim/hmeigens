@@ -1,4 +1,5 @@
 // Source file for all functions in complex_parse.hpp.
+// All functions are fully documented at their declarations.
 // Definitions (hmeigens):
 //     - parseComplex(std::string_view).
 // Definitions (hmeigens::ParseError):
@@ -15,11 +16,6 @@
 #include <stdexcept>      // For std::invalid_argument
 #include <format>
 
-// Local brief alias for the conversion macro to improve legibility.
-#define HMS HMEIGENS_MAKE_SCALAR
-
-// A function to parse complex numbers from text using regular expressions.
-// Fully documented in .hpp.
 hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
     // String for a generic number with optional exponential part.
     // Structure:
@@ -49,21 +45,15 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
     // [iI]                Mandatory, if this is missing the regex matches the empty string and this regex doesn't need to match real numbers, already handled above
     // $                   End of the string
     static const std::regex algebraicForm {"^(" + signedNumber + R"((?![\.\diI]))?()" + sign +")?(" + unsignedNumber + ")?[iI]$"};
-
-    // Get the start and end of the read data.
-    const auto* first = input.data();
-    const auto* last  = input.data() + input.size();
-
     // Using cmatch since the input is std::string_view.
     std::cmatch match;
-
+    const auto* first = input.data();
+    const auto* last  = input.data() + input.size();
     // Real number case.
     if (std::regex_match(first, last, match, realNumber)) {
         return hmeigens::Complex {
-            // Matched real part, including sign.
             hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input),
-            // Null imaginary part.
-            HMS(0.)
+            HMEIGENS_MAKE_SCALAR(0.)
         };
     }
     // Ordered pair case.
@@ -77,32 +67,21 @@ hmeigens::Complex hmeigens::parseComplex(std::string_view input) {
     }
     // Algebraic expression case.
     if (std::regex_match(first, last, match, algebraicForm)) {
-        // If a real part is matched, it is used.
-        // If not matched, it is null.
         const hmeigens::Scalar realPart =
             match[1].matched ?
             hmeigens::detail::toScalar(std::string_view{match[1].first, match[1].second}, input) :
-            HMS(0.);
-        // If there is a sign, it is used.
-        // If there is no sign, it is a '+'.
-        const hmeigens::Scalar imagSign = (match[2].matched and *match[2].first == '-') ? HMS(-1.) : HMS(1.);
-        // If there is a magnitude, it is used.
-        // If there is no magnitude, it is 1.0.
+            HMEIGENS_MAKE_SCALAR(0.);
+        const hmeigens::Scalar imagSign = (match[2].matched and *match[2].first == '-') ? HMEIGENS_MAKE_SCALAR(-1.) : HMEIGENS_MAKE_SCALAR(1.);
         const hmeigens::Scalar imagMagnitude =
             match[3].matched ?
             hmeigens::detail::toScalar(std::string_view{match[3].first, match[3].second}, input) :
-            HMS(1.);
+            HMEIGENS_MAKE_SCALAR(1.);
         return hmeigens::Complex{realPart, imagSign * imagMagnitude};
     }
-    // If nothing matches an exception is thrown.
     throw hmeigens::ParseError{input};
 }
 
-// Constructor for a hmeigens::ParseError that does not require a second explanation line.
 hmeigens::ParseError::ParseError(std::string_view input) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".", hmeigens::detail::escape(input))) {}
 
-// Constructor for a hmeigens::ParseError that requires a second explanation line.
 // The errorMessage needs no escaping, as it is built by internal functions that escape text on their own.
 hmeigens::ParseError::ParseError(std::string_view input, std::string_view errorMessage) : std::invalid_argument(std::format("Unable to parse a complex number from \"{0}\".\n---> {1}", hmeigens::detail::escape(input), errorMessage)) {}
-
-#undef HMS

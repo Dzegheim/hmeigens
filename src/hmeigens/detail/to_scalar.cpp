@@ -1,4 +1,5 @@
 // Source file for all functions in to_scalar.hpp.
+// All functions are fully documented at their declarations.
 // Definitions (hmeigens::detail):
 //     - toScalar(std::string_view, std::string_view).
 #include "hmeigens/detail/to_scalar.hpp"
@@ -17,12 +18,9 @@
 hmeigens::Scalar hmeigens::detail::toScalar(std::string_view toConvert, std::string_view fullInput) {
     // Stored here because if a leading "+" is removed, the user can still get the original text meant for conversion in an error message.
     const std::string_view originalToConvert = toConvert;
-    // Check that toConvert is not empty, and that the first character is a '+'.
-    // If it is a '+', drop it.
     if (not toConvert.empty() and toConvert.front() == '+') {
         toConvert.remove_prefix(1);
     }
-    // Get the start and end of toConvert.
     const char* first = toConvert.data();
     const char* last  = toConvert.data()+toConvert.size();
     hmeigens::Scalar value{};
@@ -32,21 +30,17 @@ hmeigens::Scalar hmeigens::detail::toScalar(std::string_view toConvert, std::str
     const auto [ptr, ec] = std::from_chars(first, last, value);
     // The value was read correctly only if ptr is last, and if ec is default.
     if (ec != std::errc{} or ptr != last) {
-        // If there is an error, throw with the offending text.
-        // The input is already checked by hmeigens::parseComplex, so a std::errc::invalid_argument should never happen.
+        // The input is already checked by hmeigens::parseComplex, so an std::errc::invalid_argument should never happen.
         // What can happen here is std::errc::result_out_of_range if the passed value does not fit in the chosen hmeigens::Scalar type.
         if (ec == std::errc::result_out_of_range) {
             throw hmeigens::ParseError{
-                // Full offending text.
                 fullInput,
-                // Error message constructed to signify out of range.
                 // The piece of offending text that caused the problem is originalToConvert.
                 std::format("Input {0} is out of range for Scalar type {1}.", hmeigens::detail::escape(originalToConvert), hmeigens::scalarType)
             };
         }
         // This should never be reached because of previous checks, but better safe than sorry.
         throw hmeigens::ParseError{
-            // Full offending text.
             fullInput,
             std::format("The text {0} caused the problem. This is a bug in HMEigenS, not in your input. Please report it on GitHub with the text you entered. Thank you.", hmeigens::detail::escape(originalToConvert))};
     }

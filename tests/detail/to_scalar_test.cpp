@@ -16,16 +16,14 @@
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 
-// Local brief alias for the conversion macro to improve legibility.
+// Readability of tests.
+using hmeigens::test::checkRealULPs;
 #define HMS HMEIGENS_MAKE_SCALAR
 
 /* --------------------------------------------- */
 /* ------------------ Helpers ------------------ */
 /* --------------------------------------------- */
 //
-// Readability of tests.
-using hmeigens::test::checkRealULPs;
-
 // This is a helper function to verify that the number read corresponds to the expected one.
 // Tolerance is documented in tolerances.hpp.
 static void checkReads(std::string_view toConvert, hmeigens::Scalar expectedValue) {

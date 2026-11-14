@@ -49,7 +49,7 @@ constexpr std::size_t hmeigens::detail::isqrt(std::size_t value) {
     // Say the maximum std::size_t is 111111(2) (odd).
     // Its isqrt is 000111(2) (odd), which squares to 110001(2) (odd).
     // In this case smallCandidate would be 000110(2), i.e. the largest possible smallCandidate, and thus no value of largeCandidate can overflow.
-    // This holds for an arbitrary number of bits.
+    // This holds for an arbitrary (even) number of bits.
     return largeCandidate * largeCandidate > value ? smallCandidate : largeCandidate;
 }
 

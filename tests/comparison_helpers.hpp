@@ -59,7 +59,8 @@ namespace hmeigens::test {
 /* -------- Definitions -------- */
 /* ----------------------------- */
 //
-// See the declaration for all relevant information.
+// See the declarations for all relevant information.
+//
 inline void hmeigens::test::checkRealULPs(const hmeigens::Scalar toCheck, const hmeigens::Scalar expected, const std::uint64_t toleranceULPs) {
     CAPTURE(toCheck, expected, toleranceULPs);
     CHECK_THAT(
@@ -69,7 +70,6 @@ inline void hmeigens::test::checkRealULPs(const hmeigens::Scalar toCheck, const 
     return;
 }
 
-// See the declaration for all relevant information.
 inline void hmeigens::test::checkComplexULPs(const hmeigens::Complex toCheck, const hmeigens::Complex expected, const std::uint64_t toleranceULPs) {
     CAPTURE(toCheck, expected, toleranceULPs);
     // Real part check.
@@ -79,7 +79,6 @@ inline void hmeigens::test::checkComplexULPs(const hmeigens::Complex toCheck, co
     return;
 }
 
-// See the declaration for all relevant information.
 inline void hmeigens::test::checkRealAbs(const hmeigens::Scalar toCheck, const hmeigens::Scalar expected, const hmeigens::Scalar tolerance) {
     CAPTURE(toCheck, expected, tolerance);
     CHECK_THAT(
@@ -89,7 +88,6 @@ inline void hmeigens::test::checkRealAbs(const hmeigens::Scalar toCheck, const h
     return;
 }
 
-// See the declaration for all relevant information.
 inline void hmeigens::test::checkComplexAbs(const hmeigens::Complex toCheck, const hmeigens::Complex expected, const hmeigens::Scalar tolerance) {
     CAPTURE(toCheck, expected, tolerance);
     // Real part check.

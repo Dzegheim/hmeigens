@@ -1,4 +1,5 @@
 // Source file for all non-template functions in square_matrix_helpers.hpp.
+// All functions are fully documented at their declarations.
 // Definitions (hmeigens::detail):
 //     - validateSize(std::size_t);
 //     - validateSize(std::intmax_t);
@@ -33,7 +34,7 @@ std::size_t hmeigens::detail::validateSize(std::size_t toValidate) {
     if (toValidate == 0) {
         throw std::invalid_argument{"Size 0 is invalid for a matrix."};
     }
-    // The value toValidate * toValidate must be able to be represented by a std::size_t.
+    // The value toValidate * toValidate must be able to be represented by an std::size_t.
     // It must also hold that the requested number of elements must be one hmeigens::SquareMatrix::Container can actually hold.
     // The variable hmeigens::maxMatrixSize is constructed so that it always satisfies both conditions.
     if (toValidate > hmeigens::maxMatrixSize) {
@@ -44,9 +45,8 @@ std::size_t hmeigens::detail::validateSize(std::size_t toValidate) {
 
 std::size_t hmeigens::detail::validateSize(std::intmax_t toValidate) {
     // A matrix must have a positive integer as a size.
-    // This function checks that the size is non-negative.
+    // This function only checks that the size is non-negative.
     // The other checks are handled by the unsigned overloads.
-    // Note that the unsigned validator can be the std::size_t overload. See the comment at the top of the square_matrix_helpers.hpp file.
     if (toValidate < 0) {
         throw std::invalid_argument{std::format("A matrix cannot have a negative size.\n---> Provided value: {0}.", toValidate)};
     }
@@ -62,7 +62,7 @@ std::size_t hmeigens::detail::validateSize(std::uintmax_t toValidate) {
     // Check that the value fits into an std::size_t.
     if (std::cmp_greater(toValidate, std::numeric_limits<std::size_t>::max())) {
         throw std::length_error{
-            // Inform the user of the error of their ways: they're trying to give a size that does not fit into std::size_t, and that also makes it certain that it will not be valid because a valid size must be both squarable within std::size_t and smaller than the maximum allowed number of elements of the container, which is a std::size_t.
+            // Inform the user of the error of their ways: they're trying to give a size that does not fit into std::size_t, and that also makes it certain that it will not be valid because a valid size must be both squarable within std::size_t and smaller than the maximum allowed number of elements of the container, which is an std::size_t.
             // Basically this value makes no sense in so many different ways that the diagnostic is a favour.
             std::format(
                 "A {0}x{0} matrix cannot be created.\n---> Number of elements is too large to be represented by std::size_t. The maximum value that can be represented by the type is {1}.\n---> Note that the maximum size allowed for a matrix with the current build settings is {2}.",
@@ -77,7 +77,6 @@ std::size_t hmeigens::detail::validateSize(std::uintmax_t toValidate) {
 }
 #endif
 
-// Fully documented in .hpp.
 std::size_t hmeigens::detail::sizeFromBodyLength(std::size_t bodyLength) {
     // An empty container cannot be used to construct a matrix because it would have size 0.
     if (bodyLength == 0) {
@@ -91,7 +90,6 @@ std::size_t hmeigens::detail::sizeFromBodyLength(std::size_t bodyLength) {
     return root;
 }
 
-// Fully documented in .hpp.
 std::size_t hmeigens::detail::checkSizeMatch(std::size_t sizeOne, std::size_t sizeTwo, std::string_view operationName) {
     // Sizes are assumed valid, i.e. 0 < sizeOne <= hmeigens::maxMatrixSize and the same for sizeTwo.
     if (sizeOne != sizeTwo) {

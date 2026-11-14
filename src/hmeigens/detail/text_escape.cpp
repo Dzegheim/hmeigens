@@ -1,4 +1,5 @@
 // Source file for all functions in text_escape.hpp.
+// All functions are fully documented at their declarations.
 // Definitions (hmeigens::detail):
 //     - isDisplayable(unsigned char);
 //     - escape(std::string_view).
@@ -9,10 +10,11 @@
 #include <format>
 #include <locale>         // For std::isprint, std::locale
 
-// Inside there is a cast because std::isprint has two overloads. This code uses the one in <locale>.
-// According to https://en.cppreference.com/cpp/locale/isprint it needs a std::ctype.
 bool hmeigens::detail::isDisplayable(unsigned char toCheck) {
-    // The first non-ASCII is 0x80 (128 decimal, 0200 octal).
+    // The chars before 128 are checked by std::isprint.
+    // According to https://en.cppreference.com/cpp/locale/isprint it needs an std::ctype.
+    // The argument must be a char, passing an unsigned one compiles and links but throws std::bad_cast at runtime.
+    // The first non-ASCII is 0x80 (128 decimal, 0200 octal), and from it onward there is no need to check here.
     return toCheck >= 0x80 or std::isprint(static_cast<char>(toCheck), std::locale::classic());
 }
 
@@ -42,11 +44,10 @@ std::string hmeigens::detail::escape(std::string_view toEscape) {
         else if (character == '\t') {
             escaped += R"(\t)";
         }
-        // Check if the character is displayable.
+        // Check if the character is displayable, and if it is not, turn it into octal.
         else if (hmeigens::detail::isDisplayable(character)) {
             escaped += static_cast<char>(character);
         }
-        // If it is not, turn it into octal.
         else {
             escaped += std::format("\\{:03o}", character);
         }

@@ -17,16 +17,14 @@ using std::string_view_literals::operator""sv;
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 
-// Local brief alias for the conversion macro to improve legibility.
+// Readability of tests.
 #define HMS HMEIGENS_MAKE_SCALAR
+using hmeigens::test::checkComplexULPs;
 
 /* --------------------------------------------- */
 /* ------------------ Helpers ------------------ */
 /* --------------------------------------------- */
 //
-// Readability of tests.
-using hmeigens::test::checkComplexULPs;
-
 // This is a helper function to test whether the text is parsed correctly.
 // Tolerance is documented in tolerances.hpp.
 static void checkParse(std::string_view testString, hmeigens::Complex expected) {

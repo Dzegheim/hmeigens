@@ -16,12 +16,10 @@
 #include <cstdint>       // For std::uint64_t
 #include <cmath>         // For std::sqrt, std::hypot
 
-// Local brief alias for the conversion macro to improve legibility.
-#define HMS HMEIGENS_MAKE_SCALAR
-
 // Readability of tests.
 using hmeigens::test::checkRealULPs;
 using hmeigens::test::checkComplexULPs;
+#define HMS HMEIGENS_MAKE_SCALAR
 
 /* --------------------------------------------- */
 /* ----------------- Constants ----------------- */

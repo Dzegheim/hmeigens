@@ -98,10 +98,11 @@ namespace hmeigens::detail {
 /* -------- Definitions -------- */
 /* ----------------------------- */
 //
-// See the declaration for all relevant information.
+// All functions are fully documented at their declarations.
+//
 // These functions are basically a glorified wrapper for hmeigens::detail::validateSize() with the corresponding parameter type.
 // They collect every other signed/unsigned value and cast it into the bigger mold.
-// Note that the unsigned validator can be the std::size_t overload. See the comment at the top of the file.
+// Note that the unsigned validator can be the std::size_t overload. See the IMPORTANT comment at the top of the file.
 template<std::signed_integral SigInt>
 std::size_t hmeigens::detail::validateSize(SigInt toValidate) {
     return hmeigens::detail::validateSize(static_cast<std::intmax_t>(toValidate));

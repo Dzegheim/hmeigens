@@ -343,28 +343,22 @@ namespace hmeigens {
 /* -------- Definitions -------- */
 /* ----------------------------- */
 //
-// Given a row and a column, gives the corresponding index for the body.
-// Fully documented at the declaration.
+// All functions are fully documented at their declarations.
+//
 inline std::size_t hmeigens::SquareMatrix::getIndex(std::size_t row, std::size_t col) const {
     return row * size_ + col;
 }
 
-// Gives the size of a matrix.
-// Fully documented at the declaration.
 inline std::size_t hmeigens::SquareMatrix::size() const {
     return size_;
 }
 
-// Size parameter constructor.
-// Takes the size as a parameter, validates it via helper, then if everything's fine it initializes the matrix as a 0 filled hmeigens::SquareMatrix::Container whose length is size*size.
-// If there is a problem with the size, the helper function throws.
-// Fully documented at the declaration.
 template<hmeigens::CanBeSize Size>
 hmeigens::SquareMatrix::SquareMatrix(Size size) :
-    // Validating HERE is important, because if it's done later, there could be an attempt to make a hmeigens::SquareMatrix::Container with an invalid size.
+    // Validating HERE is important, because if it's done later, there could be an attempt to make an hmeigens::SquareMatrix::Container with an invalid size.
     size_(hmeigens::detail::validateSize(size)),
-    // Using size_ for initialization makes it so that if the members are somehow swapped in the header, -Wuninitialized (i. e. -Wall) would complain.
-    // The container may generate a std::bad_alloc. That is deliberately not handled here.
+    // Using size_ for initialization makes it so that if the members are somehow swapped in the header, -Wuninitialized (i.e. -Wall) would complain.
+    // The container may generate an std::bad_alloc. That is deliberately not handled here.
     body_(size_*size_) {}
 
 /// @cond
@@ -372,8 +366,6 @@ hmeigens::SquareMatrix::SquareMatrix(Size size) :
 // Issue opened at https://github.com/doxygen/doxygen/issues/12379 as no relevant duplicate was found.
 // It thinks this is another function. This conditional prevents it from showing up as an undocumented duplicate.
 //
-// This and the three after are the accessors.
-// Fully documented at the declaration.
 // Note: The operators are index safe in DEBUG MODE ONLY.
 // Note: The casts are either:
 // - always safe if the index is checked by checkIndex, as the value cannot overflow if checkIndex didn't throw;
@@ -389,7 +381,6 @@ const hmeigens::Complex& hmeigens::SquareMatrix::operator()(Row row, Col col) co
     )];
 }
 
-// Fully documented at the declaration.
 template<hmeigens::CanBeSize Row, hmeigens::CanBeSize Col>
 hmeigens::Complex& hmeigens::SquareMatrix::operator()(Row row, Col col) {
     #ifndef NDEBUG
@@ -401,7 +392,6 @@ hmeigens::Complex& hmeigens::SquareMatrix::operator()(Row row, Col col) {
     )];
 }
 
-// Fully documented at the declaration.
 template<hmeigens::CanBeSize Row, hmeigens::CanBeSize Col>
 const hmeigens::Complex& hmeigens::SquareMatrix::at(Row row, Col col) const {
     hmeigens::SquareMatrix::checkIndex(row, col);
@@ -411,7 +401,6 @@ const hmeigens::Complex& hmeigens::SquareMatrix::at(Row row, Col col) const {
     )];
 }
 
-// Fully documented at the declaration.
 template<hmeigens::CanBeSize Row, hmeigens::CanBeSize Col>
 hmeigens::Complex& hmeigens::SquareMatrix::at(Row row, Col col) {
     hmeigens::SquareMatrix::checkIndex(row, col);
@@ -421,11 +410,9 @@ hmeigens::Complex& hmeigens::SquareMatrix::at(Row row, Col col) {
     )];
 }
 
-// Verifies that an index is within the matrix, throws if not.
 // For non-negative values checking for just the expression row * size_ + col < body_.size() could result in wrong indexing being accepted.
 // Something like (0,8) for a 3x3 matrix would give the element in position (2,2), which is not what was asked, as what was asked makes no sense.
 // Not that anyone writing this code would make that mistake and write a comment about it...
-// Fully documented at the declaration.
 template<hmeigens::CanBeSize Row, hmeigens::CanBeSize Col>
 void hmeigens::SquareMatrix::checkIndex(Row row, Col col) const {
     if (
@@ -439,9 +426,6 @@ void hmeigens::SquareMatrix::checkIndex(Row row, Col col) const {
     return;
 }
 
-// Creates a size * size identity matrix if size is valid.
-// Throws (via the constructor) otherwise.
-// Fully documented at the declaration.
 template<hmeigens::CanBeSize Size>
 hmeigens::SquareMatrix hmeigens::SquareMatrix::identity(Size size) {
     hmeigens::SquareMatrix id{size};

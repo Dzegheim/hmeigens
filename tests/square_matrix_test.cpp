@@ -31,17 +31,15 @@
 #include <catch2/matchers/catch_matchers_exception.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-// Local brief alias for the conversion macro to improve legibility.
+// Readability of tests.
+using hmeigens::test::checkRealULPs;
+using hmeigens::test::checkComplexULPs;
 #define HMS HMEIGENS_MAKE_SCALAR
 
 /* --------------------------------------------- */
 /* ------------------ Helpers ------------------ */
 /* --------------------------------------------- */
 //
-// Readability of tests.
-using hmeigens::test::checkRealULPs;
-using hmeigens::test::checkComplexULPs;
-
 // This helper checks that all elements of a matrix match the ones of a reference hmeigens::SquareMatrix::Container within toleranceULPs.
 // It accesses the elements via hmeigens::SquareMatrix::operator() const.
 static void checkAllElementsVersus(const hmeigens::SquareMatrix& toCheck, const hmeigens::SquareMatrix::Container& referenceBody, std::uint64_t toleranceULPs) {

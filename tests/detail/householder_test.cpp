@@ -20,13 +20,11 @@
 #include <cstddef>   // For std::size_t
 #include <limits>    // For std::numeric_limits
 
-// Local brief alias for the conversion macro to improve legibility.
-#define HMS HMEIGENS_MAKE_SCALAR
-
-// Readability.
+// Readability of tests.
 using hmeigens::test::checkRealULPs;
 using hmeigens::test::checkComplexULPs;
 using hmeigens::test::checkComplexAbs;
+#define HMS HMEIGENS_MAKE_SCALAR
 
 /* ----------------------------- */
 /* --------- IMPORTANT --------- */

@@ -81,14 +81,14 @@ namespace hmeigens {
 /* -------- Definitions -------- */
 /* ----------------------------- */
 //
-// See the declaration for all relevant information.
+// All functions are fully documented at their declarations.
+//
 inline constexpr std::uint64_t hmeigens::normTolerance(std::size_t size) {
     // Squaring size is always safe if it comes from a matrix.
     // For all realistic cases, multiplying a squared size by 2*HMEIGENS_HYPOT_ULPS will never overflow.
     return HMEIGENS_HYPOT_ULPS*2*size*size;
 }
 
-// See the declaration for all relevant information.
 inline constexpr std::uint64_t hmeigens::toleranceTolerance(std::size_t size, std::uint64_t extra) {
     return 2*hmeigens::normTolerance(size)+2+extra;
 }
