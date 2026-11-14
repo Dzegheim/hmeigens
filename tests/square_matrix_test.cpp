@@ -597,7 +597,6 @@ TEST_CASE("Square matrix test: the overloads of at() are index safe.", "[square_
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
     // The string used by std::format to construct the error message.
     constexpr std::string_view indexErrorString = "Invalid index ({0},{1}) for {2}x{2} matrix. Please note matrices are 0-indexed.";
-    // This variable is just for readability of the loops below.
     // The cast is safe because the size is small.
     const std::intmax_t size = static_cast<std::intmax_t>(testMatrixConst.size());
     // 3 cases are relevant:
@@ -645,7 +644,6 @@ TEST_CASE("Square matrix test: the overloads of operator() are index safe.", "[s
     const hmeigens::SquareMatrix& testMatrixConst = testMatrix;
     // The string used by std::format to construct the error message.
     constexpr std::string_view indexErrorString = "Invalid index ({0},{1}) for {2}x{2} matrix. Please note matrices are 0-indexed.";
-    // This variable is just for readability of the loops below.
     // The cast is safe because the size is small.
     const std::intmax_t size = static_cast<std::intmax_t>(testMatrixConst.size());
     // 3 cases are relevant:
@@ -799,8 +797,6 @@ TEST_CASE("Square matrix test: the Frobenius norm gives the expected values.", "
         hmeigens::normTolerance(2)
     );
     // Matrices whose elements squared over/underflow. The norm is still a valid number in range. Using std::hypot guarantees the result cannot overflow in the middle of calculations.
-    //
-    // Names for readability.
     const hmeigens::Scalar max = std::numeric_limits<hmeigens::Scalar>::max();
     const hmeigens::Scalar min = std::numeric_limits<hmeigens::Scalar>::min();
     // Value whose square always overflows.

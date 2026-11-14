@@ -80,7 +80,6 @@ static hmeigens::SquareMatrix::Container applyReflectorForTesting(const hmeigens
 static void checkVector(const hmeigens::SquareMatrix::Container& vector) {
     // Build a copy of the input to work on.
     auto copyVector = vector;
-    // Readability.
     const auto& v0 = vector[0];
     const auto normV = hmeigens::detail::twoNorm(vector);
     // Call the function.

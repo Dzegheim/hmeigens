@@ -59,7 +59,7 @@ namespace hmeigens::test {
 /* -------- Definitions -------- */
 /* ----------------------------- */
 //
-// See the declarations for all relevant information.
+// All functions are fully documented at their declarations.
 //
 inline void hmeigens::test::checkRealULPs(const hmeigens::Scalar toCheck, const hmeigens::Scalar expected, const std::uint64_t toleranceULPs) {
     CAPTURE(toCheck, expected, toleranceULPs);

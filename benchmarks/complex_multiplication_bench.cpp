@@ -15,7 +15,7 @@
 #include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-// Readability
+// Readability.
 using hmeigens::SquareMatrix;
 using hmeigens::Complex;
 using hmeigens::benchmark::randomMatrix;

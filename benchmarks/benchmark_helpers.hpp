@@ -26,7 +26,8 @@ namespace hmeigens::benchmark {
 /* -------- Definitions -------- */
 /* ----------------------------- */
 //
-// See the declaration for all relevant information.
+// All functions are fully documented at their declarations.
+//
 inline hmeigens::SquareMatrix hmeigens::benchmark::randomMatrix(std::size_t size, std::mt19937_64& rng) {
     hmeigens::SquareMatrix matrix{size};
     std::uniform_real_distribution<hmeigens::Scalar> dist(HMEIGENS_MAKE_SCALAR(-1.), HMEIGENS_MAKE_SCALAR(1.));
@@ -38,7 +39,6 @@ inline hmeigens::SquareMatrix hmeigens::benchmark::randomMatrix(std::size_t size
     return matrix;
 }
 
-// See the declaration for all relevant information.
 inline void hmeigens::benchmark::requireEqualMatrices(const hmeigens::SquareMatrix& firstMatrix, const hmeigens::SquareMatrix& secondMatrix) {
     const std::size_t size = firstMatrix.size();
     // Sizes must match.

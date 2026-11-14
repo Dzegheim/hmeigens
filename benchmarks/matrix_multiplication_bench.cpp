@@ -14,7 +14,7 @@
 #include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-// Readability
+// Readability.
 using hmeigens::SquareMatrix;
 using hmeigens::Complex;
 using hmeigens::detail::checkSizeMatch;
@@ -68,7 +68,6 @@ static SquareMatrix rearrangedMult(const SquareMatrix& leftHand, const SquareMat
     SquareMatrix product{checkSizeMatch(size, rightHand.size(), "matrix multiplication")};
     for (std::size_t i = 0; i < size; ++i) {
         for (std::size_t k = 0; k < size; ++k) {
-            // Store the value of the left-hand matrix.
             // Two accesses per value of k, instead of 2*size ones if done inside the inner loop.
             const auto lTempRe = leftHand(i,k).real();
             const auto lTempIm = leftHand(i,k).imag();
@@ -92,11 +91,8 @@ static SquareMatrix& transposeInPlace(SquareMatrix& matrix) {
     for (std::size_t i = 0; i < matrix.size(); ++i) {
         // Pass through all subdiagonal elements.
         for (std::size_t j = 0; j < i; ++j) {
-            // Store the first one.
             auto temp = matrix(i, j);
-            // Overwrite the first one with the second one.
             matrix(i, j) = matrix(j, i);
-            // Overwrite the second one with the stored temporary.
             matrix(j, i) = temp;
         }
     }
@@ -115,7 +111,6 @@ static SquareMatrix transposeMult(const SquareMatrix& leftHand, const SquareMatr
     const std::size_t size = leftHand.size();
     // Size validation.
     SquareMatrix product{checkSizeMatch(size, rightHand.size(), "matrix multiplication")};
-    // Copy the right hand, then transpose it.
     SquareMatrix rightHandT = rightHand;
     transposeInPlace(rightHandT);
     for (std::size_t i = 0; i < size; ++i) {
