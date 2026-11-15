@@ -3,7 +3,8 @@
 // - constants;
 // - helpers;
 // - test cases:
-//      - hmeigens::detail::makeHouseholderInPlace.
+//      - hmeigens::detail::makeHouseholderInPlace;
+//      - hmeigens::detail::applyLeftHouseholderInPlace.
 #include "hmeigens/detail/householder.hpp"
 #include "hmeigens/detail/algebra_helpers.hpp"
 #include "hmeigens/scalar.hpp"
@@ -36,13 +37,13 @@ using hmeigens::test::checkComplexAbs;
 /* ----------------- Constants ----------------- */
 /* --------------------------------------------- */
 //
-// Base tolerance for the tests of hmeigens::detail::makeHouseholderInPlace.
+// Base tolerance for the tests.
 // Reference: Matrix Computations (Golub & Van Loan, 4th edition, 2013), section 5.1.5 Roundoff Properties.
 // The error scales linearly with the 2-norm of the vector.
 // The form for the error given is O(u*norm), where u is half of hmeigens::epsilon.
 // The constant is never explicitly given.
 // The value chosen here is somewhat arbitrary and generous. What the tests here check is not a tight behaviour, so this is fine.
-// IMPORTANT: When the tests are not performed on a normalized vector, this value needs to be multiplied by the vector's 2-norm.
+// IMPORTANT: When the tests are not performed on a normalized vector, this value needs to be multiplied by the norm.
 constexpr hmeigens::Scalar testTolerance = HMS(100.)*hmeigens::epsilon;
 
 /* --------------------------------------------- */
@@ -140,13 +141,71 @@ static void checkVector(const hmeigens::SquareMatrix::Container& vector) {
     return;
 }
 
-/* ------------------------------------------------ */
-/* ------------------ Test cases ------------------ */
-/* ------------------------------------------------ */
+// This helper builds a full Householder matrix to test both the left and right application functions.
+// The matrix is built with the mathematical definition:
+// H = I-2*u*u^dagger.
+// Note that here vector (i.e. u) is assumed to be unit-length.
+// Here col is the column u was computed from.
+static hmeigens::SquareMatrix buildHouseholderForTesting(const hmeigens::SquareMatrix::Container& vector, const std::size_t col) {
+    hmeigens::SquareMatrix householder = hmeigens::SquareMatrix::identity(col+1+vector.size());
+    // A part of the Householder matrix will remain the identity.
+    // The only parts that need to be modified are those in the subblock past col.
+    for (std::size_t i = 0; i < vector.size(); ++i) {
+        for (std::size_t j = 0; j < vector.size(); ++j) {
+            householder(col+1+i, col+1+j) -= HMS(2.)*vector[i]*std::conj(vector[j]);
+        }
+    }
+    return householder;
+}
+
+// This helper compares the explicit left application of a Householder matrix to the input matrix against the fast application performed by hmeigens::detail::applyLeftHouseholderInPlace.
+// Both the Householder matrix and the Householder vector are built from column col.
+// The tolerance for this check is testTolerance multiplied by the Frobenius norm of matrix.
+// Note: it must hold that col+1 < matrix.size().
+static void checkLeftHouseholder(const hmeigens::SquareMatrix& matrix, const std::size_t col) {
+    const std::size_t amount = matrix.size()-col-1;
+    hmeigens::SquareMatrix::Container vector(amount);
+    for (std::size_t i = 0; i < amount; ++i) {
+        vector[i] = matrix(col+1+i, col);
+    }
+    // The function is [[nodiscard]]. This prevents the compiler warning, as the returned value is not needed here.
+    static_cast<void>(hmeigens::detail::makeHouseholderInPlace(vector));
+    const hmeigens::SquareMatrix householder = buildHouseholderForTesting(vector, col);
+    const auto expected = householder*matrix;
+    auto toCheck = matrix;
+    hmeigens::detail::applyLeftHouseholderInPlace(toCheck, vector, col);
+    const auto tolerance = testTolerance*matrix.norm();
+    for (std::size_t i = 0; i < matrix.size(); ++i) {
+        for (std::size_t j = 0; j < matrix.size(); ++j) {
+            CAPTURE(i, j);
+            // Up to col: toCheck must be completely unchanged.
+            if (j <= col) {
+                checkComplexULPs(
+                    toCheck(i, j),
+                    matrix(i, j),
+                    0
+                );
+            }
+            // After col: verify against expected within tolerance.
+            else {
+                checkComplexAbs(
+                    toCheck(i, j),
+                    expected(i, j),
+                    tolerance
+                );
+            }
+        }
+    }
+    return;
+}
+
+/* ------------------------------------------------- */
+/* ------------------ Test cases ------------------- */
+/* ------------------------------------------------- */
 //
-/* ------------------------------------------------ */
-/* --- hmeigens::detail::makeHouseholderInPlace --- */
-/* ------------------------------------------------ */
+/* ------------------------------------------------- */
+/* --- hmeigens::detail::makeHouseholderInPlace ---- */
+/* ------------------------------------------------- */
 //
 TEST_CASE("Householder vector computation test: the testing helper behaves as expected.", "[householder][detail][makeHouseholderInPlace][helper]") {
     // GIVEN a vector v and a unit vector u
@@ -358,6 +417,88 @@ TEST_CASE("Householder vector computation test: the Householder vector is correc
         {HMS(0.), HMS(1.e-7)}
     };
     checkVector(v);
+}
+
+/* ------------------------------------------------- */
+/* - hmeigens::detail::applyLeftHouseholderInPlace - */
+/* ------------------------------------------------- */
+//
+TEST_CASE("Left Householder application test: the testing helper behaves as expected.", "[householder][detail][applyLeftHouseholderInPlace][helper]") {
+    // GIVEN a unit-length Householder vector and a column number
+    // WHEN  the corresponding Householder matrix is built
+    // THEN  it is the expected matrix
+    //
+    // The tolerance here is 0 ULPs, as all operations below are correctly rounded, performed on exactly representable values, and have exactly representable results.
+    //
+    // Assuming u is the subdiagonal second column of a 4x4 matrix, the relevant components of the Householder matrix are (counting from 0):
+    // H(2, 2) = 1-2*(.5+.5i)*(.5-.5i)
+    //         = 1-2*(.25+.25)
+    //         = 1-1
+    //         = 0;
+    // H(2, 3) = -2*(.5+.5i)*(.5+.5i)
+    //         = -2*(.25-.25+.5i)
+    //         = -2*.5i
+    //         = -i;
+    // H(3, 2) = -2*(.5-.5i)*(.5-.5i)
+    //         = -2*(.25-.25-.5i)
+    //         = -2*-.5i
+    //         = i;
+    // H(3, 3) = 1-2*(.5-.5i)*(.5+.5i)
+    //         = H(2, 2).
+    // The rest is simply the identity matrix.
+    const hmeigens::SquareMatrix::Container u{
+        {HMS(.5), HMS(.5)},
+        {HMS(.5), HMS(-.5)}
+    };
+    const hmeigens::SquareMatrix expected{
+        {{HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
+         {HMS(0.), HMS(0.)}, {HMS(1.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)},
+         {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(-1.)},
+         {HMS(0.), HMS(0.)}, {HMS(0.), HMS(0.)}, {HMS(0.), HMS(1.)}, {HMS(0.), HMS(0.)}}
+    };
+    // Here col must be 1 since u has 2 elements, otherwise the built reflector would not be a 4x4.
+    const auto toCheck = buildHouseholderForTesting(u, 1);
+    REQUIRE(toCheck.size() == expected.size());
+    for (std::size_t i = 0; i < toCheck.size(); ++i) {
+        for (std::size_t j = 0; j < toCheck.size(); ++j) {
+            CAPTURE(i, j);
+            checkComplexULPs(
+                toCheck(i, j),
+                expected(i, j),
+                0
+            );
+        }
+    }
+}
+
+TEST_CASE("Left Householder application test: the application is correct.", "[householder][detail][applyLeftHouseholderInPlace]") {
+    // GIVEN a matrix and an appropriate unit-length Householder vector built from its column col
+    // WHEN  hmeigens::detail::applyLeftHouseholderInPlace applies the reflector to matrix
+    // THEN  the matrix is unchanged up to column col, while after it, it is the same as the direct left application of the Householder matrix
+    //
+    // The minimum meaningful size is 3, as this function is used in the process of turning a matrix into upper Hessenberg form, and 2x2/1x1 matrices are already such by definition.
+    const hmeigens::SquareMatrix testMatrix{
+        {{HMS(1.), HMS(-1.)}, {HMS(2.), HMS(-.02)}, {HMS(3.), HMS(-.3)},
+         {HMS(4.), HMS(-.4)}, {HMS(5.), HMS(-5.)}, {HMS(6.), HMS(-.06)},
+         {HMS(7.), HMS(-.07)}, {HMS(8.), HMS(-.8)}, {HMS(9.), HMS(-9.)}}
+    };
+    checkLeftHouseholder(testMatrix, 0);
+    // Larger size, various values of col.
+    const hmeigens::SquareMatrix testMatrixLarge{
+        {{HMS(1.), HMS(-1.)}, {HMS(2.), HMS(-.02)}, {HMS(3.), HMS(-.3)}, {HMS(-4.), HMS(.4)}, {HMS(-5.), HMS(5.)}, {HMS(-6.), HMS(.06)},
+         {HMS(4.), HMS(-.4)}, {HMS(5.), HMS(-5.)}, {HMS(16.), HMS(-1.06)}, {HMS(14.), HMS(-1.4)}, {HMS(15.), HMS(-15.)}, {HMS(16.), HMS(-1.06)},
+         {HMS(7.), HMS(-.07)}, {HMS(8.), HMS(-.8)}, {HMS(9.), HMS(-9.)}, {HMS(-.07), HMS(7.)}, {HMS(-.8), HMS(8.)}, {HMS(-9.), HMS(9.)},
+
+         {HMS(9.), HMS(-.8)}, {HMS(7.), HMS(-6.)}, {HMS(25.), HMS(-4.06)}, {HMS(13.), HMS(-2.2)}, {HMS(11.), HMS(-11.)}, {HMS(10.), HMS(-0.06)},
+         {HMS(44.), HMS(-.44)}, {HMS(45.), HMS(-45.)}, {HMS(46.), HMS(-1.46)}, {HMS(14.4), HMS(-1.44)}, {HMS(15.4), HMS(-15.4)}, {HMS(16.4), HMS(-1.064)},
+         {HMS(24.), HMS(-3.4)}, {HMS(15.), HMS(-45.)}, {HMS(66.), HMS(-7.06)}, {HMS(14.8), HMS(-1.49)}, {HMS(15.1), HMS(-15.2)}, {HMS(16.3), HMS(-1.006)}
+        }
+    };
+    // Values up to size-3 are ok to pass, size-2 is meaningless size-1 is invalid.
+    checkLeftHouseholder(testMatrixLarge, 0);
+    checkLeftHouseholder(testMatrixLarge, 1);
+    checkLeftHouseholder(testMatrixLarge, 2);
+    checkLeftHouseholder(testMatrixLarge, 3);
 }
 
 #undef HMS
