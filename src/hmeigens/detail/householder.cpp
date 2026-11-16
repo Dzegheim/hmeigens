@@ -10,6 +10,7 @@
 
 #include <cmath>      // For std::hypot, std::sqrt
 #include <cstddef>    // For std::size_t
+#include <complex>    // For std::conj
 
 // The names in the comments (u, phi, ...) match those of the documentation of hmeigens::makeUpperHessenbergInPlace() from eigenvalues_solver.hpp.
 // The variable vector is turned from v to v/||v||, to u/||v||, to u/||u||.
@@ -44,28 +45,17 @@ hmeigens::Complex hmeigens::detail::makeHouseholderInPlace(std::span<hmeigens::C
     return -minusPhi*normV;
 }
 
-// The products of complex numbers are done manually rather than with std::operator*. See the explanation at hmeigens::operator* in square_matrix.cpp for details.
 void hmeigens::detail::applyLeftHouseholderInPlace(hmeigens::SquareMatrix& matrix, std::span<const hmeigens::Complex> vector, const std::size_t col) {
     for (std::size_t otherCol = col+1; otherCol < matrix.size(); ++otherCol) {
-        hmeigens::Scalar scalarProductRe{};
-        hmeigens::Scalar scalarProductIm{};
+        hmeigens::Complex scalarProduct{};
         // Compute the scalar product of the conjugate of vector and the matrix's column.
         for (std::size_t i = 0; i < vector.size(); ++i) {
-            const auto vectorElRe = vector[i].real();
-            const auto vectorElImConj = -vector[i].imag();
-            const auto matrixElRe = matrix(col+1+i, otherCol).real();
-            const auto matrixElIm = matrix(col+1+i, otherCol).imag();
-            scalarProductRe += vectorElRe*matrixElRe-vectorElImConj*matrixElIm;
-            scalarProductIm += vectorElRe*matrixElIm+vectorElImConj*matrixElRe;
+            scalarProduct += hmeigens::detail::product(std::conj(vector[i]), matrix(col+1+i, otherCol));
         }
-        // Edit the matrix by subtracting 2u times the scalar product.
+        // Edit the matrix by subtracting twice the scalar product times u.
+        scalarProduct *= HMEIGENS_MAKE_SCALAR(2.);
         for (std::size_t i = 0; i < vector.size(); ++i) {
-            const auto vectorElRe = vector[i].real();
-            const auto vectorElIm = vector[i].imag();
-            matrix(col+1+i, otherCol) -= hmeigens::Complex{
-                HMEIGENS_MAKE_SCALAR(2.)*(scalarProductRe*vectorElRe-scalarProductIm*vectorElIm),
-                HMEIGENS_MAKE_SCALAR(2.)*(scalarProductIm*vectorElRe+scalarProductRe*vectorElIm)
-            };
+            matrix(col+1+i, otherCol) -= hmeigens::detail::product(scalarProduct, vector[i]);
         }
     }
     return;

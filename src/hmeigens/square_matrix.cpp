@@ -51,12 +51,11 @@ hmeigens::SquareMatrix hmeigens::SquareMatrix::adjoint() const {
 // After benchmarking two design choices emerged.
 // (1) benchmarks/matrix_multiplication_bench.cpp shows that the approach implemented below is the best performing of the three considered ones. That file contains a brief explanation of each.
 // The approach chosen here is the one that allows for vectorization and cache access optimization.
-// (2) benchmarks/complex_multiplication_bench.cpp shows that an explicitly written complex multiplication is faster than the standard operator* from <complex>.
-// This is because the standard version may perform safety checks on the finiteness of numbers. Those checks are not needed here, as the finiteness of the matrix norm (and therefore of all of its elements) is a prerequisite this code will enforce in the eigenvalue search. Those checks, though not required, may happen, and slow the calculations down.
+// (2) See hmeigens::detail::product in algebra_helpers.hpp.
 hmeigens::SquareMatrix hmeigens::operator* (const hmeigens::SquareMatrix& leftHand, const hmeigens::SquareMatrix& rightHand) {
     const std::size_t size = leftHand.size();
     // Construct a zero-filled matrix after checking the sizes match.
-    hmeigens::SquareMatrix product{
+    hmeigens::SquareMatrix productMatrix{
         hmeigens::detail::checkSizeMatch(
             size,
             rightHand.size(),
@@ -65,19 +64,12 @@ hmeigens::SquareMatrix hmeigens::operator* (const hmeigens::SquareMatrix& leftHa
     };
     for (std::size_t i = 0; i < size; ++i) {
         for (std::size_t k = 0; k < size; ++k) {
-            // Two accesses per value of k, instead of 2*size ones if done inside the inner loop.
-            const auto lTempRe = leftHand(i,k).real();
-            const auto lTempIm = leftHand(i,k).imag();
+            // One access per value of k, instead of size ones if done inside the inner loop.
+            const auto lTemp = leftHand(i,k);
             for (std::size_t j = 0; j < size; ++j) {
-                // Only two accesses rather than four.
-                const auto rTempRe = rightHand(k,j).real();
-                const auto rTempIm = rightHand(k,j).imag();
-                product(i,j)+=hmeigens::Complex{
-                    lTempRe*rTempRe-lTempIm*rTempIm,
-                    lTempRe*rTempIm+lTempIm*rTempRe
-                };
+                productMatrix(i,j)+=hmeigens::detail::product(lTemp, rightHand(k,j));
             }
         }
     }
-    return product;
+    return productMatrix;
 }
