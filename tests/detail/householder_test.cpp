@@ -4,7 +4,7 @@
 // - helpers;
 // - test cases:
 //      - hmeigens::detail::makeHouseholderInPlace;
-//      - hmeigens::detail::applyLeftHouseholderInPlace.
+//      - hmeigens::detail::applyLeftHouseholderInPlace and hmeigens::detail::applyRightHouseholderInPlace.
 #include "hmeigens/detail/householder.hpp"
 #include "hmeigens/detail/algebra_helpers.hpp"
 #include "hmeigens/scalar.hpp"
@@ -158,11 +158,17 @@ static hmeigens::SquareMatrix buildHouseholderForTesting(const hmeigens::SquareM
     return householder;
 }
 
-// This helper compares the explicit left application of a Householder matrix to the input matrix against the fast application performed by hmeigens::detail::applyLeftHouseholderInPlace.
+// This enum is used to determine from which side the Householder matrix must be applied to the input matrix by checkHouseholder.
+enum class Side {
+    left,
+    right
+};
+
+// This helper compares the explicit application of a Householder matrix to the input matrix against the fast application performed by hmeigens::detail::applyLeftHouseholderInPlace or hmeigens::detail::applyRightHouseholderInPlace, chosen with side.
 // Both the Householder matrix and the Householder vector are built from column col.
 // The tolerance for this check is testTolerance multiplied by the Frobenius norm of matrix.
 // Note: it must hold that col+1 < matrix.size().
-static void checkLeftHouseholder(const hmeigens::SquareMatrix& matrix, const std::size_t col) {
+static void checkHouseholder(const hmeigens::SquareMatrix& matrix, const std::size_t col, const Side side) {
     const std::size_t amount = matrix.size()-col-1;
     hmeigens::SquareMatrix::Container vector(amount);
     for (std::size_t i = 0; i < amount; ++i) {
@@ -171,9 +177,17 @@ static void checkLeftHouseholder(const hmeigens::SquareMatrix& matrix, const std
     // The function is [[nodiscard]]. This prevents the compiler warning, as the returned value is not needed here.
     static_cast<void>(hmeigens::detail::makeHouseholderInPlace(vector));
     const hmeigens::SquareMatrix householder = buildHouseholderForTesting(vector, col);
-    const auto expected = householder*matrix;
+    const auto expected =
+        side == Side::left ?
+        householder*matrix :
+        matrix*householder;
     auto toCheck = matrix;
-    hmeigens::detail::applyLeftHouseholderInPlace(toCheck, vector, col);
+    if (side == Side::left) {
+        hmeigens::detail::applyLeftHouseholderInPlace(toCheck, vector, col);
+    }
+    else {
+        hmeigens::detail::applyRightHouseholderInPlace(toCheck, vector, col);
+    }
     const auto tolerance = testTolerance*matrix.norm();
     for (std::size_t i = 0; i < matrix.size(); ++i) {
         for (std::size_t j = 0; j < matrix.size(); ++j) {
@@ -199,13 +213,13 @@ static void checkLeftHouseholder(const hmeigens::SquareMatrix& matrix, const std
     return;
 }
 
-/* ------------------------------------------------- */
-/* ------------------ Test cases ------------------- */
-/* ------------------------------------------------- */
+/* -------------------------------------------------- */
+/* ------------------- Test cases ------------------- */
+/* -------------------------------------------------- */
 //
-/* ------------------------------------------------- */
-/* --- hmeigens::detail::makeHouseholderInPlace ---- */
-/* ------------------------------------------------- */
+/* -------------------------------------------------- */
+/* ---- hmeigens::detail::makeHouseholderInPlace ---- */
+/* -------------------------------------------------- */
 //
 TEST_CASE("Householder vector computation test: the testing helper behaves as expected.", "[householder][detail][makeHouseholderInPlace][helper]") {
     // GIVEN a vector v and a unit vector u
@@ -419,11 +433,14 @@ TEST_CASE("Householder vector computation test: the Householder vector is correc
     checkVector(v);
 }
 
-/* ------------------------------------------------- */
-/* - hmeigens::detail::applyLeftHouseholderInPlace - */
-/* ------------------------------------------------- */
+/* -------------------------------------------------- */
+/* -- hmeigens::detail::applyLeftHouseholderInPlace - */
+/* - hmeigens::detail::applyRightHouseholderInPlace - */
+/* -------------------------------------------------- */
 //
-TEST_CASE("Left Householder application test: the testing helper behaves as expected.", "[householder][detail][applyLeftHouseholderInPlace][helper]") {
+// Since these two functions are tested by the same helper with the exception of an enum parameter, they are grouped together.
+//
+TEST_CASE("Householder application test: the testing helper behaves as expected.", "[householder][detail][applyLeftHouseholderInPlace][applyRightHouseholderInPlace][helper]") {
     // GIVEN a unit-length Householder vector and a column number
     // WHEN  the corresponding Householder matrix is built
     // THEN  it is the expected matrix
@@ -482,7 +499,7 @@ TEST_CASE("Left Householder application test: the application is correct.", "[ho
          {HMS(4.), HMS(-.4)}, {HMS(5.), HMS(-5.)}, {HMS(6.), HMS(-.06)},
          {HMS(7.), HMS(-.07)}, {HMS(8.), HMS(-.8)}, {HMS(9.), HMS(-9.)}}
     };
-    checkLeftHouseholder(testMatrix, 0);
+    checkHouseholder(testMatrix, 0, Side::left);
     // Larger size, various values of col.
     const hmeigens::SquareMatrix testMatrixLarge{
         {{HMS(1.), HMS(-1.)}, {HMS(2.), HMS(-.02)}, {HMS(3.), HMS(-.3)}, {HMS(-4.), HMS(.4)}, {HMS(-5.), HMS(5.)}, {HMS(-6.), HMS(.06)},
@@ -494,11 +511,41 @@ TEST_CASE("Left Householder application test: the application is correct.", "[ho
          {HMS(24.), HMS(-3.4)}, {HMS(15.), HMS(-45.)}, {HMS(66.), HMS(-7.06)}, {HMS(14.8), HMS(-1.49)}, {HMS(15.1), HMS(-15.2)}, {HMS(16.3), HMS(-1.006)}
         }
     };
-    // Values up to size-3 are ok to pass, size-2 is meaningless size-1 is invalid.
-    checkLeftHouseholder(testMatrixLarge, 0);
-    checkLeftHouseholder(testMatrixLarge, 1);
-    checkLeftHouseholder(testMatrixLarge, 2);
-    checkLeftHouseholder(testMatrixLarge, 3);
+    // Values up to size-3 are ok to pass, size-2 is meaningless, size-1 is invalid.
+    checkHouseholder(testMatrixLarge, 0, Side::left);
+    checkHouseholder(testMatrixLarge, 1, Side::left);
+    checkHouseholder(testMatrixLarge, 2, Side::left);
+    checkHouseholder(testMatrixLarge, 3, Side::left);
+}
+
+TEST_CASE("Right Householder application test: the application is correct.", "[householder][detail][applyRightHouseholderInPlace]") {
+    // GIVEN a matrix and an appropriate unit-length Householder vector built from its column col
+    // WHEN  hmeigens::detail::applyRightHouseholderInPlace applies the reflector to matrix
+    // THEN  the matrix is unchanged up to column col, while after it, it is the same as the direct right application of the Householder matrix
+    //
+    // The minimum meaningful size is 3, see the previous case.
+    const hmeigens::SquareMatrix testMatrix{
+        {{HMS(1.), HMS(-1.)}, {HMS(2.), HMS(-.02)}, {HMS(3.), HMS(-.3)},
+         {HMS(4.), HMS(-.4)}, {HMS(5.), HMS(-5.)}, {HMS(6.), HMS(-.06)},
+         {HMS(7.), HMS(-.07)}, {HMS(8.), HMS(-.8)}, {HMS(9.), HMS(-9.)}}
+    };
+    checkHouseholder(testMatrix, 0, Side::right);
+    // Larger size, various values of col.
+    const hmeigens::SquareMatrix testMatrixLarge{
+        {{HMS(1.), HMS(-1.)}, {HMS(2.), HMS(-.02)}, {HMS(3.), HMS(-.3)}, {HMS(-4.), HMS(.4)}, {HMS(-5.), HMS(5.)}, {HMS(-6.), HMS(.06)},
+         {HMS(4.), HMS(-.4)}, {HMS(5.), HMS(-5.)}, {HMS(16.), HMS(-1.06)}, {HMS(14.), HMS(-1.4)}, {HMS(15.), HMS(-15.)}, {HMS(16.), HMS(-1.06)},
+         {HMS(7.), HMS(-.07)}, {HMS(8.), HMS(-.8)}, {HMS(9.), HMS(-9.)}, {HMS(-.07), HMS(7.)}, {HMS(-.8), HMS(8.)}, {HMS(-9.), HMS(9.)},
+
+         {HMS(9.), HMS(-.8)}, {HMS(7.), HMS(-6.)}, {HMS(25.), HMS(-4.06)}, {HMS(13.), HMS(-2.2)}, {HMS(11.), HMS(-11.)}, {HMS(10.), HMS(-0.06)},
+         {HMS(44.), HMS(-.44)}, {HMS(45.), HMS(-45.)}, {HMS(46.), HMS(-1.46)}, {HMS(14.4), HMS(-1.44)}, {HMS(15.4), HMS(-15.4)}, {HMS(16.4), HMS(-1.064)},
+         {HMS(24.), HMS(-3.4)}, {HMS(15.), HMS(-45.)}, {HMS(66.), HMS(-7.06)}, {HMS(14.8), HMS(-1.49)}, {HMS(15.1), HMS(-15.2)}, {HMS(16.3), HMS(-1.006)}
+        }
+    };
+    // See previous case.
+    checkHouseholder(testMatrixLarge, 0, Side::right);
+    checkHouseholder(testMatrixLarge, 1, Side::right);
+    checkHouseholder(testMatrixLarge, 2, Side::right);
+    checkHouseholder(testMatrixLarge, 3, Side::right);
 }
 
 #undef HMS

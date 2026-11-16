@@ -1,7 +1,8 @@
 // File for functions that perform various parts of the Householder reflection.
 // Declarations (hmeigens::detail):
 //     - makeHouseholderInPlace(std::span<Complex>);
-//     - applyLeftHouseholderInPlace(SquareMatrix&, std::span<const Complex>, const std::size_t).
+//     - applyLeftHouseholderInPlace(SquareMatrix&, std::span<const Complex>, const std::size_t);
+//     - applyRightHouseholderInPlace(SquareMatrix&, std::span<const Complex>, const std::size_t).
 #ifndef HMEIGENS_DETAIL_HOUSEHOLDER_HPP
 #define HMEIGENS_DETAIL_HOUSEHOLDER_HPP
 
@@ -37,6 +38,11 @@ namespace hmeigens::detail {
     // Columns after col have their rows from col+1 onwards changed to be those of H*A.
     // Note: it must hold that vector.size() == matrix.size()-col-1. No safety checks are performed before accessing memory.
     void applyLeftHouseholderInPlace(SquareMatrix& matrix, std::span<const Complex> vector, const std::size_t col);
+
+    // This function applies a Householder matrix constructed from vector to matrix in place from the right, i.e. it computes the relevant portion of A*H.
+    // Columns after col have all of their rows changed to be those of A*H.
+    // Assumptions, preconditions, and behaviour for columns up to col are the same as those of hmeigens::detail::applyLeftHouseholderInPlace.
+    void applyRightHouseholderInPlace(SquareMatrix& matrix, std::span<const Complex> vector, const std::size_t col);
 }
 
 #endif

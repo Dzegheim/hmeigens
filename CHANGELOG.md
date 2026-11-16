@@ -20,7 +20,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::product`, which computes the product of complex numbers explicitly, but does not perform the safety checks that `std::operator*` may, to be faster.
 - **A new file pair `householder.hpp`/`.cpp` in `detail/`.** It is meant to host the functions that perform the Householder reflections to transform a matrix into upper Hessenberg form. It contains:
     - `hmeigens::detail::makeHouseholderInPlace`, which takes all the elements below the diagonal in a column and transforms the container holding them into the unit Householder vector, then returns the element to be put into the subdiagonal position in the matrix;
-    - `hmeigens::detail::applyLeftHouseholderInPlace`, which uses a Householder vector to apply the reflector from the left to the input matrix without actually building it, by editing the elements in the columns after the given one (yes, it's complicated, read the documentation).
+    - `hmeigens::detail::applyLeftHouseholderInPlace`, which uses a Householder vector to apply the reflector from the left to the input matrix without actually building it, by editing the elements in the columns after the given one (yes, it's complicated, read the documentation);
+    - `hmeigens::detail::applyRightHouseholderInPlace`, which is the same as the one above but from the right.
 - **A new file `eigenvalues_solver.hpp`.** It is meant to host the functions of the main solver. It contains:
     - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenbergInPlace`, **not implemented yet**, that houses the documentation for the Householder reflection part of the code;
     - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenberg`, same as above.
@@ -36,8 +37,9 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::twoNorm` thoroughly tested, though most of its tests are done via `hmeigens::SquareMatrix::norm`;
     - `hmeigens::detail::complexUnitVector` thoroughly tested;
     - `hmeigens::detail::makeHouseholderInPlace` thoroughly tested;
-    - `hmeigens::detail::applyLeftHouseholderInPlace` thoroughly tested;
-    - `hmeigens::detail::product` thoroughly tested.
+    - `hmeigens::detail::product` thoroughly tested;
+    - `hmeigens::detail::applyLeftHouseholderInPlace` and `hmeigens::detail::applyRightHouseholderInPlace` thoroughly tested.
+
 
 ### Fixed
 - **The project now compiles with Clang.** Some cases of double braces were resolved by Clang as ambiguous. This was found out during the CI workflow jobs. All instances were fixed.

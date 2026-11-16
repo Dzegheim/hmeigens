@@ -2,7 +2,8 @@
 // All functions are fully documented at their declarations.
 // Definitions (hmeigens::detail):
 //     - makeHouseholderInPlace(std::span<Complex>);
-//     - applyLeftHouseholderInPlace(SquareMatrix&, std::span<const Complex>, const std::size_t).
+//     - applyLeftHouseholderInPlace(SquareMatrix&, std::span<const Complex>, const std::size_t);
+//     - applyRightHouseholderInPlace(SquareMatrix&, std::span<const Complex>, const std::size_t).
 #include "hmeigens/detail/householder.hpp"
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/square_matrix.hpp"
@@ -56,6 +57,22 @@ void hmeigens::detail::applyLeftHouseholderInPlace(hmeigens::SquareMatrix& matri
         scalarProduct *= HMEIGENS_MAKE_SCALAR(2.);
         for (std::size_t i = 0; i < vector.size(); ++i) {
             matrix(col+1+i, otherCol) -= hmeigens::detail::product(scalarProduct, vector[i]);
+        }
+    }
+    return;
+}
+
+void hmeigens::detail::applyRightHouseholderInPlace(hmeigens::SquareMatrix& matrix, std::span<const hmeigens::Complex> vector, const std::size_t col) {
+    for (std::size_t row = 0; row < matrix.size(); ++row) {
+        hmeigens::Complex scalarProduct{};
+        // Compute the scalar product of vector and the matrix's row.
+        for (std::size_t i = 0; i < vector.size(); ++i) {
+            scalarProduct += hmeigens::detail::product(vector[i], matrix(row, col+1+i));
+        }
+        // Edit the matrix by subtracting twice the scalar product times conj(u).
+        scalarProduct *= HMEIGENS_MAKE_SCALAR(2.);
+        for (std::size_t i = 0; i < vector.size(); ++i) {
+            matrix(row, col+1+i) -= hmeigens::detail::product(scalarProduct, std::conj(vector[i]));
         }
     }
     return;
