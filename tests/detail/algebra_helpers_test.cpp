@@ -3,7 +3,8 @@
 // - constants;
 // - test cases:
 //      - hmeigens::detail::twoNorm;
-//      - hmeigens::detail::complexUnitVector.
+//      - hmeigens::detail::complexUnitVector;
+//      - hmeigens::detail::product.
 #include "hmeigens/detail/algebra_helpers.hpp"
 #include "hmeigens/scalar.hpp"
 #include "hmeigens/tolerances.hpp"
@@ -137,6 +138,59 @@ TEST_CASE("Complex unit vector test: the direction is correct.", "[algebra_helpe
     );
 }
 
-
+/* ------------------------------------------------ */
+/* ----------- hmeigens::detail::product ---------- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Complex product test: the value is correct.", "[algebra_helpers][detail][product]") {
+    // GIVEN two complex numbers
+    // WHEN  their product is computed by hmeigens::detail::product
+    // THEN  it is correct
+    //
+    // The tolerance is 0 ULPs, as all operations performed in the function are correctly rounded, and here they are performed on exactly representable values, and have exactly representable results.
+    //
+    // Trivial cases.
+    checkComplexULPs(
+        hmeigens::detail::product(
+            hmeigens::Complex{HMS(0.), HMS(0.)},
+            hmeigens::Complex{HMS(6.), HMS(7.)}
+            ),
+        hmeigens::Complex{HMS(0.), HMS(0.)},
+        0
+    );
+    checkComplexULPs(
+        hmeigens::detail::product(
+            hmeigens::Complex{HMS(6.), HMS(7.)},
+            hmeigens::Complex{HMS(0.), HMS(0.)}
+            ),
+        hmeigens::Complex{HMS(0.), HMS(0.)},
+        0
+    );
+    checkComplexULPs(
+        hmeigens::detail::product(
+            hmeigens::Complex{HMS(1.), HMS(0.)},
+            hmeigens::Complex{HMS(6.), HMS(7.)}
+            ),
+        hmeigens::Complex{HMS(6.), HMS(7.)},
+        0
+    );
+    checkComplexULPs(
+        hmeigens::detail::product(
+            hmeigens::Complex{HMS(6.), HMS(7.)},
+            hmeigens::Complex{HMS(0.), HMS(-1.)}
+            ),
+        hmeigens::Complex{HMS(7.), HMS(-6.)},
+        0
+    );
+    // Generic values.
+    checkComplexULPs(
+        hmeigens::detail::product(
+            hmeigens::Complex{HMS(1.), HMS(2.)},
+            hmeigens::Complex{HMS(3.), HMS(4.)}
+            ),
+        hmeigens::Complex{HMS(-5.), HMS(10.)},
+        0
+    );
+}
 
 #undef HMS
