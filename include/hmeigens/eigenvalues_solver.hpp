@@ -30,7 +30,7 @@ namespace hmeigens {
     /// @param matrix The matrix to be transformed into upper Hessenberg form.
     /// @return A reference to the given `hmeigens::SquareMatrix`, modified to be in upper Hessenberg form.
     /// @throws std::bad_alloc if memory cannot be allocated to construct an `hmeigens::SquareMatrix::Container` that is at least `matrix.size()-1` long.
-    /// @warning This function is not implemented yet, and thus is only declared, never defined. Calling it will cause a linker error and fail to build the project. As of now, this header only exists to house the documentation referenced by other parts of the code to keep a consistent notation.
+    /// @warning This function's correctness is untested as of now.
     /// @sa hmeigens::makeUpperHessenberg
     SquareMatrix& makeUpperHessenbergInPlace(SquareMatrix& matrix);
 
@@ -41,7 +41,7 @@ namespace hmeigens {
     /// @return A matrix in upper Hessenberg form that is similar to the input.
     /// @throws std::bad_alloc if memory cannot be allocated to construct an `hmeigens::SquareMatrix::Container` that is at least `matrix.size()-1` long.
     /// @throws std::bad_alloc if memory to construct `matrix` cannot be allocated on the machine.
-    /// @warning This function is not implemented yet, and thus is only declared, never defined. Calling it will cause a linker error and fail to build the project. As of now, this header only exists to house the documentation referenced by other parts of the code to keep a consistent notation.
+    /// @warning This function's correctness is untested as of now.
     /// @sa hmeigens::makeUpperHessenbergInPlace
     [[nodiscard]] SquareMatrix makeUpperHessenberg(SquareMatrix matrix);
 }

@@ -22,9 +22,9 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::makeHouseholderInPlace`, which takes all the elements below the diagonal in a column and transforms the container holding them into the unit Householder vector, then returns the element to be put into the subdiagonal position in the matrix;
     - `hmeigens::detail::applyLeftHouseholderInPlace`, which uses a Householder vector to apply the reflector from the left to the input matrix without actually building it, by editing the elements in the columns after the given one (yes, it's complicated, read the documentation);
     - `hmeigens::detail::applyRightHouseholderInPlace`, which is the same as the one above but from the right.
-- **A new file `eigenvalues_solver.hpp`.** It is meant to host the functions of the main solver. It contains:
-    - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenbergInPlace`, **not implemented yet**, that houses the documentation for the Householder reflection part of the code;
-    - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenberg`, same as above.
+- **A new file pair `eigenvalues_solver.hpp`/`.cpp`.** It is meant to host the functions of the main solver. It contains:
+    - `hmeigens::makeUpperHessenbergInPlace`, which transforms a matrix into a similar matrix in upper Hessenberg form (untested as of now);
+    - `hmeigens::makeUpperHessenberg`, same as above, but does not alter the input.
 - **A new `hmeigens::SquareMatrix::trace()` function.** It computes the trace.
 - **The codebase now enforces the IEC 559 standard at compile time.** This is likely unnecessary, but better safe than sorry.
 - **New `hmeigens::toleranceTolerance` helper in `tolerances.hpp`.**
@@ -41,7 +41,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::product` thoroughly tested;
     - `hmeigens::detail::applyLeftHouseholderInPlace` and `hmeigens::detail::applyRightHouseholderInPlace` thoroughly tested;
     - `hmeigens::SquareMatrix::trace` thoroughly tested;
-    - `hmeigens::SquareMatrix::norm`'s trace identity is now tested.
+    - `hmeigens::SquareMatrix::norm`'s trace identity is now tested;
+    - `hmeigens::makeUpperHessenberg`'s behaviour with respect to `hmeigens::makeUpperHessenbergInPlace` is correct.
 
 ### Fixed
 - **The project now compiles with Clang.** Some cases of double braces were resolved by Clang as ambiguous. This was found out during the CI workflow jobs. All instances were fixed.

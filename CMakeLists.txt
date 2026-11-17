@@ -78,6 +78,7 @@ set(HMEIGENS_SOURCES
     detail/square_matrix_helpers.cpp
     detail/algebra_helpers.cpp
     detail/householder.cpp
+    eigenvalues_solver.cpp
 )
 list(TRANSFORM HMEIGENS_SOURCES PREPEND src/hmeigens/)
 
