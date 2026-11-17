@@ -2,10 +2,20 @@
 // Sections:
 // - test cases:
 //      - hmeigens::normTolerance;
-//      - hmeigens::toleranceTolerance.
+//      - hmeigens::toleranceTolerance;
+//      - hmeigens::normPreservationTolerance.
 #include "hmeigens/tolerances.hpp"
+#include "hmeigens/square_matrix.hpp"
+#include "hmeigens/constants.hpp"
+#include "hmeigens/scalar.hpp"
+
+#include "comparison_helpers.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+
+// Readability of tests.
+using hmeigens::test::checkRealULPs;
+#define HMS HMEIGENS_MAKE_SCALAR
 
 /* ------------------------------------------------ */
 /* ----------- hmeigens::normTolerance ------------ */
@@ -42,3 +52,34 @@ TEST_CASE("Tolerances test: toleranceTolerance gives the expected values.", "[to
     // Explicitly computed value.
     STATIC_REQUIRE(hmeigens::toleranceTolerance(5, 20) == 100*HMEIGENS_HYPOT_ULPS+22);
 }
+
+/* ------------------------------------------------ */
+/* ----- hmeigens::normPreservationTolerance ------ */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Tolerances test: normPreservationTolerance gives the expected values.", "[tolerances][normPreservationTolerance]") {
+    // GIVEN a matrix
+    // WHEN  hmeigens::normPreservationTolerance is called
+    // THEN  it returns the expected value
+    //
+    // Null matrix. Exact value.
+    checkRealULPs(
+        hmeigens::normPreservationTolerance(
+            hmeigens::SquareMatrix{{HMS(0.), HMS(0.), HMS(0.), HMS(0.)}}
+        ),
+        HMS(0.),
+        0
+    );
+    // Single element.
+    const auto hypotULPs = static_cast<hmeigens::Scalar>(HMEIGENS_HYPOT_ULPS);
+    checkRealULPs(
+        hmeigens::normPreservationTolerance(
+            hmeigens::SquareMatrix{{HMS(0.), HMS(0.), HMS(8.), HMS(0.)}}
+        ),
+        hmeigens::epsilon*(HMS(32.)*hmeigens::toleranceK+HMS(128.)*hypotULPs),
+        // The tolerance is the one for hmeigens::getTolerance + 1 for the sum. The second part is exact.
+        hmeigens::toleranceTolerance(2)+1
+    );
+}
+
+#undef HMS

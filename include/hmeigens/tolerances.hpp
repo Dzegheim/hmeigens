@@ -5,12 +5,19 @@
 // Declarations (hmeigens):
 //     - parseTolerance;
 //     - normTolerance(std::size_t);
-//     - toleranceTolerance(std::size_t, std::uint64_t).
+//     - toleranceTolerance(std::size_t, std::uint64_t);
+//     - normPreservationTolerance(const SquareMatrix&).
 // Definitions (hmeigens):
 //     - normTolerance(std::size_t);
-//     - toleranceTolerance(std::size_t, std::uint64_t).
+//     - toleranceTolerance(std::size_t, std::uint64_t);
+//     - normPreservationTolerance(const SquareMatrix&).
 #ifndef HMEIGENS_TOLERANCES_HPP
 #define HMEIGENS_TOLERANCES_HPP
+
+#include "hmeigens/predicates.hpp"
+#include "hmeigens/square_matrix.hpp"
+#include "hmeigens/scalar.hpp"
+#include "hmeigens/constants.hpp"
 
 #include <cstddef>  // For std::size_t
 #include <cstdint>  // For std::uint64_t
@@ -56,12 +63,12 @@ namespace hmeigens {
     /// The actual tolerance enforced by the tests is therefore, by default, \f(4n^2\f). The value is however modifiable at configure time, because that upper bound is not a standard requirement, and some implementations may break it.
     /// See the documentation of `HMEIGENS_HYPOT_ULPS` for details on how its default was chosen and how it can be changed.
     /// @param size The size of the matrix whose norm is being computed.
-    /// @return A `std::uint64_t` that is `2*size*size*HMEIGENS_HYPOT_ULPS`.
+    /// @return An `std::uint64_t` that is `2*size*size*HMEIGENS_HYPOT_ULPS`.
     /// @pre `size <= hmeigens::maxMatrixSize`.
     /// @warning The function performs no overflow check itself. It assumes the given `size` always comes from a matrix, and that its square can be multiplied by `2*HMEIGENS_HYPOT_ULPS`.
     /// @sa HMEIGENS_HYPOT_ULPS
     /// @sa hmeigens::SquareMatrix::norm()
-    [[nodiscard]] inline constexpr std::uint64_t normTolerance(std::size_t size);
+    [[nodiscard]] constexpr std::uint64_t normTolerance(const std::size_t size);
 
     /// @brief Returns the tolerance for the computation of the tolerance by `hmeigens::getTolerance()`.
     ///
@@ -72,8 +79,24 @@ namespace hmeigens {
     /// @param size The size of the matrix whose tolerance is being computed.
     /// @param extra The extra number of ULPs that need to be added to the tolerance due to operations being performed on the reference testing value.
     /// @warning If `hmeigens::Scalar` is `float`, and `size` is greater than `4096`, then callers need to pass at least `extra = 1`, due to the square of the size no longer being exactly representable within `float`, thus being rounded.
-    /// @return A `std::uint64_t` that is `2*(normTolerance(size)+1)+extra`.
-    [[nodiscard]] inline constexpr std::uint64_t toleranceTolerance(std::size_t size, std::uint64_t extra = 0);
+    /// @return An `std::uint64_t` that is `2*(normTolerance(size)+1)+extra`.
+    [[nodiscard]] constexpr std::uint64_t toleranceTolerance(const std::size_t size, const std::uint64_t extra = 0);
+
+    /// @brief Returns the tolerance for the norm preservation test of the upper Hessenberg reduction.
+    ///
+    /// The tolerance for a matrix \f(\mathbf{M}\f) is
+    /// \f[
+    /// t_H\left(\mathbf{M}\right) = t\left(\mathbf{M}\right)+2t_n\left(\mathbf{M}\right)\cdot\varepsilon\cdot\left\|\mathbf{M}\right\|\ ,
+    /// \f]
+    /// where \f(t\left(\mathbf{M}\right)\f) is the tolerance as computed by `hmeigens::getTolerance()` for \f(\mathbf{M}\f), \f(t_n\left(\mathbf{M}\right)\f) is the same for `hmeigens::normTolerance()`, \f(\varepsilon\f) is `hmeigens::epsilon`, and \f(\left\|\cdot\right\|\f) is the Frobenius norm.
+    ///
+    /// The factor \f(2\f) is due to the fact that the norm is computed twice, both before and after the transformation. The norm tolerance is a count of ULPs, while the test checks an absolute tolerance, so multiplying by \f(\varepsilon\cdot\left\|\mathbf{M}\right\|\f) is needed to transform it into an absolute error.
+    ///
+    /// It may seem counterintuitive to use \f(\left\|\mathbf{M}\right\|\f) twice, rather than using the norm of the upper Hessenberg reduction \f(\mathbf{M}_H\f). If the transformation performed by `hmeigens::makeUpperHessenbergInPlace()` is correct, the two norms differ by about \f(t\left(\mathbf{M}\right)\f) (see `hmeigens::getTolerance()`), so the difference in tolerance of the two is negligible. The tests of `hmeigens::SquareMatrix::norm()` already verify that it is invariant under a unitary transformation, therefore a test that fails with this tolerance fails because the transformation does not preserve the norm, and thus is not unitary.
+    /// @param matrix The matrix to compute the tolerance for.
+    /// @return The value \f(t_H\left(\mathbf{M}\right)\f) from the formula.
+    /// @pre `matrix` must be finite as per `hmeigens::isFinite()`.
+    [[nodiscard]] Scalar normPreservationTolerance(const SquareMatrix& matrix);
 
 }
 
@@ -83,14 +106,25 @@ namespace hmeigens {
 //
 // All functions are fully documented at their declarations.
 //
-inline constexpr std::uint64_t hmeigens::normTolerance(std::size_t size) {
+inline constexpr std::uint64_t hmeigens::normTolerance(const std::size_t size) {
     // Squaring size is always safe if it comes from a matrix.
     // For all realistic cases, multiplying a squared size by 2*HMEIGENS_HYPOT_ULPS will never overflow.
     return HMEIGENS_HYPOT_ULPS*2*size*size;
 }
 
-inline constexpr std::uint64_t hmeigens::toleranceTolerance(std::size_t size, std::uint64_t extra) {
+inline constexpr std::uint64_t hmeigens::toleranceTolerance(const std::size_t size, const std::uint64_t extra) {
     return 2*hmeigens::normTolerance(size)+2+extra;
+}
+
+inline hmeigens::Scalar hmeigens::normPreservationTolerance(const hmeigens::SquareMatrix& matrix) {
+    return // For each element of the formula:
+        hmeigens::getTolerance(matrix)+            // t(M);
+        HMEIGENS_MAKE_SCALAR(2.)*
+        static_cast<hmeigens::Scalar>(
+            hmeigens::normTolerance(matrix.size()) // t_n(M);
+        )*
+        hmeigens::epsilon*                         // \varepsilon;
+        matrix.norm();                             // ||M||.
 }
 
 #endif
