@@ -36,6 +36,7 @@ namespace hmeigens {
     /// This tolerance is used to determine, for example, when a number is `0.` with respect to the matrix to verify triangularity, or any other property described by the other functions of `predicates.hpp`.
     /// @param matrix The matrix to compute the tolerance of.
     /// @return The tolerance computed as \f(k\cdot n^2\cdot\left\|\mathbf{M}\right\|\cdot\varepsilon\f).
+    /// @pre `matrix` must be finite as per `hmeigens::isFinite()`.
     /// @sa hmeigens::toleranceK
     /// @sa HMEIGENS_TOLERANCE_K
     [[nodiscard]] Scalar getTolerance(const SquareMatrix& matrix);
