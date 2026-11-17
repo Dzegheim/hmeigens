@@ -4,7 +4,8 @@
 //     - SquareMatrix(Container&&);
 //     - norm() const;
 //     - adjointInPlace();
-//     - adjoint() const.
+//     - adjoint() const;
+//     - trace() const.
 // Definitions (hmeigens):
 //     - operator*(const SquareMatrix&, const SquareMatrix&).
 #include "hmeigens/square_matrix.hpp"
@@ -43,6 +44,14 @@ hmeigens::SquareMatrix hmeigens::SquareMatrix::adjoint() const {
     hmeigens::SquareMatrix adj = *this;
     adj.adjointInPlace();
     return adj;
+}
+
+hmeigens::Complex hmeigens::SquareMatrix::trace() const {
+    hmeigens::Complex tr{};
+    for (std::size_t i = 0; i < size(); ++i) {
+        tr += (*this)(i, i);
+    }
+    return tr;
 }
 
 // The base algorithm would be, given P=L*R:

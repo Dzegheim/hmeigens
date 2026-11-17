@@ -18,6 +18,7 @@
 //     - norm() const;
 //     - adjointInPlace();
 //     - adjoint() const;
+//     - trace() const;
 //     - getIndex(std::size_t, std::size_t) const;
 //     - <CanBeSize, CanBeSize> checkIndex(Row, Col) const.
 // Declarations (hmeigens):
@@ -276,6 +277,7 @@ namespace hmeigens {
         /// where \f(\left|m_{ij}\right|^2\f) is the squared modulus of the element.
         /// The Frobenius norm is used in this project because it is invariant under unitary operations.
         /// @return The Frobenius norm of the matrix as an `hmeigens::Scalar`.
+        /// @pre All elements of the matrix must be finite.
         [[nodiscard]] Scalar norm() const;
 
         /// @brief Transforms a matrix into its adjoint.
@@ -290,6 +292,17 @@ namespace hmeigens {
         /// @return An `hmeigens::SquareMatrix` that is the adjoint of the given matrix.
         /// @throws std::bad_alloc if the memory could not be allocated on the machine.
         [[nodiscard]] SquareMatrix adjoint() const;
+
+        /// @brief Trace of the matrix.
+        ///
+        /// For a matrix \f(\mathbf{M}\f) of size \f(n\f) with elements \f(m_{ij}\f) the trace is
+        /// \f[
+        /// \text{Tr}\left(\mathbf{M}\right)=\sum_{i=1}^{n}m_{ii}\ ,
+        /// \f]
+        /// i.e. the sum of the diagonal elements.
+        /// @return The trace of the matrix.
+        /// @pre All elements of the matrix must be finite.
+        [[nodiscard]] Complex trace() const;
 
         private:
         // Member function for computing the index of an element given the row and col (column).

@@ -9,6 +9,7 @@
 //      - hmeigens::SquareMatrix::norm;
 //      - hmeigens::SquareMatrix::adjointInPlace;
 //      - hmeigens::SquareMatrix::adjoint;
+//      - hmeigens::SquareMatrix::trace;
 //      - hmeigens::operator*.
 #include "hmeigens/tolerances.hpp"
 #include "hmeigens/square_matrix.hpp"
@@ -897,7 +898,7 @@ TEST_CASE("Square matrix test: the Frobenius norm satisfies the trace identity."
     // GIVEN a matrix M and its adjoint M_h
     // WHEN  the equality norm(M) = sqrt(trace(M_h * M)) is tested for
     // THEN  it holds
-    SKIP("The member hmeigens::SquareMatrix::trace is not implemented yet.");
+    SKIP("This test will be implemented soon.");
 }
 
 TEST_CASE("Square matrix test: the Frobenius norm is invariant under unitary similarity transformations.", "[square_matrix][SquareMatrix][norm]") {
@@ -1020,6 +1021,46 @@ TEST_CASE("Square matrix test: the adjoint operation gives the correct value and
     // Tolerance is 0 ULPs as no algebra is performed on the numbers.
     // (Changing a sign does not round the number.)
     checkAllElementsVersus(testMatrixConj, testConj, 0);
+}
+
+/* --------------------------------------------------------------- */
+/* ---------------- hmeigens::SquareMatrix::trace ---------------- */
+/* --------------------------------------------------------------- */
+//
+TEST_CASE("Square matrix test: the trace is correct.", "[square_matrix][SquareMatrix][trace]") {
+    // GIVEN a matrix
+    // WHEN  its trace is computed
+    // THEN  it is correct
+    //
+    // The tolerance is 0 ULPs, as all operations performed in the function are correctly rounded, and here they are performed on exactly representable values, and have exactly representable results.
+    //
+    // Trivial case: 1x1.
+    checkComplexULPs(
+        hmeigens::SquareMatrix(1).trace(),
+        hmeigens::Complex{},
+        0
+    );
+    checkComplexULPs(
+        hmeigens::SquareMatrix{{{HMS(6.), HMS(7.)}}}.trace(),
+        hmeigens::Complex{HMS(6.), HMS(7.)},
+        0
+    );
+    // Identity matrix: the trace is the size.
+    checkComplexULPs(
+        hmeigens::SquareMatrix::identity(99).trace(),
+        hmeigens::Complex{HMS(99.)},
+        0
+    );
+    // Generic matrix.
+    checkComplexULPs(
+        hmeigens::SquareMatrix{
+            {{HMS(1.), HMS(-1.)}, {HMS(3.5), HMS(0.)},  {HMS(0.), HMS(0.5)},
+             {HMS(-1.), HMS(2.)}, {HMS(-3.), HMS(3.)},  {HMS(1.23), HMS(1.44)},
+             {HMS(2.), HMS(-8.)}, {HMS(0.), HMS(.125)}, {HMS(14.), HMS(.125)}}
+        }.trace(),
+        hmeigens::Complex{HMS(12.), HMS(2.125)},
+        0
+    );
 }
 
 /* --------------------------------------------------------------- */

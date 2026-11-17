@@ -25,6 +25,7 @@ Version 0.2.0 is recorded from git history.
 - **A new file `eigenvalues_solver.hpp`.** It is meant to host the functions of the main solver. It contains:
     - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenbergInPlace`, **not implemented yet**, that houses the documentation for the Householder reflection part of the code;
     - **THE DECLARATION ONLY** of `hmeigens::makeUpperHessenberg`, same as above.
+- **A new `hmeigens::SquareMatrix::trace()` function.** It computes the trace.
 - **The codebase now enforces the IEC 559 standard at compile time.** This is likely unnecessary, but better safe than sorry.
 - **New `hmeigens::toleranceTolerance` helper in `tolerances.hpp`.**
 - **New pair of constants `HMEIGENS_TOLERANCE_K` and `hmeigens::toleranceK`.** The first is a temporary value that needs to be computed in benchmarking when the codebase is done, and will later be a configurable value via CMake. The second is just a cast of the other to `hmeigens::Scalar`. See documentation for details on what they represent.
@@ -38,8 +39,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::complexUnitVector` thoroughly tested;
     - `hmeigens::detail::makeHouseholderInPlace` thoroughly tested;
     - `hmeigens::detail::product` thoroughly tested;
-    - `hmeigens::detail::applyLeftHouseholderInPlace` and `hmeigens::detail::applyRightHouseholderInPlace` thoroughly tested.
-
+    - `hmeigens::detail::applyLeftHouseholderInPlace` and `hmeigens::detail::applyRightHouseholderInPlace` thoroughly tested;
+    - `hmeigens::SquareMatrix::trace` thoroughly tested.
 
 ### Fixed
 - **The project now compiles with Clang.** Some cases of double braces were resolved by Clang as ambiguous. This was found out during the CI workflow jobs. All instances were fixed.
