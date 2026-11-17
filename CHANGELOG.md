@@ -40,7 +40,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::makeHouseholderInPlace` thoroughly tested;
     - `hmeigens::detail::product` thoroughly tested;
     - `hmeigens::detail::applyLeftHouseholderInPlace` and `hmeigens::detail::applyRightHouseholderInPlace` thoroughly tested;
-    - `hmeigens::SquareMatrix::trace` thoroughly tested.
+    - `hmeigens::SquareMatrix::trace` thoroughly tested;
+    - `hmeigens::SquareMatrix::norm`'s trace identity is now tested.
 
 ### Fixed
 - **The project now compiles with Clang.** Some cases of double braces were resolved by Clang as ambiguous. This was found out during the CI workflow jobs. All instances were fixed.

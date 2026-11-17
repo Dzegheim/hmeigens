@@ -898,7 +898,30 @@ TEST_CASE("Square matrix test: the Frobenius norm satisfies the trace identity."
     // GIVEN a matrix M and its adjoint M_h
     // WHEN  the equality norm(M) = sqrt(trace(M_h * M)) is tested for
     // THEN  it holds
-    SKIP("This test will be implemented soon.");
+    const hmeigens::SquareMatrix testMatrix{
+        {{HMS(-2.), HMS(3.)},  {HMS(.25), HMS(-.5)},  {HMS(4.), HMS(1.)},
+         {HMS(3.), HMS(-1.)},  {HMS(-.375), HMS(2.)}, {HMS(.5), HMS(.75)},
+         {HMS(-4.), HMS(-2.)}, {HMS(.875), HMS(1.)},  {HMS(2.), HMS(-.25)}}
+    };
+    const auto testMatrixAdj = testMatrix.adjoint();
+    const auto tr = (testMatrixAdj*testMatrix).trace();
+    checkRealULPs(
+        std::sqrt(tr.real()),
+        testMatrix.norm(),
+        // Tolerance here is:
+        // - normTolerance(3) ULPs for the norm;
+        // - 0 ULPs for the trace (performs correctly rounded operations on exactly representable quantities with exactly representable results);
+        // - 1 ULP for std::sqrt.
+        hmeigens::normTolerance(3)+1
+    );
+    // The identity would require the square root of the trace.
+    // The imaginary part is checked as is because the expected number is real.
+    checkRealULPs(
+        tr.imag(),
+        HMS(0.),
+        // 0 ULPs tolerance for the reasons above.
+        0
+    );
 }
 
 TEST_CASE("Square matrix test: the Frobenius norm is invariant under unitary similarity transformations.", "[square_matrix][SquareMatrix][norm]") {
@@ -1014,13 +1037,13 @@ TEST_CASE("Square matrix test: the adjoint operation gives the correct value and
         {HMS(0.), HMS(-.5)}, {HMS(1.23), HMS(-1.44)}, {HMS(0.), HMS(0.)}
     };
     // Perform the adjoint computation.
-    auto testMatrixConj = testMatrix.adjoint();
+    auto testMatrixAdj = testMatrix.adjoint();
     // Original matrix is untouched.
     checkAllElementsVersus(testMatrix, testBody, 0);
     // Adjoint is computed correctly.
     // Tolerance is 0 ULPs as no algebra is performed on the numbers.
     // (Changing a sign does not round the number.)
-    checkAllElementsVersus(testMatrixConj, testConj, 0);
+    checkAllElementsVersus(testMatrixAdj, testConj, 0);
 }
 
 /* --------------------------------------------------------------- */
