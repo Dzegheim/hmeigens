@@ -505,7 +505,6 @@ TEST_CASE("Left Householder application test: the application is correct.", "[ho
         {{HMS(1.), HMS(-1.)}, {HMS(2.), HMS(-.02)}, {HMS(3.), HMS(-.3)}, {HMS(-4.), HMS(.4)}, {HMS(-5.), HMS(5.)}, {HMS(-6.), HMS(.06)},
          {HMS(4.), HMS(-.4)}, {HMS(5.), HMS(-5.)}, {HMS(16.), HMS(-1.06)}, {HMS(14.), HMS(-1.4)}, {HMS(15.), HMS(-15.)}, {HMS(16.), HMS(-1.06)},
          {HMS(7.), HMS(-.07)}, {HMS(8.), HMS(-.8)}, {HMS(9.), HMS(-9.)}, {HMS(-.07), HMS(7.)}, {HMS(-.8), HMS(8.)}, {HMS(-9.), HMS(9.)},
-
          {HMS(9.), HMS(-.8)}, {HMS(7.), HMS(-6.)}, {HMS(25.), HMS(-4.06)}, {HMS(13.), HMS(-2.2)}, {HMS(11.), HMS(-11.)}, {HMS(10.), HMS(-0.06)},
          {HMS(44.), HMS(-.44)}, {HMS(45.), HMS(-45.)}, {HMS(46.), HMS(-1.46)}, {HMS(14.4), HMS(-1.44)}, {HMS(15.4), HMS(-15.4)}, {HMS(16.4), HMS(-1.064)},
          {HMS(24.), HMS(-3.4)}, {HMS(15.), HMS(-45.)}, {HMS(66.), HMS(-7.06)}, {HMS(14.8), HMS(-1.49)}, {HMS(15.1), HMS(-15.2)}, {HMS(16.3), HMS(-1.006)}
@@ -535,7 +534,6 @@ TEST_CASE("Right Householder application test: the application is correct.", "[h
         {{HMS(1.), HMS(-1.)}, {HMS(2.), HMS(-.02)}, {HMS(3.), HMS(-.3)}, {HMS(-4.), HMS(.4)}, {HMS(-5.), HMS(5.)}, {HMS(-6.), HMS(.06)},
          {HMS(4.), HMS(-.4)}, {HMS(5.), HMS(-5.)}, {HMS(16.), HMS(-1.06)}, {HMS(14.), HMS(-1.4)}, {HMS(15.), HMS(-15.)}, {HMS(16.), HMS(-1.06)},
          {HMS(7.), HMS(-.07)}, {HMS(8.), HMS(-.8)}, {HMS(9.), HMS(-9.)}, {HMS(-.07), HMS(7.)}, {HMS(-.8), HMS(8.)}, {HMS(-9.), HMS(9.)},
-
          {HMS(9.), HMS(-.8)}, {HMS(7.), HMS(-6.)}, {HMS(25.), HMS(-4.06)}, {HMS(13.), HMS(-2.2)}, {HMS(11.), HMS(-11.)}, {HMS(10.), HMS(-0.06)},
          {HMS(44.), HMS(-.44)}, {HMS(45.), HMS(-45.)}, {HMS(46.), HMS(-1.46)}, {HMS(14.4), HMS(-1.44)}, {HMS(15.4), HMS(-15.4)}, {HMS(16.4), HMS(-1.064)},
          {HMS(24.), HMS(-3.4)}, {HMS(15.), HMS(-45.)}, {HMS(66.), HMS(-7.06)}, {HMS(14.8), HMS(-1.49)}, {HMS(15.1), HMS(-15.2)}, {HMS(16.3), HMS(-1.006)}
