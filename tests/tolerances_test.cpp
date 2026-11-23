@@ -3,7 +3,8 @@
 // - test cases:
 //      - hmeigens::normTolerance;
 //      - hmeigens::toleranceTolerance;
-//      - hmeigens::normPreservationTolerance.
+//      - hmeigens::normPreservationTolerance;
+//      - hmeigens::eigenPreservationTolerance.
 #include "hmeigens/tolerances.hpp"
 #include "hmeigens/square_matrix.hpp"
 #include "hmeigens/constants.hpp"
@@ -79,6 +80,58 @@ TEST_CASE("Tolerances test: normPreservationTolerance gives the expected values.
         hmeigens::epsilon*(HMS(32.)*hmeigens::toleranceK+HMS(128.)*hypotULPs),
         // The tolerance is the one for hmeigens::getTolerance + 1 for the sum. The second part is exact.
         hmeigens::toleranceTolerance(2)+1
+    );
+}
+
+/* ------------------------------------------------ */
+/* ----- hmeigens::eigenPreservationTolerance ----- */
+/* ------------------------------------------------ */
+//
+TEST_CASE("Tolerances test: eigenPreservationTolerance gives the expected values.", "[tolerances][eigenPreservationTolerance]") {
+    // GIVEN a matrix
+    // WHEN  hmeigens::eigenPreservationTolerance is called
+    // THEN  it returns the expected value
+    //
+    // Null matrix. Exact value.
+    checkRealULPs(
+        hmeigens::eigenPreservationTolerance(
+            hmeigens::SquareMatrix{{HMS(0.), HMS(0.), HMS(0.), HMS(0.)}},
+            1000,
+            HMS(0.)
+        ),
+        HMS(0.),
+        0
+    );
+    // Single element.
+    const hmeigens::SquareMatrix testMatrix{
+        {HMS(8.), HMS(0.), HMS(0.), HMS(0.),
+         HMS(0.), HMS(0.), HMS(0.), HMS(0.),
+         HMS(0.), HMS(0.), HMS(0.), HMS(0.),
+         HMS(0.), HMS(0.), HMS(0.), HMS(0.)}
+    };
+    // The tolerance is the one for hmeigens::getTolerance + 1 for the sum and + 1 for std::pow.
+    const auto tolerance = hmeigens::toleranceTolerance(4)+2;
+    // Trivial power.
+    checkRealULPs(
+        hmeigens::eigenPreservationTolerance(
+            testMatrix,
+            1,
+            // Norm of testMatrix^0 = I.
+            HMS(2.)
+        ),
+        hmeigens::epsilon*(HMS(256.)*hmeigens::toleranceK+HMS(80.)),
+        tolerance
+    );
+    // Non-trivial power different from size.
+    checkRealULPs(
+        hmeigens::eigenPreservationTolerance(
+            testMatrix,
+            3,
+            // Norm of testMatrix^2.
+            HMS(64.)
+        ),
+        hmeigens::epsilon*(HMS(24576.)*hmeigens::toleranceK+HMS(15360.)),
+        tolerance
     );
 }
 

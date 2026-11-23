@@ -4,13 +4,15 @@
 //     - HMEIGENS_HYPOT_ULPS.
 // Declarations (hmeigens):
 //     - parseTolerance;
-//     - normTolerance(std::size_t);
-//     - toleranceTolerance(std::size_t, std::uint64_t);
-//     - normPreservationTolerance(const SquareMatrix&).
+//     - normTolerance(const std::size_t);
+//     - toleranceTolerance(const std::size_t, const std::uint64_t);
+//     - normPreservationTolerance(const SquareMatrix&);
+//     - eigenPreservationTolerance(const SquareMatrix&, const std::uint64_t, const Scalar).
 // Definitions (hmeigens):
-//     - normTolerance(std::size_t);
-//     - toleranceTolerance(std::size_t, std::uint64_t);
-//     - normPreservationTolerance(const SquareMatrix&).
+//     - normTolerance(const std::size_t);
+//     - toleranceTolerance(const std::size_t, const std::uint64_t);
+//     - normPreservationTolerance(const SquareMatrix&);
+//     - eigenPreservationTolerance(const SquareMatrix&, const std::uint64_t, const Scalar).
 #ifndef HMEIGENS_TOLERANCES_HPP
 #define HMEIGENS_TOLERANCES_HPP
 
@@ -21,6 +23,7 @@
 
 #include <cstddef>  // For std::size_t
 #include <cstdint>  // For std::uint64_t
+#include <cmath>    // For std::pow
 
 #ifndef HMEIGENS_HYPOT_ULPS
 /// @brief ULP multiplier for the norm tests. Default value is `2`. Can be set at configure time with `-DHMEIGENS_HYPOT_ULPS=<n>`.
@@ -96,7 +99,41 @@ namespace hmeigens {
     /// @param matrix The matrix to compute the tolerance for.
     /// @return The value \f(t_H\left(\mathbf{M}\right)\f) from the formula.
     /// @pre `matrix` must be finite as per `hmeigens::isFinite()`.
+    /// @sa hmeigens::getTolerance
+    /// @sa hmeigens::eigenPreservationTolerance
     [[nodiscard]] Scalar normPreservationTolerance(const SquareMatrix& matrix);
+
+    /// @brief Returns the tolerance for the eigenvalue preservation test of the upper Hessenberg reduction at a specific power.
+    ///
+    /// The tolerance for a matrix \f(\mathbf{M}\f) is the combination of two terms. The first is due to the transformation and is
+    /// \f[
+    /// t_{E_1}\left(\mathbf{M}\right) = t\left(\mathbf{M}\right)\cdot m\cdot\left\|\mathbf{M}^{m-1}\right\|\ ,
+    /// \f]
+    ///
+    /// where \f(t\left(\mathbf{M}\right)\f) is the tolerance as computed by `hmeigens::getTolerance()` for \f(\mathbf{M}\f), \f(m\f) is the power to which the matrix is raised, and \f(\left\|\cdot\right\|\f) is the Frobenius norm.
+    ///
+    /// The factors \f(m\cdot\left\|\mathbf{M}^{m-1}\right\|\f) are due to the fact that the upper Hessenberg matrix \f(\mathbf{M}_H\f) is not similar to \f(\mathbf{M}\f) itself, but to \f(\mathbf{M}+\mathbf{E}\f) (with \f(\left\|\mathbf{E}\right\|\leq t(\mathbf{M})\f), see `hmeigens::getTolerance()`). Thus \f(\left(\mathbf{M}+\mathbf{E}\right)^m\f) has \f(m\f) factors each containing \f(\mathbf{E}\f), and each error is multiplied by \f(m-1\f) other factors whose product has norm \f(\left\|\mathbf{M}^{m-1}\right\|\f) (up to negligible terms of order \f(t\left(\mathbf{M}\right)^2\f)).
+    ///
+    /// The second term is due to the matrix multiplications and the trace, and it is
+    /// \f[
+    /// t_{E_2}\left(\mathbf{M}\right) = 2\cdot m\cdot(n+1)\varepsilon\cdot\left\|\mathbf{M}\right\|^m\ ,
+    /// \f]
+    ///
+    /// where \f(\varepsilon\f) is `hmeigens::epsilon` and \f(n\f) is the size of \f(\mathbf{M}\f).
+    ///
+    /// The factor \f(2\f) is due to the power being computed twice, while \f(m\left(n+1\right)\f) is a good upper bound for the number of times each individual value is rounded. Each element has at most \f(n+1\f) roundings per matrix product, multiplied by \f(m-1\f) matrix products, and then \f(n-1\f) more for the trace computation. This gives \f(m(n+1)-2\f), and the \f(-2\f) can be dropped for simplicity. Terms of order \f(\varepsilon^2\f) are neglected.
+    ///
+    /// The norms of \f(\mathbf{M}\f) and \f(\mathbf{M}_H\f) can be used interchangeably in the code. See `hmeigens::normPreservationTolerance`.
+    /// @param matrix The matrix to compute the tolerance for.
+    /// @param power The power \f(m\f) the matrix is raised to.
+    /// @param matrixPowerNorm The norm of \f(\mathbf{M}^{m-1}\f).
+    /// @return The value \f(t_E\left(\mathbf{M}\right)=t_{E_1}\left(\mathbf{M}\right)+t_{E_2}\left(\mathbf{M}\right)\f) from the formulas.
+    /// @pre `matrix` must be finite as per `hmeigens::isFinite()`.
+    /// @pre `power >= 1`.
+    /// @pre `matrixPowerNorm` must be the norm of `matrix` raised to the `power-1`.
+    /// @sa hmeigens::getTolerance
+    /// @sa hmeigens::normPreservationTolerance
+    [[nodiscard]] Scalar eigenPreservationTolerance(const SquareMatrix& matrix, const std::uint64_t power, const Scalar matrixPowerNorm);
 
 }
 
@@ -125,6 +162,20 @@ inline hmeigens::Scalar hmeigens::normPreservationTolerance(const hmeigens::Squa
         )*
         hmeigens::epsilon*                         // \varepsilon;
         matrix.norm();                             // ||M||.
+}
+
+inline hmeigens::Scalar hmeigens::eigenPreservationTolerance(const hmeigens::SquareMatrix& matrix, const std::uint64_t power, const hmeigens::Scalar matrixPowerNorm) {
+    const auto powerScalar = static_cast<hmeigens::Scalar>(power);
+    return // For each element of the formula:
+        hmeigens::getTolerance(matrix)*        // t(M);
+        powerScalar*                           // m;
+        matrixPowerNorm+                       // ||M^(m-1)||;
+        HMEIGENS_MAKE_SCALAR(2.)*
+        hmeigens::epsilon*                     // \varepsilon;
+        static_cast<hmeigens::Scalar>(
+            power*(matrix.size()+1)              // m*(n+1);
+        )*
+        std::pow(matrix.norm(), powerScalar);  // ||M||^m.
 }
 
 #endif
