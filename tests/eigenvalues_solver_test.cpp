@@ -13,6 +13,7 @@
 
 #include <cstddef>       // For std::size_t
 #include <cstdint>       // For std::uint64_t
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -40,6 +41,21 @@ static void checkMatrixULPs(const hmeigens::SquareMatrix& toCheck, const hmeigen
         }
     }
     return;
+}
+
+// This helper produces an std::vector holding every matrix power of its input from 0 (identity matrix) to size.
+// The original matrix is copied in position 1 as it would be copied in the test case anyway.
+static std::vector<hmeigens::SquareMatrix> matrixPowers(const hmeigens::SquareMatrix& matrix) {
+    std::vector<hmeigens::SquareMatrix> powers;
+    powers.reserve(matrix.size()+1);
+    powers.push_back(hmeigens::SquareMatrix::identity(matrix.size()));
+    powers.push_back(matrix);
+    auto matrixPower = matrix;
+    for (std::size_t i = 0; i < matrix.size()-1; ++i) {
+        matrixPower = matrixPower*matrix;
+        powers.push_back(matrixPower);
+    }
+    return powers;
 }
 
 /* --------------------------------------------- */
@@ -178,7 +194,55 @@ TEST_CASE("Eigenvalues solver test: the in-place upper Hessenberg transformation
 }
 
 TEST_CASE("Eigenvalues solver test: the in-place upper Hessenberg transformation preserves the eigenvalues.", "[eigenvalues_solver][makeUpperHessenbergInPlace]") {
-    SKIP("This case will be implemented soon.");
+    // GIVEN a matrix A
+    // WHEN  hmeigens::makeUpperHessenbergInPlace acts on it and transforms it into A_H
+    // THEN  the identity Tr(A^m) = Tr(A_H^m) holds for all m values from 1 to A.size()
+    //
+    // Smallest meaningful size.
+    hmeigens::SquareMatrix testMatrix{
+        {{HMS(-2.), HMS(3.)},  {HMS(.25), HMS(-.5)},  {HMS(4.), HMS(1.)},
+         {HMS(3.), HMS(-1.)},  {HMS(-.375), HMS(2.)}, {HMS(.5), HMS(.75)},
+         {HMS(-4.), HMS(-2.)}, {HMS(.875), HMS(1.)},  {HMS(2.), HMS(-.25)}}
+    };
+    const auto powers = matrixPowers(testMatrix);
+    hmeigens::makeUpperHessenbergInPlace(testMatrix);
+    const auto powersHessenberg = matrixPowers(testMatrix);
+    for (std::size_t m = 1; m <= testMatrix.size(); ++m) {
+        CAPTURE(m);
+        checkComplexAbs(
+            powersHessenberg[m].trace(),
+            powers[m].trace(),
+            hmeigens::eigenPreservationTolerance(
+                powers[1],
+                m,
+                powers[m-1].norm()
+            )
+        );
+    }
+    // Larger size.
+    hmeigens::SquareMatrix testMatrixLarge{
+        {{HMS(1.), HMS(-1.)}, {HMS(2.), HMS(-.02)}, {HMS(3.), HMS(-.3)}, {HMS(-4.), HMS(.4)}, {HMS(-5.), HMS(5.)}, {HMS(-6.), HMS(.06)},
+         {HMS(4.), HMS(-.4)}, {HMS(5.), HMS(-5.)}, {HMS(16.), HMS(-1.06)}, {HMS(14.), HMS(-1.4)}, {HMS(15.), HMS(-15.)}, {HMS(16.), HMS(-1.06)},
+         {HMS(7.), HMS(-.07)}, {HMS(8.), HMS(-.8)}, {HMS(9.), HMS(-9.)}, {HMS(-.07), HMS(7.)}, {HMS(-.8), HMS(8.)}, {HMS(-9.), HMS(9.)},
+         {HMS(9.), HMS(-.8)}, {HMS(7.), HMS(-6.)}, {HMS(25.), HMS(-4.06)}, {HMS(13.), HMS(-2.2)}, {HMS(11.), HMS(-11.)}, {HMS(10.), HMS(-0.06)},
+         {HMS(44.), HMS(-.44)}, {HMS(45.), HMS(-45.)}, {HMS(46.), HMS(-1.46)}, {HMS(14.4), HMS(-1.44)}, {HMS(15.4), HMS(-15.4)}, {HMS(16.4), HMS(-1.064)},
+         {HMS(24.), HMS(-3.4)}, {HMS(15.), HMS(-45.)}, {HMS(66.), HMS(-7.06)}, {HMS(14.8), HMS(-1.49)}, {HMS(15.1), HMS(-15.2)}, {HMS(16.3), HMS(-1.006)}}
+    };
+    const auto powersLarge = matrixPowers(testMatrixLarge);
+    hmeigens::makeUpperHessenbergInPlace(testMatrixLarge);
+    const auto powersHessenbergLarge = matrixPowers(testMatrixLarge);
+    for (std::size_t m = 1; m <= testMatrixLarge.size(); ++m) {
+        CAPTURE(m);
+        checkComplexAbs(
+            powersHessenbergLarge[m].trace(),
+            powersLarge[m].trace(),
+            hmeigens::eigenPreservationTolerance(
+                powersLarge[1],
+                m,
+                powersLarge[m-1].norm()
+            )
+        );
+    }
 }
 
 /* --------------------------------------------- */

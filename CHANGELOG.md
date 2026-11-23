@@ -23,11 +23,13 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::applyLeftHouseholderInPlace`, which uses a Householder vector to apply the reflector from the left to the input matrix without actually building it, by editing the elements in the columns after the given one (yes, it's complicated, read the documentation);
     - `hmeigens::detail::applyRightHouseholderInPlace`, which is the same as the one above but from the right.
 - **A new file pair `eigenvalues_solver.hpp`/`.cpp`.** It is meant to host the functions of the main solver. It contains:
-    - `hmeigens::makeUpperHessenbergInPlace`, which transforms a matrix into a similar matrix in upper Hessenberg form (untested as of now);
+    - `hmeigens::makeUpperHessenbergInPlace`, which transforms a matrix into a similar matrix in upper Hessenberg form;
     - `hmeigens::makeUpperHessenberg`, same as above, but does not alter the input.
 - **A new `hmeigens::SquareMatrix::trace()` function.** It computes the trace.
 - **The codebase now enforces the IEC 559 standard at compile time.** This is likely unnecessary, but better safe than sorry.
-- **New `hmeigens::toleranceTolerance` helper in `tolerances.hpp`.**
+- **New helpers in `tolerances.hpp`.** Specifically:
+    - `hmeigens::toleranceTolerance`, used to test `hmeigens::getTolerance`;
+    - `hmeigens::normPreservationTolerance` and `hmeigens::eigenPreservationTolerance`, used to test `hmeigens::makeUpperHessenbergInPlace`;
 - **New pair of constants `HMEIGENS_TOLERANCE_K` and `hmeigens::toleranceK`.** The first is a temporary value that needs to be computed in benchmarking when the codebase is done, and will later be a configurable value via CMake. The second is just a cast of the other to `hmeigens::Scalar`. See documentation for details on what they represent.
 - **New tests.** Specifically:
     - `hmeigens::isFinite` thoroughly tested;
@@ -42,6 +44,8 @@ Version 0.2.0 is recorded from git history.
     - `hmeigens::detail::applyLeftHouseholderInPlace` and `hmeigens::detail::applyRightHouseholderInPlace` thoroughly tested;
     - `hmeigens::SquareMatrix::trace` thoroughly tested;
     - `hmeigens::SquareMatrix::norm`'s trace identity is now tested;
+    - `hmeigens::normPreservationTolerance` and `hmeigens::eigenPreservationTolerance` thoroughly tested;
+    - `hmeigens::makeUpperHessenbergInPlace` thoroughly tested;
     - `hmeigens::makeUpperHessenberg`'s behaviour with respect to `hmeigens::makeUpperHessenbergInPlace` is correct.
 
 ### Fixed
